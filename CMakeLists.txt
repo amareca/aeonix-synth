@@ -12,6 +12,12 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 option(AEONIX_BUILD_TESTS "Compila y registra los unit tests del nucleo" ON)
 option(AEONIX_DEV_TOOLS "Compila las herramientas de desarrollo (F11/F12, snapshots y badge DEV)" OFF)
 
+# Runtime estatico de MSVC (/MT): el binario no depende del redistribuible
+# Visual C++. Debe fijarse antes de crear cualquier target, JUCE incluido.
+if(MSVC)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+
 # ==============================================================================
 #  NUCLEO PURO (dominio) — C++ sin JUCE, sin I/O, sin GUI.
 # ==============================================================================
@@ -57,7 +63,9 @@ endif()
 juce_add_gui_app(Aeonix
     PRODUCT_NAME "${AEONIX_PRODUCT_NAME}"
     COMPANY_NAME "Aeonix"
+    COMPANY_COPYRIGHT "Copyright (C) 2026 AEONIX contributors"
     VERSION     "0.1.0"
+    ICON_BIG    "${CMAKE_CURRENT_SOURCE_DIR}/assets/icon.png"
     NEEDS_WEB_BROWSER FALSE
     NEEDS_CURL FALSE
 )

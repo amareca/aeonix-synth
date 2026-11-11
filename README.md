@@ -18,6 +18,20 @@ futuro plugin VST3.
 - Cuatro temas visuales: Holo Accents, Holo Glass, Holo Minimal y Prototipo.
 - Interfaz en español e inglés, con tres tamaños de texto.
 
+## Descargar
+
+La versión para Windows se publica en
+[GitHub Releases](https://github.com/amareca/aeonix-synth/releases).
+
+- Requisitos: **Windows 10/11 de 64 bits**. El ejecutable enlaza el runtime de
+  C++ de forma estática, así que no hace falta instalar Visual C++.
+- Descarga `AEONIX-0.1.0-win64.zip`, descomprímelo y ejecuta `AEONIX.exe`.
+- El ejecutable **no está firmado**: SmartScreen puede avisar la primera vez.
+  Comprueba el SHA256 publicado en la release y usa
+  "Más información → Ejecutar de todas formas".
+- Los datos de usuario viven en `%APPDATA%\Aeonix` y
+  `Documentos\Aeonix\Presets`.
+
 ## Compilar (Windows)
 
 Requisitos: Visual Studio 2022 Build Tools (workload C++), CMake 3.24+.
