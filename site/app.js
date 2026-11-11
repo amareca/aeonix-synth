@@ -35,7 +35,7 @@
       'hero.cta.gallery': 'Ver capturas',
       'hero.note': 'Gratis y open source · Windows 10 y 11 · x64 · 3,5 MB',
       'hero.window': 'Vista principal',
-      'hero.caption': 'Superficie principal con texto Muy grande (1320 × 790). Captura de AEONIX 0.1.0, build PRO.',
+      'hero.caption': 'Superficie principal con texto Muy grande (1316 × 786). Captura de AEONIX 0.1.0, build PRO.',
       'hero.alt': 'Interfaz de AEONIX: barra de preset, secciones de síntesis, teclado virtual y controles de efectos.',
 
       'stats.label': 'Datos del producto',
@@ -75,11 +75,11 @@
       'gallery.lead': 'Capturas reales de AEONIX 0.1.0 en Windows. Pulsa una imagen para ampliarla.',
       'gallery.note': 'Todas las capturas son de la build PRO, sin herramientas de desarrollo.',
       'shot.1.title': 'Superficie principal',
-      'shot.1.meta': 'Texto Normal · 1180 × 752',
+      'shot.1.meta': 'Texto Normal · 1176 × 748',
       'shot.1.alt': 'Superficie principal de AEONIX con texto Normal.',
       'shot.1.open': 'Ampliar captura: superficie principal',
       'shot.2.title': 'Texto Grande',
-      'shot.2.meta': '1220 × 770',
+      'shot.2.meta': '1216 × 766',
       'shot.2.alt': 'Superficie de AEONIX con texto Grande.',
       'shot.2.open': 'Ampliar captura: texto Grande',
       'shot.3.title': 'Gestor de presets',
@@ -87,7 +87,7 @@
       'shot.3.alt': 'Gestor de presets de AEONIX con búsqueda, filtros y favoritos.',
       'shot.3.open': 'Ampliar captura: gestor de presets',
       'shot.4.title': 'Búsqueda en la biblioteca',
-      'shot.4.meta': 'Filtro «lead» · 1180 × 752',
+      'shot.4.meta': 'Filtro «lead» · 1176 × 748',
       'shot.4.alt': 'Gestor de presets de AEONIX filtrado por la búsqueda lead.',
       'shot.4.open': 'Ampliar captura: búsqueda en la biblioteca',
       'shot.5.title': 'Ajustes de apariencia',
@@ -104,7 +104,7 @@
       'themes.title': 'Cuatro acabados, la misma lógica',
       'themes.lead': 'El tema no cambia el layout: cambia la luz. Elige uno para ver la captura.',
       'themes.choose': 'Elige un tema',
-      'themes.previewMeta': '1180 × 752 · build PRO',
+      'themes.previewMeta': '1176 × 748 · build PRO',
       'theme.accents.desc': 'Títulos y líneas con degradado holográfico. El acabado de referencia.',
       'theme.glass.desc': 'Paneles translúcidos, campo de estrellas y brillo violeta en el teclado.',
       'theme.minimal.desc': 'Sin degradados ni translucidez: contraste sobrio y bordes discretos.',
@@ -226,7 +226,7 @@
       'hero.cta.gallery': 'View screenshots',
       'hero.note': 'Free and open source · Windows 10 and 11 · x64 · 3.5 MB',
       'hero.window': 'Main view',
-      'hero.caption': 'Main surface with extra-large text (1320 × 790). Screenshot of AEONIX 0.1.0, PRO build.',
+      'hero.caption': 'Main surface with extra-large text (1316 × 786). Screenshot of AEONIX 0.1.0, PRO build.',
       'hero.alt': 'AEONIX interface: preset bar, synthesis sections, virtual keyboard and effects controls.',
 
       'stats.label': 'Product facts',
@@ -266,11 +266,11 @@
       'gallery.lead': 'Real screenshots of AEONIX 0.1.0 on Windows. Click an image to enlarge it.',
       'gallery.note': 'All screenshots come from the PRO build, without developer tools.',
       'shot.1.title': 'Main surface',
-      'shot.1.meta': 'Normal text · 1180 × 752',
+      'shot.1.meta': 'Normal text · 1176 × 748',
       'shot.1.alt': 'AEONIX main surface with normal text.',
       'shot.1.open': 'Enlarge screenshot: main surface',
       'shot.2.title': 'Large text',
-      'shot.2.meta': '1220 × 770',
+      'shot.2.meta': '1216 × 766',
       'shot.2.alt': 'AEONIX surface with large text.',
       'shot.2.open': 'Enlarge screenshot: large text',
       'shot.3.title': 'Preset manager',
@@ -278,7 +278,7 @@
       'shot.3.alt': 'AEONIX preset manager with search, filters and favorites.',
       'shot.3.open': 'Enlarge screenshot: preset manager',
       'shot.4.title': 'Library search',
-      'shot.4.meta': '“lead” filter · 1180 × 752',
+      'shot.4.meta': '“lead” filter · 1176 × 748',
       'shot.4.alt': 'AEONIX preset manager filtered by the search term lead.',
       'shot.4.open': 'Enlarge screenshot: library search',
       'shot.5.title': 'Appearance settings',
@@ -295,7 +295,7 @@
       'themes.title': 'Four finishes, same logic',
       'themes.lead': "The theme doesn't change the layout, only the light. Pick one to preview.",
       'themes.choose': 'Choose a theme',
-      'themes.previewMeta': '1180 × 752 · PRO build',
+      'themes.previewMeta': '1176 × 748 · PRO build',
       'theme.accents.desc': 'Holographic gradient titles and lines. The reference finish.',
       'theme.glass.desc': 'Translucent panels, a starfield and a violet glow on the keyboard.',
       'theme.minimal.desc': 'No gradients or translucency: sober contrast and discreet borders.',
@@ -395,27 +395,27 @@
     accents: {
       name: 'Holo Accents',
       src: 'assets/captures/theme-accents.png',
-      width: 1180,
-      height: 752
+      width: 1176,
+      height: 748
     },
     glass: {
       name: 'Holo Glass',
       src: 'assets/captures/theme-glass.png',
-      width: 1180,
-      height: 752
+      width: 1176,
+      height: 748
     },
     minimal: {
       name: 'Holo Minimal',
       src: 'assets/captures/theme-minimal.png',
-      width: 1180,
-      height: 752
+      width: 1176,
+      height: 748
     },
     prototype: {
       name: 'Prototipo',
       nameEn: 'Prototype',
       src: 'assets/captures/theme-prototype.png',
-      width: 1180,
-      height: 752
+      width: 1176,
+      height: 748
     }
   };
 
