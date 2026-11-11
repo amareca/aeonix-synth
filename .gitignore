@@ -1,0 +1,14 @@
+# Build de CMake
+build/
+build-pro/
+out/
+
+# VSCode / Visual Studio
+.vs/
+.vscode/
+CMakeUserPresets.json
+*.user
+
+# Sistema
+Thumbs.db
+.DS_Store

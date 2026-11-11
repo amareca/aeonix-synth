@@ -1,0 +1,49 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "dev",
+      "displayName": "AEONIX DEV (Visual Studio 2022 x64)",
+      "description": "Build de desarrollo con Snapshot/Layout/F11/F12 y datos en AeonixDev",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "AEONIX_DEV_TOOLS": "ON"
+      }
+    },
+    {
+      "name": "pro",
+      "displayName": "AEONIX PRO (Visual Studio 2022 x64)",
+      "description": "Producto final sin herramientas de desarrollo y datos en Aeonix",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build-pro",
+      "cacheVariables": {
+        "AEONIX_DEV_TOOLS": "OFF"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "release",
+      "configurePreset": "dev",
+      "configuration": "Release"
+    },
+    {
+      "name": "debug",
+      "configurePreset": "dev",
+      "configuration": "Debug"
+    },
+    {
+      "name": "pro-release",
+      "configurePreset": "pro",
+      "configuration": "Release"
+    },
+    {
+      "name": "pro-debug",
+      "configurePreset": "pro",
+      "configuration": "Debug"
+    }
+  ]
+}
