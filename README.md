@@ -23,6 +23,8 @@ futuro plugin VST3.
 La versión para Windows se publica en
 [GitHub Releases](https://github.com/amareca/aeonix-synth/releases).
 
+Web del proyecto: <https://amareca.github.io/aeonix-synth/>
+
 - Requisitos: **Windows 10/11 de 64 bits**. El ejecutable enlaza el runtime de
   C++ de forma estática, así que no hace falta instalar Visual C++.
 - Descarga `AEONIX-0.1.0-win64.zip`, descomprímelo y ejecuta `AEONIX.exe`.

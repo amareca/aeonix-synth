@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://amareca.github.io/aeonix-synth/sitemap.xml
