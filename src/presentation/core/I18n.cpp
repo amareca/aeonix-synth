@@ -1,7 +1,6 @@
 #include "I18n.h"
 
 #include <iterator>
-#include <memory>
 
 #include "presentation/core/Utf8.h"
 
@@ -100,20 +99,13 @@ Language getLanguage()
 
 void installJuceLocalisation (Language language)
 {
-    static std::unique_ptr<juce::LocalisedStrings> spanish;
-
+    // setCurrentMappings toma la propiedad del puntero y libera la traduccion
+    // anterior. No guardes el objeto en otro propietario: seria doble liberacion.
     if (language == Language::spanish)
-    {
-        if (spanish == nullptr)
-            spanish = std::make_unique<juce::LocalisedStrings> (
-                juce::String (juce::CharPointer_UTF8 (juceSpanishDictionary)), false);
-
-        juce::LocalisedStrings::setCurrentMappings (spanish.get());
-    }
+        juce::LocalisedStrings::setCurrentMappings (
+            new juce::LocalisedStrings (juce::String (juce::CharPointer_UTF8 (juceSpanishDictionary)), false));
     else
-    {
         juce::LocalisedStrings::setCurrentMappings (nullptr);
-    }
 }
 
 } // namespace aeonix
