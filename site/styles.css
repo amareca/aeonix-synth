@@ -221,6 +221,16 @@ button {
   font-weight: 600;
   letter-spacing: 0.2em;
   line-height: 1;
+  color: var(--text);
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) {
+  .brand__name {
+    background: linear-gradient(90deg, #4ecdc4 0%, #5aa9e6 30%, #a78bfa 62%, #e6c15a 85%, #e6c15a 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
 }
 
 .nav {
