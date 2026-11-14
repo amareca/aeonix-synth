@@ -365,10 +365,62 @@ void PresetManagerOverlay::SortButton::paintButton (
 }
 
 // ============================================================================
+//  Scrollbar de la lista
+// ============================================================================
+
+void PresetManagerOverlay::ListScrollBarLookAndFeel::setTheme (ThemeId theme)
+{
+    theme_ = theme;
+}
+
+void PresetManagerOverlay::ListScrollBarLookAndFeel::drawScrollbar (
+    juce::Graphics& g,
+    juce::ScrollBar& bar,
+    int x, int y, int width, int height,
+    bool isScrollbarVertical,
+    int thumbStartPosition,
+    int thumbSize,
+    bool isMouseOver,
+    bool isMouseDown)
+{
+    if (! isScrollbarVertical)
+    {
+        juce::LookAndFeel_V4::drawScrollbar (g, bar, x, y, width, height,
+                                             isScrollbarVertical, thumbStartPosition,
+                                             thumbSize, isMouseOver, isMouseDown);
+        return;
+    }
+
+    const auto colours = themeColours (theme_);
+    const auto thickness = juce::jmin (ui::px (3), width);
+
+    if (thickness <= 0 || thumbSize <= 0)
+        return;
+
+    const auto thumb = juce::Rectangle<int> (x + (width - thickness) / 2,
+                                             thumbStartPosition,
+                                             thickness,
+                                             thumbSize);
+
+    auto alpha = 0.55f;
+
+    if (isMouseDown)
+        alpha = 0.95f;
+    else if (isMouseOver)
+        alpha = 0.80f;
+
+    g.setColour (colours.muted.withAlpha (alpha));
+    g.fillRoundedRectangle (thumb.toFloat(), static_cast<float> (thickness) * 0.5f);
+}
+
+// ============================================================================
 //  Construccion
 // ============================================================================
 
-PresetManagerOverlay::~PresetManagerOverlay() = default;
+PresetManagerOverlay::~PresetManagerOverlay()
+{
+    listBox_.getVerticalScrollBar().setLookAndFeel (nullptr);
+}
 
 PresetManagerOverlay::PresetManagerOverlay()
 {
@@ -452,6 +504,11 @@ PresetManagerOverlay::PresetManagerOverlay()
     listBox_.setColour (juce::ListBox::outlineColourId, juce::Colours::transparentBlack);
     listBox_.setName ("PresetManagerList");
     listBox_.setTitle (tr (TextId::presetManagerListAccessible));
+
+    if (auto* viewport = listBox_.getViewport())
+        viewport->setScrollBarThickness (ui::px (9));
+
+    listBox_.getVerticalScrollBar().setLookAndFeel (&listScrollLookAndFeel_);
     addAndMakeVisible (listBox_);
 
     detailName_.setFont (ui::font (15.0f, juce::Font::bold));
@@ -2245,6 +2302,7 @@ void PresetManagerOverlay::applyThemeToChildren()
     searchEditor_.setColour (juce::TextEditor::highlightColourId, colours.accent.withAlpha (0.35f));
 
     listBox_.setColour (juce::ListBox::textColourId, colours.text);
+    listScrollLookAndFeel_.setTheme (theme_);
 
     formShield_.setTheme (theme_);
     formTitle_.setColour (juce::Label::textColourId, colours.text);

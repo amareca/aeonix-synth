@@ -161,6 +161,25 @@ private:
         bool open_ = false;
     };
 
+    // Scrollbar de la lista: solo cambia la tinta del thumb. El canal, el area
+    // de clic y el resto de scrollbars de la app se quedan como estan.
+    class ListScrollBarLookAndFeel final : public juce::LookAndFeel_V4
+    {
+    public:
+        void setTheme (ThemeId theme);
+        void drawScrollbar (juce::Graphics& g,
+                            juce::ScrollBar& bar,
+                            int x, int y, int width, int height,
+                            bool isScrollbarVertical,
+                            int thumbStartPosition,
+                            int thumbSize,
+                            bool isMouseOver,
+                            bool isMouseDown) override;
+
+    private:
+        ThemeId theme_ = ThemeId::holoAccents;
+    };
+
     // Capa modal de los formularios: atenua el panel y dibuja la tarjeta.
     class FormShield final : public juce::Component
     {
@@ -218,6 +237,7 @@ private:
     juce::Label titleLabel_;
     juce::TextEditor searchEditor_;
     IconButton closeButton_ { IconType::close, tr (TextId::presetManagerClose) };
+    ListScrollBarLookAndFeel listScrollLookAndFeel_;
     juce::ListBox listBox_ { "Presets", nullptr };
     std::unique_ptr<ListModel> model_;
     juce::Label countLabel_;
