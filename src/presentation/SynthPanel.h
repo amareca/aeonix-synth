@@ -49,6 +49,9 @@ public:
     // Se dispara al cargar un preset (para persistir el ultimo preset).
     std::function<void (const juce::String&)> onPresetLoaded;
 
+    // Audicion desde el gestor: carga sin marcar Recientes ni el ultimo preset.
+    std::function<void (const juce::String&)> onPresetPreviewed;
+
     // Abre la carpeta de presets de usuario en el explorador.
     std::function<void()> onOpenPresetsFolder;
     std::function<void()> onRequestSaveCopy;
@@ -80,7 +83,8 @@ public:
     void selectPresetByName (const juce::String& name, bool countAsRecent = true);
 
     // Carga pedida por el gestor de presets; respeta la guardia de cambios.
-    void requestLoadPreset (const juce::String& name);
+    // countAsRecent=false es una audicion: no marca Recientes.
+    void requestLoadPreset (const juce::String& name, bool countAsRecent = true);
 
     // Catalogo actual, para el gestor de presets.
     [[nodiscard]] const std::vector<PresetEntry>& presetEntries() const noexcept

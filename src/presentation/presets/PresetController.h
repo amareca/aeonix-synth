@@ -27,6 +27,7 @@ public:
                       PatchBinder& binder,
                       juce::Component& dialogParent,
                       std::function<void (const juce::String&)> onPresetLoaded,
+                      std::function<void (const juce::String&)> onPresetPreviewed,
                       std::function<bool()> isDirty,
                       std::function<void (const juce::String&)> notify);
     ~PresetController();
@@ -40,8 +41,9 @@ public:
     // Selecciona y carga un preset por nombre (al restaurar la config).
     void selectByName (const juce::String& name, bool countAsRecent = true);
 
-    // Carga pedida por el gestor: respeta la guardia de cambios.
-    void requestLoadByName (const juce::String& name);
+    // Carga pedida por el gestor. Con countAsRecent=false es una audicion:
+    // no marca Recientes ni guarda el ultimo preset.
+    void requestLoadByName (const juce::String& name, bool countAsRecent = true);
 
     // Acciones del gestor de presets (sin formularios propios).
     bool saveCurrentPreset();
@@ -76,6 +78,7 @@ private:
     PatchBinder& binder_;
     juce::Component& dialogParent_;
     std::function<void (const juce::String&)> onPresetLoaded_;
+    std::function<void (const juce::String&)> onPresetPreviewed_;
     std::function<bool()> isDirty_;
     std::function<void (const juce::String&)> notify_;
     juce::String loadedName_;

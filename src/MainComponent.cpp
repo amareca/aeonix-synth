@@ -96,7 +96,16 @@ MainComponent::MainComponent()
     presetManagerOverlay_ = std::make_unique<aeonix::PresetManagerOverlay>();
     presetManagerOverlay_->onLoad = [this] (const juce::String& name)
     {
-        synthPanel.requestLoadPreset (name);
+        synthPanel.requestLoadPreset (name, true);
+    };
+    presetManagerOverlay_->onAudition = [this] (const juce::String& name)
+    {
+        synthPanel.requestLoadPreset (name, false);
+    };
+    presetManagerOverlay_->onAuditionChanged = [this] (bool enabled)
+    {
+        config_.setInt ("presets.audition", enabled ? 1 : 0);
+        config_.save();
     };
     presetManagerOverlay_->onOpenFolder = [this] { openPresetsFolder(); };
     presetManagerOverlay_->onFavorite = [this] (const juce::String& name, bool favorite)
@@ -139,7 +148,18 @@ MainComponent::MainComponent()
 
         return deleted;
     };
-    presetManagerOverlay_->onClosed = [this] { grabKeyboardFocus(); };
+    presetManagerOverlay_->onClosed = [this]
+    {
+        const auto name = synthPanel.currentPresetName();
+
+        if (name.isNotEmpty())
+        {
+            config_.setString ("preset.last", name);
+            config_.save();
+        }
+
+        grabKeyboardFocus();
+    };
     addChildComponent (*presetManagerOverlay_);
 
     addChildComponent (toast_);             // invisible hasta que se muestre un aviso
@@ -218,11 +238,24 @@ MainComponent::MainComponent()
         synthPanel.setPresetModified (false);
         config_.setString ("preset.last", name);
         config_.save();
+
+        if (presetManagerOverlay_ != nullptr)
+            presetManagerOverlay_->notifyPresetLoaded (name);
+    };
+    synthPanel.onPresetPreviewed = [this] (const juce::String& name)
+    {
+        presetLoaded_ = true;
+        synthPanel.setPresetModified (false);
+
+        if (presetManagerOverlay_ != nullptr)
+            presetManagerOverlay_->setCurrentPreset (name, false);
     };
     synthPanel.onOpenPresetsFolder = [this] { openPresetManager(); };
     synthPanel.onRequestSaveCopy = [this]
     {
-        openPresetManager();
+        if (presetManagerOverlay_ != nullptr && ! presetManagerOverlay_->isOpen())
+            openPresetManager();
+
         presetManagerOverlay_->beginCopyForm();
     };
     synthPanel.onPresetToast = [this] (const juce::String& message)
@@ -932,6 +965,7 @@ void MainComponent::openPresetManager()
 {
     presetManagerOverlay_->setBounds (getLocalBounds());
     presetManagerOverlay_->setTheme (theme_);
+    presetManagerOverlay_->setAudition (config_.getInt ("presets.audition", 0) != 0);
     presetManagerOverlay_->show (synthPanel.presetEntries(),
                                  synthPanel.currentPresetName(),
                                  synthPanel.isPresetModified());

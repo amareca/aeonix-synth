@@ -221,6 +221,60 @@ private:
 };
 
 // ============================================================================
+//  Toggle de audicion
+// ============================================================================
+
+void PresetManagerOverlay::AuditionButton::setTheme (ThemeId theme)
+{
+    if (theme_ != theme)
+    {
+        theme_ = theme;
+        repaint();
+    }
+}
+
+void PresetManagerOverlay::AuditionButton::paintButton (
+    juce::Graphics& g,
+    bool shouldDrawButtonAsHighlighted,
+    bool shouldDrawButtonAsDown)
+{
+    const auto colours = themeColours (theme_);
+    const auto bounds = getLocalBounds().toFloat().reduced (0.5f);
+    const bool on = getToggleState();
+    const bool enabled = isEnabled();
+
+    auto fill = on ? colours.accent.withAlpha (0.14f) : colours.panel;
+    auto border = on ? colours.accent.withAlpha (0.55f)
+                     : colours.muted.withAlpha (0.55f);
+    auto text = on ? colours.accent : colours.muted;
+
+    if (! enabled)
+    {
+        fill = fill.withMultipliedAlpha (0.45f);
+        border = border.withMultipliedAlpha (0.45f);
+        text = text.withMultipliedAlpha (0.45f);
+    }
+    else if (shouldDrawButtonAsDown)
+    {
+        fill = fill.brighter (0.08f);
+    }
+    else if (shouldDrawButtonAsHighlighted)
+    {
+        fill = fill.brighter (0.04f);
+    }
+
+    g.setColour (fill);
+    g.fillRoundedRectangle (bounds, 4.0f);
+    g.setColour (border);
+    g.drawRoundedRectangle (bounds, 4.0f, 1.0f);
+    g.setColour (text);
+    g.setFont (ui::font (11.0f));
+    g.drawFittedText (getButtonText(),
+                      getLocalBounds().reduced (ui::px (8), 0),
+                      juce::Justification::centred, 1);
+}
+
+// ============================================================================
 //  Construccion
 // ============================================================================
 
@@ -331,9 +385,23 @@ PresetManagerOverlay::PresetManagerOverlay()
     loadButton_.setEnabled (false);
     addAndMakeVisible (loadButton_);
 
-    openFolderButton_.setButtonText (tr (TextId::presetManagerOpenFolder));
-    openFolderButton_.setTooltip (tr (TextId::presetManagerOpenFolderTooltip));
+    auditionButton_.setButtonText (tr (TextId::presetManagerAudition));
+    auditionButton_.setTooltip (tr (TextId::presetManagerAuditionTooltip));
+    auditionButton_.setTitle (tr (TextId::presetManagerAudition));
+    auditionButton_.setName ("PresetAudition");
+    auditionButton_.setClickingTogglesState (true);
+    auditionButton_.onClick = [this]
+    {
+        updateAuditionButton();
+
+        if (onAuditionChanged)
+            onAuditionChanged (auditionButton_.getToggleState());
+    };
+    addAndMakeVisible (auditionButton_);
+
     openFolderButton_.setName ("OpenPresetsFolder");
+    openFolderButton_.setTitle (tr (TextId::presetManagerOpenFolder));
+    openFolderButton_.setWantsKeyboardFocus (true);
     openFolderButton_.onClick = [this] { if (onOpenFolder) onOpenFolder(); };
     addAndMakeVisible (openFolderButton_);
 
@@ -431,6 +499,7 @@ void PresetManagerOverlay::show (const std::vector<PresetEntry>& entries,
     currentName_ = currentName;
     selectedName_ = currentName;
     modified_ = modified;
+    pendingClose_ = false;
     filter_ = Filter::all;
     category_ = PresetCategory::other;
 
@@ -457,6 +526,7 @@ void PresetManagerOverlay::refreshEntries (const std::vector<PresetEntry>& entri
     entries_ = entries;
     currentName_ = currentName;
     modified_ = modified;
+    pendingClose_ = false;
 
     if (findEntry (currentName_) != nullptr)
         selectedName_ = currentName_;
@@ -472,10 +542,45 @@ void PresetManagerOverlay::hide()
     if (! isVisible())
         return;
 
+    pendingClose_ = false;
     setVisible (false);
 
     if (onClosed)
         onClosed();
+}
+
+void PresetManagerOverlay::setAudition (bool enabled)
+{
+    auditionButton_.setToggleState (enabled, juce::dontSendNotification);
+    updateAuditionButton();
+}
+
+bool PresetManagerOverlay::isAuditionEnabled() const
+{
+    return auditionButton_.getToggleState();
+}
+
+void PresetManagerOverlay::setCurrentPreset (const juce::String& name, bool modified)
+{
+    currentName_ = name;
+    modified_ = modified;
+
+    if (isVisible())
+    {
+        updateDetail();
+        repaint();
+    }
+}
+
+void PresetManagerOverlay::notifyPresetLoaded (const juce::String& name)
+{
+    setCurrentPreset (name, false);
+
+    if (pendingClose_)
+    {
+        pendingClose_ = false;
+        hide();
+    }
 }
 
 void PresetManagerOverlay::setTheme (ThemeId theme)
@@ -657,6 +762,7 @@ void PresetManagerOverlay::updateDetail()
     favoriteButton_.setEnabled (hasEntry);
 
     detailCurrentModified_ = isCurrent && modified_;
+    updateAuditionButton();
 
     if (saveWasVisible != userPreset)
         resized();
@@ -683,6 +789,21 @@ void PresetManagerOverlay::updateDetail()
     updateActionColours();
     updateFavoriteButton();
     repaint();
+}
+
+void PresetManagerOverlay::updateAuditionButton()
+{
+    const bool enabled = ! modified_;
+    const auto label = tr (TextId::presetManagerAudition);
+
+    auditionButton_.setEnabled (enabled);
+    auditionButton_.setButtonText (auditionButton_.getToggleState()
+                                       ? juce::String::charToString (0x2713) + " " + label
+                                       : label);
+    auditionButton_.setTooltip (enabled
+                                    ? tr (TextId::presetManagerAuditionTooltip)
+                                    : tr (TextId::presetManagerAuditionBlockedTooltip));
+    auditionButton_.setTheme (theme_);
 }
 
 void PresetManagerOverlay::updateActionColours()
@@ -988,9 +1109,24 @@ void PresetManagerOverlay::rowSelected (int row)
     if (updating_ || row < 0 || row >= filteredCount())
         return;
 
+    pendingClose_ = false;
     selectedName_ = entries_[static_cast<size_t> (visible_[static_cast<size_t> (row)])].name;
     updateDetail();
     repaint();
+    maybeAudition();
+}
+
+void PresetManagerOverlay::maybeAudition()
+{
+    if (! auditionButton_.getToggleState()
+        || modified_
+        || formMode_ != FormMode::none
+        || selectedName_.isEmpty()
+        || selectedName_ == currentName_)
+        return;
+
+    if (onAudition)
+        onAudition (selectedName_);
 }
 
 void PresetManagerOverlay::rowClicked (int row, const juce::MouseEvent& e)
@@ -1030,6 +1166,9 @@ void PresetManagerOverlay::focusNextInOverlay (bool backwards)
         focusables.push_back (&searchEditor_);
         focusables.push_back (&listBox_);
 
+        if (auditionButton_.isEnabled())
+            focusables.push_back (&auditionButton_);
+
         SidebarRow* rows[] = { &allRow_, &factoryRow_, &userRow_, &favoritesRow_, &recentsRow_ };
 
         for (auto* row : rows)
@@ -1044,13 +1183,14 @@ void PresetManagerOverlay::focusNextInOverlay (bool backwards)
                 focusables.push_back (&component);
         };
 
+        addAction (newButton_);
+        addAction (openFolderButton_);
         addAction (favoriteButton_);
         addAction (loadButton_);
         addAction (saveButton_);
         addAction (saveCopyButton_);
         addAction (renameButton_);
         addAction (deleteButton_);
-        focusables.push_back (&openFolderButton_);
     }
 
     const auto* current = juce::Component::getCurrentlyFocusedComponent();
@@ -1089,10 +1229,14 @@ void PresetManagerOverlay::loadSelected()
     if (findEntry (name) == nullptr || visibleRowOf (name) < 0)
         return;
 
-    hide();
+    // No cerrar hasta que la carga prospere: si la guardia se cancela, el
+    // gestor sigue abierto.
+    pendingClose_ = true;
 
     if (onLoad)
         onLoad (name);
+    else
+        pendingClose_ = false;
 }
 
 int PresetManagerOverlay::visibleRowOf (const juce::String& name) const
@@ -1176,6 +1320,12 @@ void PresetManagerOverlay::paint (juce::Graphics& g)
         g.fillRect (sidebarSeparatorBounds_);
     }
 
+    if (! footerTopLineBounds_.isEmpty())
+    {
+        g.setColour (colours.panelBorder.withAlpha (0.45f));
+        g.fillRect (footerTopLineBounds_);
+    }
+
     paintListHeader (g);
     paintDetail (g);
     paintEmptyState (g);
@@ -1183,23 +1333,59 @@ void PresetManagerOverlay::paint (juce::Graphics& g)
 
 void PresetManagerOverlay::paintOverChildren (juce::Graphics& g)
 {
-    if (formMode_ != FormMode::none || ! searchEditor_.getText().isEmpty())
+    if (formMode_ != FormMode::none)
         return;
 
-    // Misma caja que usa TextEditor para el texto: viewport (bounds menos
-    // borde) recortado por los indents. Asi el placeholder comparte x y linea
-    // base con el caret y con lo que se escribe.
-    const auto border = searchEditor_.getBorder();
-    auto area = searchEditor_.getBounds()
-                    .withTrimmedLeft (border.getLeft() + searchEditor_.getLeftIndent())
-                    .withTrimmedRight (border.getRight())
-                    .withTrimmedTop (border.getTop() + searchEditor_.getTopIndent())
-                    .withTrimmedBottom (border.getBottom());
+    const auto colours = themeColours (theme_);
 
-    g.setColour (themeColours (theme_).muted);
-    g.setFont (searchEditor_.getFont());
-    g.drawFittedText (tr (TextId::presetManagerSearch), area,
-                      juce::Justification::centredLeft, 1);
+    if (searchEditor_.getText().isEmpty())
+    {
+        // Misma caja que usa TextEditor para el texto: viewport (bounds menos
+        // borde) recortado por los indents. Asi el placeholder comparte x y
+        // linea base con el caret y con lo que se escribe.
+        const auto border = searchEditor_.getBorder();
+        auto area = searchEditor_.getBounds()
+                        .withTrimmedLeft (border.getLeft() + searchEditor_.getLeftIndent())
+                        .withTrimmedRight (border.getRight())
+                        .withTrimmedTop (border.getTop() + searchEditor_.getTopIndent())
+                        .withTrimmedBottom (border.getBottom());
+
+        g.setColour (colours.muted);
+        g.setFont (searchEditor_.getFont());
+        g.drawFittedText (tr (TextId::presetManagerSearch), area,
+                          juce::Justification::centredLeft, 1);
+    }
+
+    if (! listFadeBounds_.isEmpty())
+    {
+        juce::ColourGradient fade (
+            colours.panel.withAlpha (0.0f),
+            static_cast<float> (listFadeBounds_.getX()),
+            static_cast<float> (listFadeBounds_.getY()),
+            colours.panel.withAlpha (0.78f),
+            static_cast<float> (listFadeBounds_.getX()),
+            static_cast<float> (listFadeBounds_.getBottom()),
+            false);
+
+        g.setGradientFill (fade);
+        g.fillRect (listFadeBounds_);
+    }
+
+    auto drawFocusRing = [&g, &colours] (juce::Component& component, float radius)
+    {
+        if (! component.isVisible() || ! component.isEnabled()
+            || ! component.hasKeyboardFocus (false))
+            return;
+
+        const auto ring = component.getBounds().toFloat().expanded (static_cast<float> (ui::px (2)));
+        g.setColour (colours.accent);
+        g.drawRoundedRectangle (ring, radius + static_cast<float> (ui::px (2)),
+                                static_cast<float> (ui::px (2)));
+    };
+
+    drawFocusRing (newButton_, 5.0f);
+    drawFocusRing (openFolderButton_, 5.0f);
+    drawFocusRing (auditionButton_, 4.0f);
 }
 
 void PresetManagerOverlay::paintListHeader (juce::Graphics& g)
@@ -1418,10 +1604,7 @@ void PresetManagerOverlay::resized()
     countLabel_.setBounds (meta.removeFromLeft (ui::px (220)));
     sortLabel_.setBounds (meta.removeFromRight (ui::px (80)));
 
-    auto footer = p.removeFromBottom (ui::px (24));
-    footerEsc_.setBounds (footer.removeFromLeft (ui::px (160)));
-    openFolderButton_.setBounds (footer.removeFromRight (ui::px (120)));
-    footer.removeFromRight (ui::px (8));
+    auto footer = p.removeFromBottom (ui::px (32));
 
     auto body = p;
 
@@ -1435,7 +1618,29 @@ void PresetManagerOverlay::resized()
     listHeaderBounds_ = listArea.removeFromTop (ui::px (22));
     listContentWidth_ = juce::jmax (ui::px (120), listArea.getWidth() - ui::px (9));
     listArea.removeFromTop (ui::px (4));
+    listArea.removeFromBottom (ui::px (6));
     listBox_.setBounds (listArea);
+
+    const int fadeHeight = ui::px (12);
+
+    if (listArea.getHeight() > fadeHeight && listContentWidth_ > 0)
+        listFadeBounds_ = { listArea.getX(),
+                            listArea.getBottom() - fadeHeight,
+                            juce::jmin (listContentWidth_, listArea.getWidth()),
+                            fadeHeight };
+    else
+        listFadeBounds_ = {};
+
+    footerTopLineBounds_ = { footer.getX(), footer.getY(), footer.getWidth(), 1 };
+    auto escArea = footer.removeFromLeft (ui::px (120));
+    footerEsc_.setBounds (escArea.withSizeKeepingCentre (escArea.getWidth(), ui::px (24)));
+
+    const int toggleHeight = ui::px (24);
+    const int toggleWidth = juce::jmin (listContentWidth_, ui::px (190));
+    auditionButton_.setBounds (listBounds_.getX(),
+                               footer.getCentreY() - toggleHeight / 2,
+                               toggleWidth,
+                               toggleHeight);
 
     const auto headerFont = ui::font (10.0f);
     float categoryTextWidth = 0.0f;
@@ -1451,7 +1656,12 @@ void PresetManagerOverlay::resized()
 
     const bool compactSidebar = ui::getTextSize() == TextSize::extraLarge;
     auto side = sidebarBounds_.reduced (ui::px (8), ui::px (8));
-    newButton_.setBounds (side.removeFromTop (ui::px (30)));
+
+    auto newRow = side.removeFromTop (ui::px (30));
+    openFolderButton_.setBounds (newRow.removeFromRight (ui::px (26))
+                                     .withSizeKeepingCentre (ui::px (26), ui::px (26)));
+    newRow.removeFromRight (ui::px (6));
+    newButton_.setBounds (newRow);
     side.removeFromTop (ui::px (compactSidebar ? 6 : 8));
     libraryLabel_.setBounds (side.removeFromTop (ui::px (compactSidebar ? 20 : 22)));
     side.removeFromTop (ui::px (compactSidebar ? 3 : 4));
@@ -1641,6 +1851,7 @@ void PresetManagerOverlay::applyThemeToChildren()
     detailName_.setColour (juce::Label::textColourId, colours.text);
     detailCurrent_.setColour (juce::Label::textColourId, colours.accent);
     footerEsc_.setColour (juce::Label::textColourId, colours.muted);
+    openFolderButton_.setTheme (theme_);
 
     searchEditor_.setTextToShowWhenEmpty ({}, colours.muted);
     searchEditor_.setColour (juce::TextEditor::textColourId, colours.text);

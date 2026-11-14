@@ -10,6 +10,7 @@ PresetController::PresetController (PresetBar& bar,
                                     PatchBinder& binder,
                                     juce::Component& dialogParent,
                                     std::function<void (const juce::String&)> onPresetLoaded,
+                                    std::function<void (const juce::String&)> onPresetPreviewed,
                                     std::function<bool()> isDirty,
                                     std::function<void (const juce::String&)> notify)
     : bar_ (bar),
@@ -17,6 +18,7 @@ PresetController::PresetController (PresetBar& bar,
       binder_ (binder),
       dialogParent_ (dialogParent),
       onPresetLoaded_ (std::move (onPresetLoaded)),
+      onPresetPreviewed_ (std::move (onPresetPreviewed)),
       isDirty_ (std::move (isDirty)),
       notify_ (std::move (notify))
 {
@@ -105,6 +107,12 @@ void PresetController::selectByName (const juce::String& name, bool countAsRecen
     {
         auto params = catalog_.load (wanted);
 
+        // Migracion: el preset guardado puede pertenecer a una biblioteca
+        // anterior. En ese caso se arranca con Default en vez de quedarse sin
+        // preset cargado.
+        if (params.empty() && wanted != "Default")
+            return selectByName ("Default", countAsRecent);
+
         if (params.empty())
             return;
 
@@ -123,13 +131,13 @@ void PresetController::selectByName (const juce::String& name, bool countAsRecen
     applyLoad (wanted, index, countAsRecent);
 }
 
-void PresetController::requestLoadByName (const juce::String& name)
+void PresetController::requestLoadByName (const juce::String& name, bool countAsRecent)
 {
     const int index = indexOf (name);
 
     if (index >= 0)
     {
-        requestLoadByIndex (index, true);
+        requestLoadByIndex (index, true, countAsRecent);
         return;
     }
 
@@ -140,10 +148,18 @@ void PresetController::requestLoadByName (const juce::String& name)
 
     binder_.apply (params);
     loadedName_ = name;
-    catalog_.markUsed (name);
 
-    if (onPresetLoaded_)
-        onPresetLoaded_ (name);
+    if (countAsRecent)
+    {
+        catalog_.markUsed (name);
+
+        if (onPresetLoaded_)
+            onPresetLoaded_ (name);
+    }
+    else if (onPresetPreviewed_)
+    {
+        onPresetPreviewed_ (name);
+    }
 }
 
 void PresetController::requestLoadByIndex (int index, bool forceReload, bool countAsRecent)
@@ -163,6 +179,10 @@ void PresetController::requestLoadByIndex (int index, bool forceReload, bool cou
         restoreSelection();
         return;
     }
+
+    // Una audicion nunca abre la guardia: si hay cambios, se queda en pausa.
+    if (! countAsRecent && isDirty_ && isDirty_())
+        return;
 
     if (isDirty_ && isDirty_())
     {
@@ -226,10 +246,16 @@ void PresetController::applyLoad (const juce::String& name, int index, bool coun
     loadedName_ = name;
 
     if (countAsRecent)
+    {
         catalog_.markUsed (name);
 
-    if (onPresetLoaded_)
-        onPresetLoaded_ (name);
+        if (onPresetLoaded_)
+            onPresetLoaded_ (name);
+    }
+    else if (onPresetPreviewed_)
+    {
+        onPresetPreviewed_ (name);
+    }
 }
 
 void PresetController::restoreSelection()

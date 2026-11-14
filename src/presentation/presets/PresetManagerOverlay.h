@@ -43,9 +43,21 @@ public:
 
     [[nodiscard]] bool isOpen() const noexcept { return isVisible(); }
 
+    // Audicion: carga al seleccionar sin cerrar el gestor.
+    void setAudition (bool enabled);
+    [[nodiscard]] bool isAuditionEnabled() const;
+
+    // Refresca el preset actual sin tocar la seleccion ni el filtro.
+    void setCurrentPreset (const juce::String& name, bool modified);
+
+    // Notifica una carga explicita; cierra solo si se pidio Cargar/Enter/doble clic.
+    void notifyPresetLoaded (const juce::String& name);
+
     void setTheme (ThemeId theme);
 
     std::function<void (const juce::String&)> onLoad;
+    std::function<void (const juce::String&)> onAudition;
+    std::function<void (bool)> onAuditionChanged;
     std::function<void()> onOpenFolder;
     std::function<void()> onClosed;
     std::function<void (const juce::String&, bool)> onFavorite;
@@ -102,6 +114,19 @@ private:
 
     class ListModel;
 
+    // Toggle de audicion con relleno y borde independientes.
+    class AuditionButton final : public juce::TextButton
+    {
+    public:
+        void setTheme (ThemeId theme);
+        void paintButton (juce::Graphics& g,
+                          bool shouldDrawButtonAsHighlighted,
+                          bool shouldDrawButtonAsDown) override;
+
+    private:
+        ThemeId theme_ = ThemeId::holoAccents;
+    };
+
     // Capa modal de los formularios: atenua el panel y dibuja la tarjeta.
     class FormShield final : public juce::Component
     {
@@ -137,6 +162,8 @@ private:
     void focusNextInOverlay (bool backwards);
     void loadRow (int row);
     void loadSelected();
+    void maybeAudition();
+    void updateAuditionButton();
     void paintEmptyState (juce::Graphics& g);
     void paintListHeader (juce::Graphics& g);
     void paintDetail (juce::Graphics& g);
@@ -169,13 +196,15 @@ private:
     juce::Label detailName_;
     juce::Label detailCurrent_;
     juce::Label footerEsc_;
+    AuditionButton auditionButton_;
     juce::TextButton favoriteButton_;
     juce::TextButton loadButton_;
     juce::TextButton saveButton_;
     juce::TextButton saveCopyButton_;
     juce::TextButton renameButton_;
     juce::TextButton deleteButton_;
-    juce::TextButton openFolderButton_;
+    IconButton openFolderButton_ { IconType::folder,
+                                   tr (TextId::presetManagerOpenFolderTooltip) };
 
     FormShield formShield_;
     juce::Label formTitle_;
@@ -197,6 +226,7 @@ private:
     PresetCategory category_ = PresetCategory::other;
     bool modified_ = false;
     bool updating_ = false;
+    bool pendingClose_ = false;
 
     juce::Rectangle<int> panelBounds_;
     juce::Rectangle<int> sidebarBounds_;
@@ -207,6 +237,8 @@ private:
     juce::Rectangle<int> detailBadgesBounds_;
     juce::Rectangle<int> detailCardBounds_;
     juce::Rectangle<int> detailStatusDotBounds_;
+    juce::Rectangle<int> footerTopLineBounds_;
+    juce::Rectangle<int> listFadeBounds_;
     juce::Rectangle<int> formCardBounds_;
     int listContentWidth_ = 0;
     int listCategoryWidth_ = 0;

@@ -73,6 +73,11 @@ SynthPanel::SynthPanel (std::function<void (const std::string&, float)> setParam
             if (onPresetLoaded)
                 onPresetLoaded (name);
         },
+        [this] (const juce::String& name)
+        {
+            if (onPresetPreviewed)
+                onPresetPreviewed (name);
+        },
         [this] { return presetBar_.isModified(); },
         [this] (const juce::String& message)
         {
@@ -234,10 +239,10 @@ void SynthPanel::selectPresetByName (const juce::String& name, bool countAsRecen
         presetController_->selectByName (name, countAsRecent);
 }
 
-void SynthPanel::requestLoadPreset (const juce::String& name)
+void SynthPanel::requestLoadPreset (const juce::String& name, bool countAsRecent)
 {
     if (presetController_ != nullptr)
-        presetController_->requestLoadByName (name);
+        presetController_->requestLoadByName (name, countAsRecent);
 }
 
 void SynthPanel::savePreset()
