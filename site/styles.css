@@ -287,6 +287,9 @@ button {
 }
 
 .lang__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-width: 32px;
   height: 26px;
   padding: 0 7px;
@@ -297,6 +300,7 @@ button {
   font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.04em;
+  text-decoration: none;
   cursor: pointer;
   transition: background 0.18s ease, color 0.18s ease;
 }
@@ -306,7 +310,8 @@ button {
   background: rgba(255, 255, 255, 0.05);
 }
 
-.lang__btn[aria-pressed="true"] {
+.lang__btn[aria-pressed="true"],
+.lang__btn[aria-current="page"] {
   background: rgba(78, 205, 196, 0.16);
   color: var(--accent);
   box-shadow: inset 0 0 0 1px rgba(78, 205, 196, 0.22);
@@ -1966,6 +1971,7 @@ button {
 .lightbox__panel img {
   display: block;
   width: auto;
+  height: auto;
   max-width: 100%;
   max-height: 70vh;
   margin: 0 auto;
@@ -2472,6 +2478,48 @@ button {
   .panel,
   .doc-card,
   .download-panel {
+    border-color: CanvasText;
+  }
+}
+
+/* -------------------------------------------------------------------- faq */
+
+.faq {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.faq__item {
+  padding: 24px;
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(27, 31, 39, 0.62), rgba(15, 20, 27, 0.74));
+}
+
+.faq__item h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #edf2f8;
+}
+
+.faq__item p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14.5px;
+  line-height: 1.62;
+}
+
+@media (max-width: 860px) {
+  .faq {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (forced-colors: active) {
+  .faq__item {
     border-color: CanvasText;
   }
 }

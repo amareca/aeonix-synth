@@ -1,0 +1,899 @@
+<!doctype html>
+<html lang="es" class="no-js" data-root="../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AEONIX — Sintetizador sustractivo gratuito y open source para Windows</title>
+<meta name="description" content="Sintetizador sustractivo gratuito y open source para Windows 10/11. 64 controles, unison, delay, reverb y gestor de presets. Standalone, AGPL-3.0.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#080c12">
+<link rel="canonical" href="https://amareca.github.io/aeonix-synth/es/">
+<link rel="alternate" hreflang="en" href="https://amareca.github.io/aeonix-synth/">
+<link rel="alternate" hreflang="es" href="https://amareca.github.io/aeonix-synth/es/">
+<link rel="alternate" hreflang="x-default" href="https://amareca.github.io/aeonix-synth/">
+<link rel="icon" href="../assets/favicon.ico" sizes="any">
+<link rel="icon" href="../assets/icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AEONIX">
+<meta property="og:title" content="AEONIX — Sintetizador sustractivo gratuito y open source para Windows">
+<meta property="og:description" content="Sintetizador sustractivo gratuito y open source para Windows 10/11 con 64 controles, unison, delay, reverb y gestor de presets.">
+<meta property="og:url" content="https://amareca.github.io/aeonix-synth/es/">
+<meta property="og:image" content="https://amareca.github.io/aeonix-synth/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AEONIX: sintetizador sustractivo gratuito para Windows">
+<meta property="og:locale" content="es_ES">
+<meta property="og:locale:alternate" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AEONIX — Sintetizador sustractivo gratuito y open source para Windows">
+<meta name="twitter:description" content="Sintetizador sustractivo gratuito y open source para Windows 10/11 con 64 controles, unison, delay, reverb y gestor de presets.">
+<meta name="twitter:image" content="https://amareca.github.io/aeonix-synth/assets/og.png">
+<link rel="stylesheet" href="../styles.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "AEONIX",
+  "alternateName": "AEONIX Synth",
+  "description": "Sintetizador sustractivo standalone gratuito y open source para Windows, pensado para pads cinematográficos, plucks atmosféricos y diseño sonoro experimental.",
+  "applicationCategory": "MultimediaApplication",
+  "applicationSubCategory": "Synthesizer",
+  "operatingSystem": "Windows 10, Windows 11",
+  "softwareRequirements": "Windows 10 u 11 de 64 bits. No requiere runtime externo.",
+  "softwareVersion": "0.1.0",
+  "fileSize": "3.5MB",
+  "inLanguage": [
+    "en",
+    "es"
+  ],
+  "datePublished": "2026-11-11",
+  "url": "https://amareca.github.io/aeonix-synth/es/",
+  "downloadUrl": "https://github.com/amareca/aeonix-synth/releases/latest",
+  "codeRepository": "https://github.com/amareca/aeonix-synth",
+  "license": "https://www.gnu.org/licenses/agpl-3.0.html",
+  "screenshot": "https://amareca.github.io/aeonix-synth/assets/captures/hero.png",
+  "featureList": [
+    "Síntesis sustractiva con oscilador, filtro, envolventes y LFO",
+    "Unison, delay estéreo y reverb",
+    "64 controles de diseño sonoro en una sola pantalla",
+    "Gestor de presets con búsqueda, filtros, favoritos y recientes",
+    "Teclado virtual, entrada MIDI y ruedas de pitch y modulación",
+    "Cuatro temas y tres tamaños de texto",
+    "Interfaz en español e inglés",
+    "Código abierto AGPL-3.0"
+  ],
+  "sameAs": [
+    "https://github.com/amareca/aeonix-synth"
+  ],
+  "author": {
+    "@type": "Person",
+    "name": "amareca",
+    "url": "https://github.com/amareca"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "EUR"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "inLanguage": "es",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿AEONIX es gratis?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. AEONIX es gratuito y open source bajo AGPL-3.0. No hay versión de pago, ni cuenta, ni límite de tiempo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Es un plugin VST o VST3?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. La versión 0.1.0 es una aplicación standalone para Windows. El formato plugin está previsto, pero aún no existe."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué versiones de Windows son compatibles?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Windows 10 y Windows 11, solo de 64 bits."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Hace falta instalar Visual C++?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. El ejecutable enlaza el runtime de C++ de forma estática, así que no requiere instalación adicional."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Está disponible el código fuente?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. El código completo se publica en GitHub bajo AGPL-3.0, con instrucciones de compilación."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Para qué tipo de sonidos está pensado?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Pads cinematográficos, plucks atmosféricos y texturas evolutivas. Los presets de fábrica son un punto de partida; todos los parámetros están en una sola pantalla."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Funciona con teclados MIDI?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. AEONIX acepta entrada MIDI y también ofrece teclado virtual, rueda de pitch y rueda de modulación."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Por qué avisa SmartScreen?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "El ejecutable 0.1.0 no está firmado, así que Windows muestra un aviso la primera vez. Comprueba el SHA-256 publicado en la release antes de ejecutarlo."
+      }
+    }
+  ]
+}
+</script>
+<script>document.documentElement.classList.replace('no-js', 'js');</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Saltar al contenido</a>
+<p class="vh" id="langStatus" role="status" aria-live="polite"></p>
+
+<header class="site-header" id="top">
+  <div class="wrap header__inner">
+    <a class="brand" href="#top" aria-label="AEONIX, inicio">
+      <img src="../logo.svg" alt="" width="30" height="30">
+      <span class="brand__name">AEONIX</span>
+    </a>
+
+    <nav class="nav" aria-label="Principal">
+      <a href="#producto">Producto</a>
+      <a href="#capturas">Capturas</a>
+      <a href="#temas">Temas</a>
+      <a href="#accesibilidad">Accesibilidad</a>
+      <a href="#docs">Proyecto</a>
+      <a class="nav__github" href="https://github.com/amareca/aeonix-synth" target="_blank" rel="noopener" aria-label="GitHub de AEONIX">
+        <svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        <span>GitHub</span>
+      </a>
+    </nav>
+
+    <div class="header__actions">
+            <div class="lang" role="group" aria-label="Idioma">
+        <a class="lang__btn" href="./" lang="es" hreflang="es" aria-current="page" aria-label="Español">ES</a>
+        <a class="lang__btn" href="../" lang="en" hreflang="en" aria-label="English">EN</a>
+      </div>
+      <a class="btn btn--sm btn--primary header__cta" href="#descarga">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4v10m0 0 4-4m-4 4-4-4M5 19h14"/></svg>
+        <span>Descargar</span>
+      </a>
+      <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mobileMenu" aria-label="Abrir menú">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="mobile-menu" id="mobileMenu" hidden>
+    <nav class="mobile-menu__nav" aria-label="Móvil">
+      <a href="#producto">Producto</a>
+      <a href="#capturas">Capturas</a>
+      <a href="#temas">Temas</a>
+      <a href="#accesibilidad">Accesibilidad</a>
+      <a href="#docs">Proyecto</a>
+      <a href="https://github.com/amareca/aeonix-synth" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+    <a class="btn btn--primary mobile-menu__cta" href="#descarga">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4v10m0 0 4-4m-4 4-4-4M5 19h14"/></svg>
+      <span>Descargar</span>
+    </a>
+  </div>
+</header>
+
+<main id="main" tabindex="-1">
+
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero__wash" aria-hidden="true"></div>
+    <div class="wrap hero__inner">
+      <p class="eyebrow eyebrow--pill">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>Versión 0.1.0 · Windows x64</span>
+      </p>
+      <h1 id="hero-title" class="hero__title">AEONIX<span class="vh"> — sintetizador sustractivo gratuito para Windows</span></h1>
+      <p class="hero__tagline">Sintetizador sustractivo standalone para Windows</p>
+      <p class="hero__lead">Una sola pantalla para esculpir el sonido: 64 controles, presets de fábrica y de usuario, y un gestor que encuentra lo que buscas. Sin pestañas, sin menús escondidos.</p>
+      <div class="hero__actions">
+        <a class="btn btn--primary btn--lg" href="#descarga">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4v10m0 0 4-4m-4 4-4-4M5 19h14"/></svg>
+          <span>Descargar</span>
+        </a>
+        <a class="btn btn--ghost btn--lg" href="#capturas">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m4 17 5-5 4 4 3-3 4 4"/></svg>
+          <span>Ver capturas</span>
+        </a>
+      </div>
+      <p class="hero__note">Gratis y open source · Windows 10 y 11 · x64 · 3,5 MB</p>
+
+      <figure class="stage reveal">
+        <div class="app-frame app-frame--hero">
+          <div class="app-frame__bar">
+            <span class="app-frame__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="app-frame__title">AEONIX <span class="app-frame__sep">·</span> <span>Vista principal</span></span>
+            <span class="app-frame__tag">0.1.0</span>
+          </div>
+          <img src="../assets/captures/hero.png"
+               width="1316" height="786" fetchpriority="high" decoding="async"
+               alt="Interfaz de AEONIX: barra de preset, secciones de síntesis, teclado virtual y controles de efectos."
+              >
+        </div>
+        <figcaption>Superficie principal con texto Muy grande (1316 × 786). Captura de AEONIX 0.1.0, build PRO.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="stats reveal" role="group" aria-label="Datos del producto">
+      <div class="stat">
+        <span class="stat__value">64</span>
+        <span class="stat__label">controles en una pantalla</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value">4</span>
+        <span class="stat__label">temas Holo y Prototipo</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value">3</span>
+        <span class="stat__label">tamaños de texto</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value stat__value--word">ES / EN</span>
+        <span class="stat__label">interfaz completa</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value stat__value--sm">Fábrica + usuario</span>
+        <span class="stat__label">presets</span>
+      </div>
+    </div>
+  </div>
+
+  <section class="section" id="producto" aria-labelledby="producto-title">
+    <div class="wrap">
+      <header class="section-head reveal">
+        <p class="eyebrow">Producto</p>
+        <h2 id="producto-title">Todo el flujo de señal, en una sola vista</h2>
+        <p class="section-lead">Del oscilador al master sin cambiar de contexto. Cada control existe porque hace falta.</p>
+      </header>
+
+      <div class="features">
+        <article class="feature feature--wide reveal">
+          <span class="feature__icon" aria-hidden="true">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M3 12h3l2-5 3 10 2.5-7 2 4H21"/></svg>
+          </span>
+          <h3>Motor sustractivo</h3>
+          <p>Oscilador, filtro y envolventes forman una cadena clara. Ajusta, escucha y compara sin abrir cuadros de diálogo.</p>
+          <div class="chain" aria-hidden="true">
+            <span>OSC</span><i>→</i><span>FILTER</span><i>→</i><span>ENV</span><i>→</i><span>MOD</span><i>→</i><span class="chain__hot">FX</span><i>→</i><span>OUT</span>
+          </div>
+        </article>
+
+        <article class="feature reveal">
+          <span class="feature__icon" aria-hidden="true">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M4 7h9M19 7h1M4 17h3M13 17h7"/><circle cx="15.5" cy="7" r="2.2"/><circle cx="9.5" cy="17" r="2.2"/></svg>
+          </span>
+          <h3>Oscilador, filtro, envolventes y LFO</h3>
+          <p>Los controles de cada etapa viven juntos y en orden de señal.</p>
+        </article>
+
+        <article class="feature reveal">
+          <span class="feature__icon" aria-hidden="true">
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M6 6l2 2M16 16l2 2M18 6l-2 2M8 16l-2 2"/></svg>
+          </span>
+          <h3>Delay y reverb</h3>
+          <p>Efectos integrados para dar espacio al sonido sin salir de la superficie principal.</p>
+        </article>
+
+        <article class="feature reveal">
+          <span class="feature__icon" aria-hidden="true">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M2.5 9c2-3 4-3 6 0s4 3 6 0 4-3 6 0"/><path d="M2.5 15c2-3 4-3 6 0s4 3 6 0 4-3 6 0" opacity=".5"/><path d="M2.5 12c2-3 4-3 6 0s4 3 6 0 4-3 6 0" opacity=".25"/></svg>
+          </span>
+          <h3>Unison</h3>
+          <p>Voces desafinadas para dar cuerpo y anchura al oscilador.</p>
+        </article>
+
+        <article class="feature reveal">
+          <span class="feature__icon" aria-hidden="true">
+            <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M8 6v7M12 6v7M16 6v7M3 13h18"/></svg>
+          </span>
+          <h3>Teclado virtual y MIDI</h3>
+          <p>Toca con el ratón o conecta un controlador: el teclado sigue lo que suena.</p>
+        </article>
+
+        <article class="feature feature--wide reveal">
+          <span class="feature__icon" aria-hidden="true">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M7 4h10v16l-5-3-5 3z"/><path d="M10 8h4"/></svg>
+          </span>
+          <h3>Gestor de presets</h3>
+          <p>Búsqueda, filtros, favoritos y recientes. Guarda, copia, renombra y borra con confirmación, sin perder el hilo.</p>
+          <div class="preset-chips" aria-hidden="true">
+            <span class="chip chip--input">
+              <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg>
+              <span>Buscar preset</span>
+            </span>
+            <span class="chip">Favoritos</span>
+            <span class="chip">Recientes</span>
+            <span class="chip">Usuario</span>
+          </div>
+        </article>
+
+        <article class="feature feature--full reveal">
+          <div class="feature__body">
+            <span class="feature__icon" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M4 8V5h3M17 4h3v4M20 17v3h-3M7 20H4v-3"/><circle cx="12" cy="12" r="3"/></svg>
+            </span>
+            <h3>Accesibilidad de serie</h3>
+            <p>Tres tamaños de texto, foco visible, español e inglés, y alturas mínimas de ventana documentadas.</p>
+          </div>
+          <div class="a11y-chips" aria-hidden="true">
+            <span class="chip">12 px</span>
+            <span class="chip">15 px</span>
+            <span class="chip">18 px</span>
+            <span class="chip chip--accent"><span class="focus-dot"></span><span>Foco visible</span></span>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="capturas" aria-labelledby="capturas-title">
+    <div class="wrap">
+      <header class="section-head reveal">
+        <p class="eyebrow">Capturas</p>
+        <h2 id="capturas-title">La interfaz, de cerca</h2>
+        <p class="section-lead">Capturas reales de AEONIX 0.1.0 en Windows. Pulsa una imagen para ampliarla.</p>
+      </header>
+
+      <div class="gallery">
+        <figure class="shot shot--a reveal">
+          <button class="shot__btn" type="button"
+                  data-title-key="shot.1.title" data-meta-key="shot.1.meta" data-alt-key="shot.1.alt"
+                  aria-label="Ampliar captura: superficie principal">
+            <img src="../assets/captures/main-normal.png"
+                 width="1176" height="748" loading="lazy" decoding="async"
+                 alt="Superficie principal de AEONIX con texto Normal.">
+            <span class="shot__zoom" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M9 4H4v5M15 4h5v5M20 15v5h-5M4 15v5h5"/></svg>
+            </span>
+          </button>
+          <figcaption>
+            <span class="shot__title">Superficie principal</span>
+            <span class="shot__meta">Texto Normal · 1176 × 748</span>
+          </figcaption>
+        </figure>
+
+        <figure class="shot shot--b reveal">
+          <button class="shot__btn" type="button"
+                  data-title-key="shot.2.title" data-meta-key="shot.2.meta" data-alt-key="shot.2.alt"
+                  aria-label="Ampliar captura: texto Grande">
+            <img src="../assets/captures/main-large.png"
+                 width="1216" height="766" loading="lazy" decoding="async"
+                 alt="Superficie de AEONIX con texto Grande.">
+            <span class="shot__zoom" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M9 4H4v5M15 4h5v5M20 15v5h-5M4 15v5h5"/></svg>
+            </span>
+          </button>
+          <figcaption>
+            <span class="shot__title">Texto Grande</span>
+            <span class="shot__meta">1216 × 766</span>
+          </figcaption>
+        </figure>
+
+        <figure class="shot shot--c reveal">
+          <button class="shot__btn" type="button"
+                  data-title-key="shot.3.title" data-meta-key="shot.3.meta" data-alt-key="shot.3.alt"
+                  aria-label="Ampliar captura: gestor de presets">
+            <img src="../assets/captures/preset-manager.png"
+                 width="1176" height="748" loading="lazy" decoding="async"
+                 alt="Gestor de presets de AEONIX con búsqueda, filtros y favoritos.">
+            <span class="shot__zoom" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M9 4H4v5M15 4h5v5M20 15v5h-5M4 15v5h5"/></svg>
+            </span>
+          </button>
+          <figcaption>
+            <span class="shot__title">Gestor de presets</span>
+            <span class="shot__meta">Búsqueda, filtros y favoritos</span>
+          </figcaption>
+        </figure>
+
+        <figure class="shot shot--d reveal">
+          <button class="shot__btn" type="button"
+                  data-title-key="shot.4.title" data-meta-key="shot.4.meta" data-alt-key="shot.4.alt"
+                  aria-label="Ampliar captura: búsqueda en la biblioteca">
+            <img src="../assets/captures/preset-manager-search.png"
+                 width="1176" height="748" loading="lazy" decoding="async"
+                 alt="Gestor de presets de AEONIX filtrado por la búsqueda lead.">
+            <span class="shot__zoom" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M9 4H4v5M15 4h5v5M20 15v5h-5M4 15v5h5"/></svg>
+            </span>
+          </button>
+          <figcaption>
+            <span class="shot__title">Búsqueda en la biblioteca</span>
+            <span class="shot__meta">Filtro «lead» · 1176 × 748</span>
+          </figcaption>
+        </figure>
+
+        <figure class="shot shot--e reveal">
+          <button class="shot__btn" type="button"
+                  data-title-key="shot.5.title" data-meta-key="shot.5.meta" data-alt-key="shot.5.alt"
+                  aria-label="Ampliar captura: ajustes de apariencia">
+            <img src="../assets/captures/settings-appearance.png"
+                 width="1176" height="748" loading="lazy" decoding="async"
+                 alt="Ajustes de AEONIX en la pestaña Apariencia, con tema, idioma y tamaño de texto.">
+            <span class="shot__zoom" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M9 4H4v5M15 4h5v5M20 15v5h-5M4 15v5h5"/></svg>
+            </span>
+          </button>
+          <figcaption>
+            <span class="shot__title">Ajustes de apariencia</span>
+            <span class="shot__meta">Tema, idioma y tamaño de texto</span>
+          </figcaption>
+        </figure>
+
+        <aside class="gallery-note reveal">
+          <h3>Qué mirar</h3>
+          <ul>
+            <li>La barra de preset marca cuándo hay cambios sin guardar.</li>
+            <li>El gestor filtra por nombre, categoría, favoritos y recientes.</li>
+            <li>El texto Muy grande no recorta etiquetas ni valores.</li>
+          </ul>
+          <button class="link-btn" type="button" data-open-shot="2">
+            <span>Ampliar el gestor</span>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h13m0 0-5-5m5 5-5 5"/></svg>
+          </button>
+          <p class="gallery-note__fine">Todas las capturas son de la build PRO, sin herramientas de desarrollo.</p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="temas" aria-labelledby="temas-title">
+    <div class="wrap">
+      <header class="section-head reveal">
+        <p class="eyebrow">Temas</p>
+        <h2 id="temas-title">Cuatro acabados, la misma lógica</h2>
+        <p class="section-lead">El tema no cambia el layout: cambia la luz. Elige uno para ver la captura.</p>
+      </header>
+
+      <div class="theme-layout">
+        <div class="theme-list reveal" role="group" aria-labelledby="theme-list-label">
+          <span class="vh" id="theme-list-label">Elige un tema</span>
+
+          <button class="theme-opt" type="button" data-theme="accents" aria-pressed="true">
+            <span class="theme-opt__swatch swatch--accents" aria-hidden="true"></span>
+            <span class="theme-opt__text">
+              <span class="theme-opt__name">Holo Accents</span>
+              <span class="theme-opt__desc">Títulos y líneas con degradado holográfico. El acabado de referencia.</span>
+            </span>
+            <span class="theme-opt__check" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24"><path d="m5 12 4 4 10-10"/></svg>
+            </span>
+          </button>
+
+          <button class="theme-opt" type="button" data-theme="glass" aria-pressed="false">
+            <span class="theme-opt__swatch swatch--glass" aria-hidden="true"></span>
+            <span class="theme-opt__text">
+              <span class="theme-opt__name">Holo Glass</span>
+              <span class="theme-opt__desc">Paneles translúcidos, campo de estrellas y brillo violeta en el teclado.</span>
+            </span>
+            <span class="theme-opt__check" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24"><path d="m5 12 4 4 10-10"/></svg>
+            </span>
+          </button>
+
+          <button class="theme-opt" type="button" data-theme="minimal" aria-pressed="false">
+            <span class="theme-opt__swatch swatch--minimal" aria-hidden="true"></span>
+            <span class="theme-opt__text">
+              <span class="theme-opt__name">Holo Minimal</span>
+              <span class="theme-opt__desc">Sin degradados ni translucidez: contraste sobrio y bordes discretos.</span>
+            </span>
+            <span class="theme-opt__check" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24"><path d="m5 12 4 4 10-10"/></svg>
+            </span>
+          </button>
+
+          <button class="theme-opt" type="button" data-theme="prototype" aria-pressed="false">
+            <span class="theme-opt__swatch swatch--prototype" aria-hidden="true"></span>
+            <span class="theme-opt__text">
+              <span class="theme-opt__name">Prototipo</span>
+              <span class="theme-opt__desc">Gris neutro, pensado para leer el layout sin distracciones.</span>
+            </span>
+            <span class="theme-opt__check" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24"><path d="m5 12 4 4 10-10"/></svg>
+            </span>
+          </button>
+        </div>
+
+        <figure class="theme-preview reveal">
+          <div class="theme-preview__wrap">
+            <div class="app-frame">
+              <div class="app-frame__bar">
+                <span class="app-frame__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                <span class="app-frame__title"><span id="themeCaption">Holo Accents</span></span>
+                <span class="app-frame__tag">0.1.0</span>
+              </div>
+              <img id="themeImg"
+                   src="../assets/captures/theme-accents.png"
+                   width="1176" height="748" loading="lazy" decoding="async"
+                   alt="Captura de AEONIX con el tema Holo Accents.">
+            </div>
+            <button class="theme-preview__btn" type="button" id="themeOpen" aria-label="Ampliar captura del tema">
+              <span class="shot__zoom" aria-hidden="true">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M9 4H4v5M15 4h5v5M20 15v5h-5M4 15v5h5"/></svg>
+              </span>
+            </button>
+          </div>
+          <figcaption>
+            <span id="themeCaptionFoot">Holo Accents</span>
+            <span>1176 × 748 · build PRO</span>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="accesibilidad" aria-labelledby="accesibilidad-title">
+    <div class="wrap">
+      <header class="section-head reveal">
+        <p class="eyebrow">Accesibilidad</p>
+        <h2 id="accesibilidad-title">Legible a la primera, también con teclado</h2>
+        <p class="section-lead">La app escala el texto y el layout por separado para que nada se recorte al crecer.</p>
+      </header>
+
+      <div class="a11y-layout">
+        <div class="a11y-list reveal">
+          <article class="a11y-item">
+            <span class="feature__icon" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M4 19h16M7 19V9m5 10V5m5 14v-6"/></svg>
+            </span>
+            <div>
+              <h3>Tres tamaños de texto</h3>
+              <p>12, 15 y 18 px sobre Segoe UI. El layout acompaña al texto con factores 1,00, 1,07 y 1,15.</p>
+            </div>
+          </article>
+
+          <article class="a11y-item">
+            <span class="feature__icon" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18M8 19v2M16 19v2"/></svg>
+            </span>
+            <div>
+              <h3>Ventanas mínimas</h3>
+              <p>Cada tamaño declara su altura mínima para que ningún control quede fuera de la ventana.</p>
+            </div>
+          </article>
+
+          <article class="a11y-item">
+            <span class="feature__icon" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M4 8V5h3M17 4h3v4M20 17v3h-3M7 20H4v-3"/><circle cx="12" cy="12" r="3"/></svg>
+            </span>
+            <div>
+              <h3>Foco y contraste</h3>
+              <p>Anillo de foco visible, texto principal por encima de 15:1 y atenuado por encima de 8:1 sobre el fondo.</p>
+            </div>
+          </article>
+
+          <article class="a11y-item">
+            <span class="feature__icon" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3.5 9h17M3.5 15h17M12 3c2.5 2.6 2.5 15.4 0 18M12 3c-2.5 2.6-2.5 15.4 0 18"/></svg>
+            </span>
+            <div>
+              <h3>Dos idiomas</h3>
+              <p>Español e inglés en toda la interfaz, también en diálogos y en el gestor de presets.</p>
+            </div>
+          </article>
+        </div>
+
+        <div class="a11y-panel reveal">
+          <div class="panel">
+            <h3 class="panel__title">Escala tipográfica</h3>
+            <div class="specimen">
+              <div class="specimen__row">
+                <span class="specimen__sample" style="font-size:18px">Sintetizador sustractivo</span>
+                <span class="specimen__label">Muy grande · 18 px</span>
+              </div>
+              <div class="specimen__row">
+                <span class="specimen__sample" style="font-size:15px">Sintetizador sustractivo</span>
+                <span class="specimen__label">Grande · 15 px</span>
+              </div>
+              <div class="specimen__row">
+                <span class="specimen__sample" style="font-size:12px">Sintetizador sustractivo</span>
+                <span class="specimen__label">Normal · 12 px</span>
+              </div>
+            </div>
+            <p class="panel__note">Tamaños reales de la app. La web usa una escala de lectura más cómoda con la misma familia.</p>
+
+            <h4 class="panel__subtitle">Contraste sobre fondo oscuro</h4>
+            <div class="contrast">
+              <div class="swatch swatch--text">
+                <span>Texto</span>
+                <b>15.4:1</b>
+              </div>
+              <div class="swatch swatch--muted">
+                <span>Atenuado</span>
+                <b>8.8:1</b>
+              </div>
+              <div class="swatch swatch--accent">
+                <span>Acento</span>
+                <b>8.5:1</b>
+              </div>
+              <div class="swatch swatch--button">
+                <span>Botón</span>
+                <b>9.8:1</b>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel panel--table">
+            <h3 class="panel__title">Altura mínima por tamaño</h3>
+            <table class="winsize">
+              <thead>
+                <tr>
+                  <th scope="col">Texto</th>
+                  <th scope="col">Ventana mínima</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Normal</th>
+                  <td>1042 × 714</td>
+                </tr>
+                <tr>
+                  <th scope="row">Grande</th>
+                  <td>1160 × 724</td>
+                </tr>
+                <tr>
+                  <th scope="row">Muy grande</th>
+                  <td>1300 × 744</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="panel__note">La ventana crece con el texto; el mínimo cambia con cada nivel.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="descarga" aria-labelledby="descarga-title">
+    <div class="wrap">
+      <div class="download-panel reveal">
+        <div class="download-panel__glow" aria-hidden="true"></div>
+        <div class="download-panel__main">
+          <p class="eyebrow">Descarga</p>
+          <h2 id="descarga-title">AEONIX 0.1.0, para Windows</h2>
+          <p class="download-panel__lead">Descarga el ZIP, descomprímelo y ejecuta AEONIX.exe. Sin instalador y sin dependencias: no hace falta Visual C++ Redistributable.</p>
+          <div class="download-actions">
+            <a class="btn btn--primary btn--lg" href="https://github.com/amareca/aeonix-synth/releases/latest" target="_blank" rel="noopener">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4v10m0 0 4-4m-4 4-4-4M5 19h14"/></svg>
+              <span>Descargar AEONIX 0.1.0</span>
+              <span class="pill pill--dark">3,5 MB</span>
+            </a>
+            <a class="btn btn--ghost btn--lg" href="https://github.com/amareca/aeonix-synth/releases/latest" target="_blank" rel="noopener">
+              <span>Ver la release en GitHub</span>
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14 5h5v5M19 5 10 14M19 14v5H5V5h5"/></svg>
+            </a>
+          </div>
+
+          <div class="checksum">
+            <p class="checksum__title">SHA256 del ZIP</p>
+            <div class="checksum__row">
+              <code>CC66E59F85BE1383C3A11E3683AFE3ECC8C057D75053FC96163EB843250FCC68</code>
+              <button class="checksum__copy" type="button" data-copy-hash="CC66E59F85BE1383C3A11E3683AFE3ECC8C057D75053FC96163EB843250FCC68" aria-label="Copiar SHA256 del ZIP">
+                <span>Copiar</span>
+              </button>
+            </div>
+            <p class="checksum__title">SHA256 de AEONIX.exe</p>
+            <div class="checksum__row">
+              <code>A2268B202A75B014305A6DE1EA27548F96591B1AF6318DB3ED78B304F4FDAC20</code>
+              <button class="checksum__copy" type="button" data-copy-hash="A2268B202A75B014305A6DE1EA27548F96591B1AF6318DB3ED78B304F4FDAC20" aria-label="Copiar SHA256 de AEONIX.exe">
+                <span>Copiar</span>
+              </button>
+            </div>
+            <p class="checksum__hint">Compruébalo en PowerShell: Get-FileHash AEONIX-0.1.0-win64.zip -Algorithm SHA256</p>
+          </div>
+
+          <p class="fineprint">El ejecutable no está firmado: SmartScreen puede avisar la primera vez. Comprueba el SHA256 antes de ejecutarlo.</p>
+        </div>
+
+        <aside class="release-card">
+          <p class="release-card__status"><span class="status-dot" aria-hidden="true"></span><span>Disponible</span></p>
+          <p class="release-card__version">0.1.0</p>
+          <dl class="release-card__list">
+            <div>
+              <dt>Plataforma</dt>
+              <dd>Windows 10/11 · x64</dd>
+            </div>
+            <div>
+              <dt>Audio</dt>
+              <dd>Salida del sistema</dd>
+            </div>
+            <div>
+              <dt>MIDI</dt>
+              <dd>Opcional</dd>
+            </div>
+            <div>
+              <dt>Tamaño</dt>
+              <dd>ZIP 3,5 MB · EXE 8,1 MB</dd>
+            </div>
+            <div>
+              <dt>Licencia</dt>
+              <dd>AGPL-3.0</dd>
+            </div>
+          </dl>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="docs" aria-labelledby="docs-title">
+    <div class="wrap">
+      <header class="section-head reveal">
+        <p class="eyebrow">Proyecto</p>
+        <h2 id="docs-title">Código abierto, sin letra pequeña</h2>
+        <p class="section-lead">El repositorio incluye el código, las instrucciones de compilación y la licencia completa.</p>
+      </header>
+
+      <div class="docs-grid">
+        <a class="doc-card reveal" href="https://github.com/amareca/aeonix-synth#readme" target="_blank" rel="noopener">
+          <span class="feature__icon" aria-hidden="true">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5M9 12h6M9 16h6"/></svg>
+          </span>
+          <h3>Guía rápida</h3>
+          <p>Qué es AEONIX, requisitos y primeros pasos con presets.</p>
+          <span class="doc-card__link">
+            <span>Leer el README</span>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h13m0 0-5-5m5 5-5 5"/></svg>
+          </span>
+        </a>
+
+        <a class="doc-card reveal" href="https://github.com/amareca/aeonix-synth#compilar-windows" target="_blank" rel="noopener">
+          <span class="feature__icon" aria-hidden="true">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H19"/></svg>
+          </span>
+          <h3>Compilar</h3>
+          <p>C++20, CMake y JUCE 8. Comandos para las builds DEV y PRO.</p>
+          <span class="doc-card__link">
+            <span>Ver instrucciones</span>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h13m0 0-5-5m5 5-5 5"/></svg>
+          </span>
+        </a>
+
+        <a class="doc-card reveal" href="https://github.com/amareca/aeonix-synth/blob/main/LICENSE" target="_blank" rel="noopener">
+          <span class="feature__icon" aria-hidden="true">
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          </span>
+          <h3>Licencia AGPL-3.0</h3>
+          <p>Código abierto. Si distribuyes una versión modificada, comparte también el código.</p>
+          <span class="doc-card__link">
+            <span>Leer la licencia</span>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h13m0 0-5-5m5 5-5 5"/></svg>
+          </span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="faq" aria-labelledby="faq-title">
+    <div class="wrap">
+      <header class="section-head reveal">
+        <p class="eyebrow">FAQ</p>
+        <h2 id="faq-title">Preguntas frecuentes</h2>
+        <p class="section-lead">Respuestas breves y verificables sobre AEONIX 0.1.0.</p>
+      </header>
+      <div class="faq">
+        <article class="faq__item">
+          <h3>¿AEONIX es gratis?</h3>
+          <p>Sí. AEONIX es gratuito y open source bajo AGPL-3.0. No hay versión de pago, ni cuenta, ni límite de tiempo.</p>
+        </article>
+        <article class="faq__item">
+          <h3>¿Es un plugin VST o VST3?</h3>
+          <p>No. La versión 0.1.0 es una aplicación standalone para Windows. El formato plugin está previsto, pero aún no existe.</p>
+        </article>
+        <article class="faq__item">
+          <h3>¿Qué versiones de Windows son compatibles?</h3>
+          <p>Windows 10 y Windows 11, solo de 64 bits.</p>
+        </article>
+        <article class="faq__item">
+          <h3>¿Hace falta instalar Visual C++?</h3>
+          <p>No. El ejecutable enlaza el runtime de C++ de forma estática, así que no requiere instalación adicional.</p>
+        </article>
+        <article class="faq__item">
+          <h3>¿Está disponible el código fuente?</h3>
+          <p>Sí. El código completo se publica en GitHub bajo AGPL-3.0, con instrucciones de compilación.</p>
+        </article>
+        <article class="faq__item">
+          <h3>¿Para qué tipo de sonidos está pensado?</h3>
+          <p>Pads cinematográficos, plucks atmosféricos y texturas evolutivas. Los presets de fábrica son un punto de partida; todos los parámetros están en una sola pantalla.</p>
+        </article>
+        <article class="faq__item">
+          <h3>¿Funciona con teclados MIDI?</h3>
+          <p>Sí. AEONIX acepta entrada MIDI y también ofrece teclado virtual, rueda de pitch y rueda de modulación.</p>
+        </article>
+        <article class="faq__item">
+          <h3>¿Por qué avisa SmartScreen?</h3>
+          <p>El ejecutable 0.1.0 no está firmado, así que Windows muestra un aviso la primera vez. Comprueba el SHA-256 publicado en la release antes de ejecutarlo.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer__inner">
+    <div class="footer__brand">
+      <a class="brand" href="#top" aria-label="AEONIX, inicio">
+        <img src="../logo.svg" alt="" width="26" height="26">
+        <span class="brand__name">AEONIX</span>
+      </a>
+      <p>Sintetizador sustractivo standalone para Windows.</p>
+      <p class="footer__built">Hecho con C++20 + JUCE 8</p>
+    </div>
+
+    <nav class="footer__links" aria-label="Pie de página">
+      <a href="https://github.com/amareca/aeonix-synth" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/amareca/aeonix-synth#readme" target="_blank" rel="noopener">Proyecto</a>
+      <a href="https://github.com/amareca/aeonix-synth/blob/main/LICENSE" target="_blank" rel="noopener">Licencia</a>
+      <a href="https://github.com/amareca/aeonix-synth/issues" target="_blank" rel="noopener">Issues</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+
+    <div class="footer__meta">
+      <span class="pill">Versión 0.1.0</span>
+      <p>AGPL-3.0 · Copyright (C) 2026 AEONIX contributors · Sin cookies ni analítica.</p>
+    </div>
+  </div>
+</footer>
+
+<dialog class="lightbox" id="lightbox" aria-label="Visor de capturas">
+  <div class="lightbox__panel">
+    <button class="lightbox__close" type="button" data-close-lightbox aria-label="Cerrar visor">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <button class="lightbox__nav lightbox__nav--prev" type="button" data-prev-shot aria-label="Captura anterior">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m14 6-6 6 6 6"/></svg>
+    </button>
+    <img id="lightboxImg" alt="" width="1176" height="748">
+    <button class="lightbox__nav lightbox__nav--next" type="button" data-next-shot aria-label="Captura siguiente">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m10 6 6 6-6 6"/></svg>
+    </button>
+    <div class="lightbox__foot">
+      <p class="lightbox__caption" id="lightboxCaption"></p>
+      <p class="lightbox__meta"><span class="lightbox__count" id="lightboxCount"></span><span>Usa ← → para navegar y Esc para cerrar.</span></p>
+    </div>
+  </div>
+</dialog>
+
+<noscript>
+  <p class="noscript">Esta página usa JavaScript para el visor de capturas, el selector de temas y los botones de copia.</p>
+</noscript>
+
+<script src="../app.js"></script>
+</body>
+</html>

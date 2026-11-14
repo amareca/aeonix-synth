@@ -1,0 +1,44 @@
+# AEONIX
+
+> AEONIX is a free, open-source standalone subtractive synthesizer for Windows 10/11 (64-bit), built with C++20 and JUCE 8. It is designed for cinematic pads, atmospheric plucks and experimental sound design.
+
+## Facts
+
+- Name: AEONIX
+- Version: 0.1.0
+- Price: free
+- License: AGPL-3.0
+- Platform: Windows 10 and Windows 11, 64-bit
+- Format: standalone desktop application. Not a VST, VST3, AU, AAX or CLAP plugin.
+- Interface languages: English and Spanish
+- Controls: 64 sound-design controls on a single screen
+- Synthesis: one oscillator, filter, envelopes, LFO and unison
+- Effects: stereo delay and reverb
+- Input: MIDI keyboards, on-screen keyboard, pitch and modulation wheels
+- Extras: preset manager with search, filters, favourites and recents; four themes; three text sizes
+- Install: unzip the release and run `AEONIX.exe`; the C++ runtime is linked statically
+- Size: ZIP 3.5 MB, executable 8.1 MB
+- Code signing: the 0.1.0 executable is not signed, so Windows SmartScreen may warn once
+- User data: `%APPDATA%\Aeonix` and `Documents\Aeonix\Presets`
+
+## Links
+
+- Website (English): https://amareca.github.io/aeonix-synth/
+- Website (Spanish): https://amareca.github.io/aeonix-synth/es/
+- Source code: https://github.com/amareca/aeonix-synth
+- Releases: https://github.com/amareca/aeonix-synth/releases
+- License: https://github.com/amareca/aeonix-synth/blob/main/LICENSE
+- Issues: https://github.com/amareca/aeonix-synth/issues
+
+## What AEONIX is not
+
+- Not a plugin yet. VST3 support is planned, not available.
+- Not a sampler, a wavetable synth or a modular environment.
+- Not paid software, and not a demo or a limited trial.
+
+## Español
+
+AEONIX es un sintetizador sustractivo standalone, gratuito y open source (AGPL-3.0) para Windows 10/11 de 64 bits. Está pensado para pads cinematográficos, plucks atmosféricos y diseño sonoro experimental. La versión 0.1.0 no es un plugin VST/VST3.
+
+- Web en español: https://amareca.github.io/aeonix-synth/es/
+- Código y descargas: https://github.com/amareca/aeonix-synth
