@@ -37,9 +37,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   option. The sort menu is 24 px per row and grows to fit its longest label.
 - **Pluck and Brass categories** (`pluck`, `metales`): the library now shows
   five plucks and five brass presets in their own rows.
+- **Themed list scrollbar**: a 3 px rounded thumb on the existing 9 px channel,
+  with a transparent track and 55/80/95 % states. It hides when the list fits.
 
 ### Changed
 
+- The preset manager header now holds the title, search, sort and close in one
+  44 px row; the counter keeps a small band of its own.
+- The footer is 52 px and absorbs the bottom padding: `Esc` and the audition
+  toggle are centred between its top rule and the overlay border.
+- The body grew from 476 to 484 px, so normal and large text show a full extra
+  row.
+- Category chips in the list use a 40 px minimum and centred text.
 - The previous 14 prototype presets were replaced by the 36-preset factory
   library.
 - The preset manager footer is now 32 px high, with a top rule, a 120 px
