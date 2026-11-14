@@ -1,8 +1,8 @@
 #include "Preset.h"
 
-#include <cmath>
+#include <array>
+#include <utility>
 
-#include "ParameterIds.h"
 #include "Patch.h"
 
 namespace aeonix
@@ -22,279 +22,985 @@ std::map<std::string, float> makeDefaultParameters()
 namespace
 {
 
-// Frecuencia del LFO (Hz) -> valor normalizado (rango log 0.05..10 Hz).
-float lfoRateNormalised (float hz)
+struct FactoryValue
 {
-    return static_cast<float> (std::log (hz / 0.05f) / std::log (200.0f));
-}
+    const char* id;
+    float value;
+};
 
-// Construye un preset de pad a partir de sus rasgos principales, con
-// unison (anchura) y LFO (movimiento del cutoff).
-Preset makePadPreset (const std::string& name,
-                      float cutoff,
-                      float attack,
-                      float release,
-                      float reverbMix,
-                      float reverbSize,
-                      float delayMix,
-                      int unisonVoices,
-                      float detuneCents,
-                      float lfoRateHz,
-                      float lfoDepth,
-                      float waveformIndex = 0.0f)
+struct FactoryPreset
 {
-    auto p = makeDefaultParameters();
-    p["osc.waveform"]      = waveformIndex / 3.0f;   // 0=sierra, 1=cuadrada...
-    p["amp.attack"]        = attack;
-    p["amp.decay"]         = 0.6f;
-    p["amp.sustain"]       = 0.8f;
-    p["amp.release"]       = release;
-    p["filter.cutoff"]     = cutoff;
-    p["filter.resonance"]  = 0.12f;
-    p["fx.reverb.mix"]     = reverbMix;
-    p["fx.reverb.size"]    = reverbSize;
-    p["fx.delay.mix"]      = delayMix;
+    const char* name;
+    std::array<FactoryValue, 25> values;
+};
 
-    // Envolvente de filtro suave: un poco de movimiento al atacar el pad.
-    p["filter.envAmount"]  = 0.15f;
-    p["filter.attack"]     = 0.35f;
-    p["filter.decay"]      = 0.7f;
-    p["filter.sustain"]    = 0.5f;
-    p["filter.release"]    = 0.7f;
-
-    // Unison (anchura): n voces + separacion en cents + reparto estereo.
-    p["unison.voices"]     = (unisonVoices - 1) / 7.0f;
-    p["unison.detune"]     = detuneCents / 50.0f;
-    p["unison.width"]      = 0.85f;
-
-    // LFO (movimiento del cutoff), forma seno.
-    p["lfo.waveform"]      = 2.0f / 3.0f;
-    p["lfo.rate"]          = lfoRateNormalised (lfoRateHz);
-    p["lfo.depth"]         = lfoDepth;
-
-    return { name, p };
-}
+// Tabla de presets de fabrica. No ajustes valores a mano: se generan desde la
+// biblioteca de diseno y se validan con los tests de presets.
+constexpr std::array<FactoryPreset, 35> factoryPresets = {{
+    { "Aurora Pad", {{
+            { "master.volume", 0.78f },
+            { "osc.waveform", 0.0f },
+            { "osc.level", 0.275f },
+            { "filter.cutoff", 0.42f },
+            { "filter.resonance", 0.12f },
+            { "filter.envAmount", 0.22f },
+            { "filter.attack", 0.62f },
+            { "filter.decay", 0.72f },
+            { "filter.sustain", 0.5f },
+            { "filter.release", 0.78f },
+            { "amp.attack", 0.78f },
+            { "amp.decay", 0.7f },
+            { "amp.sustain", 0.85f },
+            { "amp.release", 0.85f },
+            { "fx.delay.time", 0.8295f },
+            { "fx.delay.feedback", 0.3f },
+            { "fx.delay.mix", 0.1f },
+            { "fx.reverb.size", 0.62f },
+            { "fx.reverb.mix", 0.3f },
+            { "lfo.rate", 0.2418f },
+            { "lfo.depth", 0.1f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.4286f },
+            { "unison.detune", 0.24f },
+            { "unison.width", 0.75f },
+    }} },
+    { "Nocturne Pad", {{
+            { "master.volume", 0.78f },
+            { "osc.waveform", 0.0f },
+            { "osc.level", 0.275f },
+            { "filter.cutoff", 0.36f },
+            { "filter.resonance", 0.15f },
+            { "filter.envAmount", 0.28f },
+            { "filter.attack", 0.66f },
+            { "filter.decay", 0.78f },
+            { "filter.sustain", 0.42f },
+            { "filter.release", 0.82f },
+            { "amp.attack", 0.85f },
+            { "amp.decay", 0.72f },
+            { "amp.sustain", 0.8f },
+            { "amp.release", 0.88f },
+            { "fx.delay.time", 0.881f },
+            { "fx.delay.feedback", 0.32f },
+            { "fx.delay.mix", 0.08f },
+            { "fx.reverb.size", 0.8f },
+            { "fx.reverb.mix", 0.38f },
+            { "lfo.rate", 0.0635f },
+            { "lfo.depth", 0.14f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.4286f },
+            { "unison.detune", 0.18f },
+            { "unison.width", 0.85f },
+    }} },
+    { "Air Pad", {{
+            { "master.volume", 0.78f },
+            { "osc.waveform", 1.0f },
+            { "osc.level", 0.22f },
+            { "filter.cutoff", 0.68f },
+            { "filter.resonance", 0.08f },
+            { "filter.envAmount", 0.15f },
+            { "filter.attack", 0.58f },
+            { "filter.decay", 0.72f },
+            { "filter.sustain", 0.55f },
+            { "filter.release", 0.8f },
+            { "amp.attack", 0.76f },
+            { "amp.decay", 0.75f },
+            { "amp.sustain", 0.88f },
+            { "amp.release", 0.9f },
+            { "fx.delay.time", 0.8295f },
+            { "fx.delay.feedback", 0.34f },
+            { "fx.delay.mix", 0.16f },
+            { "fx.reverb.size", 0.85f },
+            { "fx.reverb.mix", 0.42f },
+            { "lfo.rate", 0.2796f },
+            { "lfo.depth", 0.07f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.5714f },
+            { "unison.detune", 0.2f },
+            { "unison.width", 0.95f },
+    }} },
+    { "Drift Pad", {{
+            { "master.volume", 0.78f },
+            { "osc.waveform", 0.0f },
+            { "osc.level", 0.275f },
+            { "filter.cutoff", 0.46f },
+            { "filter.resonance", 0.18f },
+            { "filter.envAmount", 0.3f },
+            { "filter.attack", 0.72f },
+            { "filter.decay", 0.82f },
+            { "filter.sustain", 0.5f },
+            { "filter.release", 0.85f },
+            { "amp.attack", 0.8f },
+            { "amp.decay", 0.75f },
+            { "amp.sustain", 0.82f },
+            { "amp.release", 0.9f },
+            { "fx.delay.time", 0.881f },
+            { "fx.delay.feedback", 0.42f },
+            { "fx.delay.mix", 0.18f },
+            { "fx.reverb.size", 0.75f },
+            { "fx.reverb.mix", 0.35f },
+            { "lfo.rate", 0.1488f },
+            { "lfo.depth", 0.28f },
+            { "lfo.waveform", 1.0f },
+            { "unison.voices", 0.4286f },
+            { "unison.detune", 0.3f },
+            { "unison.width", 0.9f },
+    }} },
+    { "Frost Pad", {{
+            { "master.volume", 0.78f },
+            { "osc.waveform", 0.0f },
+            { "osc.level", 0.22f },
+            { "filter.cutoff", 0.74f },
+            { "filter.resonance", 0.25f },
+            { "filter.envAmount", 0.3f },
+            { "filter.attack", 0.5f },
+            { "filter.decay", 0.75f },
+            { "filter.sustain", 0.45f },
+            { "filter.release", 0.82f },
+            { "amp.attack", 0.64f },
+            { "amp.decay", 0.7f },
+            { "amp.sustain", 0.82f },
+            { "amp.release", 0.9f },
+            { "fx.delay.time", 0.76f },
+            { "fx.delay.feedback", 0.4f },
+            { "fx.delay.mix", 0.2f },
+            { "fx.reverb.size", 0.9f },
+            { "fx.reverb.mix", 0.4f },
+            { "lfo.rate", 0.3382f },
+            { "lfo.depth", 0.05f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.5714f },
+            { "unison.detune", 0.16f },
+            { "unison.width", 0.9f },
+    }} },
+    { "Glass Pluck", {{
+            { "master.volume", 0.8f },
+            { "osc.waveform", 0.0f },
+            { "osc.level", 0.8f },
+            { "filter.cutoff", 0.6514f },
+            { "filter.resonance", 0.2184f },
+            { "filter.envAmount", 0.5f },
+            { "filter.attack", 0.05f },
+            { "filter.decay", 0.45f },
+            { "filter.sustain", 0.05f },
+            { "filter.release", 0.45f },
+            { "amp.attack", 0.08f },
+            { "amp.decay", 0.55f },
+            { "amp.sustain", 0.1f },
+            { "amp.release", 0.45f },
+            { "fx.delay.time", 0.4276f },
+            { "fx.delay.feedback", 0.3f },
+            { "fx.delay.mix", 0.16f },
+            { "fx.reverb.size", 0.55f },
+            { "fx.reverb.mix", 0.18f },
+            { "lfo.rate", 0.8692f },
+            { "lfo.depth", 0.0f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.0f },
+            { "unison.detune", 0.0f },
+            { "unison.width", 0.0f },
+    }} },
+    { "Wood Pluck", {{
+            { "master.volume", 0.8f },
+            { "osc.waveform", 1.0f },
+            { "osc.level", 0.8f },
+            { "filter.cutoff", 0.5927f },
+            { "filter.resonance", 0.1362f },
+            { "filter.envAmount", 0.35f },
+            { "filter.attack", 0.04f },
+            { "filter.decay", 0.42f },
+            { "filter.sustain", 0.04f },
+            { "filter.release", 0.4f },
+            { "amp.attack", 0.1f },
+            { "amp.decay", 0.45f },
+            { "amp.sustain", 0.06f },
+            { "amp.release", 0.42f },
+            { "fx.delay.time", 0.2922f },
+            { "fx.delay.feedback", 0.0f },
+            { "fx.delay.mix", 0.0f },
+            { "fx.reverb.size", 0.3f },
+            { "fx.reverb.mix", 0.1f },
+            { "lfo.rate", 0.8692f },
+            { "lfo.depth", 0.0f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.0f },
+            { "unison.detune", 0.0f },
+            { "unison.width", 0.0f },
+    }} },
+    { "Bell Pluck", {{
+            { "master.volume", 0.8f },
+            { "osc.waveform", 0.3333f },
+            { "osc.level", 0.8f },
+            { "filter.cutoff", 0.5927f },
+            { "filter.resonance", 0.383f },
+            { "filter.envAmount", 0.45f },
+            { "filter.attack", 0.05f },
+            { "filter.decay", 0.52f },
+            { "filter.sustain", 0.06f },
+            { "filter.release", 0.5f },
+            { "amp.attack", 0.06f },
+            { "amp.decay", 0.6f },
+            { "amp.sustain", 0.08f },
+            { "amp.release", 0.52f },
+            { "fx.delay.time", 0.5372f },
+            { "fx.delay.feedback", 0.25f },
+            { "fx.delay.mix", 0.12f },
+            { "fx.reverb.size", 0.7f },
+            { "fx.reverb.mix", 0.2f },
+            { "lfo.rate", 0.8692f },
+            { "lfo.depth", 0.0f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.0f },
+            { "unison.detune", 0.0f },
+            { "unison.width", 0.0f },
+    }} },
+    { "Muted Pluck", {{
+            { "master.volume", 0.8f },
+            { "osc.waveform", 1.0f },
+            { "osc.level", 0.8f },
+            { "filter.cutoff", 0.5147f },
+            { "filter.resonance", 0.1087f },
+            { "filter.envAmount", 0.38f },
+            { "filter.attack", 0.04f },
+            { "filter.decay", 0.45f },
+            { "filter.sustain", 0.02f },
+            { "filter.release", 0.38f },
+            { "amp.attack", 0.12f },
+            { "amp.decay", 0.52f },
+            { "amp.sustain", 0.07f },
+            { "amp.release", 0.48f },
+            { "fx.delay.time", 0.2922f },
+            { "fx.delay.feedback", 0.0f },
+            { "fx.delay.mix", 0.0f },
+            { "fx.reverb.size", 0.2f },
+            { "fx.reverb.mix", 0.05f },
+            { "lfo.rate", 0.8692f },
+            { "lfo.depth", 0.0f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.0f },
+            { "unison.detune", 0.0f },
+            { "unison.width", 0.0f },
+    }} },
+    { "Wide Pluck", {{
+            { "master.volume", 0.8f },
+            { "osc.waveform", 0.0f },
+            { "osc.level", 0.275f },
+            { "filter.cutoff", 0.615f },
+            { "filter.resonance", 0.1773f },
+            { "filter.envAmount", 0.4f },
+            { "filter.attack", 0.06f },
+            { "filter.decay", 0.48f },
+            { "filter.sustain", 0.08f },
+            { "filter.release", 0.46f },
+            { "amp.attack", 0.1f },
+            { "amp.decay", 0.55f },
+            { "amp.sustain", 0.1f },
+            { "amp.release", 0.5f },
+            { "fx.delay.time", 0.4182f },
+            { "fx.delay.feedback", 0.32f },
+            { "fx.delay.mix", 0.15f },
+            { "fx.reverb.size", 0.62f },
+            { "fx.reverb.mix", 0.24f },
+            { "lfo.rate", 0.8692f },
+            { "lfo.depth", 0.0f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.4286f },
+            { "unison.detune", 0.2f },
+            { "unison.width", 0.9f },
+    }} },
+    { "Copper Lead", {{
+            { "master.volume", 0.8f },
+            { "osc.waveform", 0.0f },
+            { "osc.level", 0.55f },
+            { "filter.cutoff", 0.66f },
+            { "filter.resonance", 0.2f },
+            { "filter.envAmount", 0.3f },
+            { "filter.attack", 0.1f },
+            { "filter.decay", 0.42f },
+            { "filter.sustain", 0.3f },
+            { "filter.release", 0.5f },
+            { "amp.attack", 0.2f },
+            { "amp.decay", 0.4f },
+            { "amp.sustain", 0.78f },
+            { "amp.release", 0.52f },
+            { "fx.delay.time", 0.4946f },
+            { "fx.delay.feedback", 0.3f },
+            { "fx.delay.mix", 0.2f },
+            { "fx.reverb.size", 0.45f },
+            { "fx.reverb.mix", 0.18f },
+            { "lfo.rate", 0.8692f },
+            { "lfo.depth", 0.06f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.1429f },
+            { "unison.detune", 0.14f },
+            { "unison.width", 0.25f },
+    }} },
+    { "Hollow Lead", {{
+            { "master.volume", 0.8f },
+            { "osc.waveform", 0.3333f },
+            { "osc.level", 0.55f },
+            { "filter.cutoff", 0.62f },
+            { "filter.resonance", 0.3556f },
+            { "filter.envAmount", 0.4f },
+            { "filter.attack", 0.08f },
+            { "filter.decay", 0.38f },
+            { "filter.sustain", 0.25f },
+            { "filter.release", 0.45f },
+            { "amp.attack", 0.15f },
+            { "amp.decay", 0.35f },
+            { "amp.sustain", 0.72f },
+            { "amp.release", 0.48f },
+            { "fx.delay.time", 0.5981f },
+            { "fx.delay.feedback", 0.38f },
+            { "fx.delay.mix", 0.2f },
+            { "fx.reverb.size", 0.4f },
+            { "fx.reverb.mix", 0.12f },
+            { "lfo.rate", 0.9036f },
+            { "lfo.depth", 0.05f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.1429f },
+            { "unison.detune", 0.12f },
+            { "unison.width", 0.2f },
+    }} },
+    { "Velvet Lead", {{
+            { "master.volume", 0.8f },
+            { "osc.waveform", 1.0f },
+            { "osc.level", 0.3667f },
+            { "filter.cutoff", 0.57f },
+            { "filter.resonance", 0.12f },
+            { "filter.envAmount", 0.35f },
+            { "filter.attack", 0.25f },
+            { "filter.decay", 0.55f },
+            { "filter.sustain", 0.5f },
+            { "filter.release", 0.55f },
+            { "amp.attack", 0.22f },
+            { "amp.decay", 0.45f },
+            { "amp.sustain", 0.8f },
+            { "amp.release", 0.55f },
+            { "fx.delay.time", 0.6496f },
+            { "fx.delay.feedback", 0.28f },
+            { "fx.delay.mix", 0.12f },
+            { "fx.reverb.size", 0.55f },
+            { "fx.reverb.mix", 0.22f },
+            { "lfo.rate", 0.8493f },
+            { "lfo.depth", 0.08f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.2857f },
+            { "unison.detune", 0.12f },
+            { "unison.width", 0.35f },
+    }} },
+    { "Twin Lead", {{
+            { "master.volume", 0.8f },
+            { "osc.waveform", 0.0f },
+            { "osc.level", 0.55f },
+            { "filter.cutoff", 0.68f },
+            { "filter.resonance", 0.22f },
+            { "filter.envAmount", 0.35f },
+            { "filter.attack", 0.06f },
+            { "filter.decay", 0.35f },
+            { "filter.sustain", 0.28f },
+            { "filter.release", 0.42f },
+            { "amp.attack", 0.12f },
+            { "amp.decay", 0.38f },
+            { "amp.sustain", 0.7f },
+            { "amp.release", 0.46f },
+            { "fx.delay.time", 0.5751f },
+            { "fx.delay.feedback", 0.22f },
+            { "fx.delay.mix", 0.16f },
+            { "fx.reverb.size", 0.35f },
+            { "fx.reverb.mix", 0.12f },
+            { "lfo.rate", 0.8692f },
+            { "lfo.depth", 0.0f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.1429f },
+            { "unison.detune", 0.32f },
+            { "unison.width", 0.3f },
+    }} },
+    { "Edge Lead", {{
+            { "master.volume", 0.8f },
+            { "osc.waveform", 0.0f },
+            { "osc.level", 0.55f },
+            { "filter.cutoff", 0.77f },
+            { "filter.resonance", 0.3967f },
+            { "filter.envAmount", 0.4f },
+            { "filter.attack", 0.05f },
+            { "filter.decay", 0.3f },
+            { "filter.sustain", 0.22f },
+            { "filter.release", 0.4f },
+            { "amp.attack", 0.1f },
+            { "amp.decay", 0.3f },
+            { "amp.sustain", 0.68f },
+            { "amp.release", 0.45f },
+            { "fx.delay.time", 0.5372f },
+            { "fx.delay.feedback", 0.42f },
+            { "fx.delay.mix", 0.2f },
+            { "fx.reverb.size", 0.25f },
+            { "fx.reverb.mix", 0.1f },
+            { "lfo.rate", 0.9036f },
+            { "lfo.depth", 0.1f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.1429f },
+            { "unison.detune", 0.1f },
+            { "unison.width", 0.18f },
+    }} },
+    { "Sub Terra Bass", {{
+            { "master.volume", 0.8f },
+            { "osc.waveform", 0.6667f },
+            { "osc.level", 0.8f },
+            { "filter.cutoff", 0.2468f },
+            { "filter.resonance", 0.1f },
+            { "filter.envAmount", 0.1f },
+            { "filter.attack", 0.0814f },
+            { "filter.decay", 0.55f },
+            { "filter.sustain", 0.25f },
+            { "filter.release", 0.4f },
+            { "amp.attack", 0.09f },
+            { "amp.decay", 0.55f },
+            { "amp.sustain", 0.92f },
+            { "amp.release", 0.45f },
+            { "fx.delay.time", 0.3883f },
+            { "fx.delay.feedback", 0.0f },
+            { "fx.delay.mix", 0.0f },
+            { "fx.reverb.size", 0.25f },
+            { "fx.reverb.mix", 0.03f },
+            { "lfo.rate", 0.8018f },
+            { "lfo.depth", 0.05f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.0f },
+            { "unison.detune", 0.0f },
+            { "unison.width", 0.0f },
+    }} },
+    { "Round Bass", {{
+            { "master.volume", 0.8f },
+            { "osc.waveform", 1.0f },
+            { "osc.level", 0.55f },
+            { "filter.cutoff", 0.392f },
+            { "filter.resonance", 0.14f },
+            { "filter.envAmount", 0.2f },
+            { "filter.attack", 0.15f },
+            { "filter.decay", 0.6f },
+            { "filter.sustain", 0.3f },
+            { "filter.release", 0.45f },
+            { "amp.attack", 0.15f },
+            { "amp.decay", 0.55f },
+            { "amp.sustain", 0.65f },
+            { "amp.release", 0.5f },
+            { "fx.delay.time", 0.3883f },
+            { "fx.delay.feedback", 0.15f },
+            { "fx.delay.mix", 0.04f },
+            { "fx.reverb.size", 0.35f },
+            { "fx.reverb.mix", 0.06f },
+            { "lfo.rate", 0.7727f },
+            { "lfo.depth", 0.06f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.1429f },
+            { "unison.detune", 0.08f },
+            { "unison.width", 0.2f },
+    }} },
+    { "Acid Line Bass", {{
+            { "master.volume", 0.8f },
+            { "osc.waveform", 0.3333f },
+            { "osc.level", 0.8f },
+            { "filter.cutoff", 0.3304f },
+            { "filter.resonance", 0.72f },
+            { "filter.envAmount", 0.7f },
+            { "filter.attack", 0.14f },
+            { "filter.decay", 0.66f },
+            { "filter.sustain", 0.05f },
+            { "filter.release", 0.45f },
+            { "amp.attack", 0.1f },
+            { "amp.decay", 0.6f },
+            { "amp.sustain", 0.35f },
+            { "amp.release", 0.4f },
+            { "fx.delay.time", 0.2922f },
+            { "fx.delay.feedback", 0.22f },
+            { "fx.delay.mix", 0.06f },
+            { "fx.reverb.size", 0.3f },
+            { "fx.reverb.mix", 0.06f },
+            { "lfo.rate", 0.8872f },
+            { "lfo.depth", 0.04f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.0f },
+            { "unison.detune", 0.0f },
+            { "unison.width", 0.0f },
+    }} },
+    { "Growl Bass", {{
+            { "master.volume", 0.8f },
+            { "osc.waveform", 0.0f },
+            { "osc.level", 0.55f },
+            { "filter.cutoff", 0.3597f },
+            { "filter.resonance", 0.34f },
+            { "filter.envAmount", 0.25f },
+            { "filter.attack", 0.189f },
+            { "filter.decay", 0.58f },
+            { "filter.sustain", 0.35f },
+            { "filter.release", 0.45f },
+            { "amp.attack", 0.1f },
+            { "amp.decay", 0.55f },
+            { "amp.sustain", 0.7f },
+            { "amp.release", 0.45f },
+            { "fx.delay.time", 0.3883f },
+            { "fx.delay.feedback", 0.2f },
+            { "fx.delay.mix", 0.05f },
+            { "fx.reverb.size", 0.35f },
+            { "fx.reverb.mix", 0.07f },
+            { "lfo.rate", 0.8493f },
+            { "lfo.depth", 0.12f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.1429f },
+            { "unison.detune", 0.1f },
+            { "unison.width", 0.3f },
+    }} },
+    { "Pulse Bass", {{
+            { "master.volume", 0.8f },
+            { "osc.waveform", 0.3333f },
+            { "osc.level", 0.55f },
+            { "filter.cutoff", 0.38f },
+            { "filter.resonance", 0.3f },
+            { "filter.envAmount", 0.3f },
+            { "filter.attack", 0.129f },
+            { "filter.decay", 0.55f },
+            { "filter.sustain", 0.3f },
+            { "filter.release", 0.45f },
+            { "amp.attack", 0.1f },
+            { "amp.decay", 0.5f },
+            { "amp.sustain", 0.75f },
+            { "amp.release", 0.4f },
+            { "fx.delay.time", 0.4276f },
+            { "fx.delay.feedback", 0.0f },
+            { "fx.delay.mix", 0.0f },
+            { "fx.reverb.size", 0.3f },
+            { "fx.reverb.mix", 0.05f },
+            { "lfo.rate", 0.8693f },
+            { "lfo.depth", 0.22f },
+            { "lfo.waveform", 1.0f },
+            { "unison.voices", 0.1429f },
+            { "unison.detune", 0.06f },
+            { "unison.width", 0.18f },
+    }} },
+    { "Soft Brass", {{
+            { "master.volume", 0.8f },
+            { "osc.waveform", 0.0f },
+            { "osc.level", 0.55f },
+            { "filter.cutoff", 0.6344f },
+            { "filter.resonance", 0.1773f },
+            { "filter.envAmount", 0.3f },
+            { "filter.attack", 0.5f },
+            { "filter.decay", 0.62f },
+            { "filter.sustain", 0.45f },
+            { "filter.release", 0.55f },
+            { "amp.attack", 0.5145f },
+            { "amp.decay", 0.55f },
+            { "amp.sustain", 0.7f },
+            { "amp.release", 0.6f },
+            { "fx.delay.time", 0.2922f },
+            { "fx.delay.feedback", 0.0f },
+            { "fx.delay.mix", 0.0f },
+            { "fx.reverb.size", 0.5f },
+            { "fx.reverb.mix", 0.22f },
+            { "lfo.rate", 0.8692f },
+            { "lfo.depth", 0.0f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.1429f },
+            { "unison.detune", 0.12f },
+            { "unison.width", 0.45f },
+    }} },
+    { "Bright Brass", {{
+            { "master.volume", 0.8f },
+            { "osc.waveform", 0.0f },
+            { "osc.level", 0.55f },
+            { "filter.cutoff", 0.7154f },
+            { "filter.resonance", 0.1362f },
+            { "filter.envAmount", 0.3f },
+            { "filter.attack", 0.45f },
+            { "filter.decay", 0.58f },
+            { "filter.sustain", 0.4f },
+            { "filter.release", 0.5f },
+            { "amp.attack", 0.4331f },
+            { "amp.decay", 0.5f },
+            { "amp.sustain", 0.62f },
+            { "amp.release", 0.55f },
+            { "fx.delay.time", 0.2922f },
+            { "fx.delay.feedback", 0.2f },
+            { "fx.delay.mix", 0.06f },
+            { "fx.reverb.size", 0.45f },
+            { "fx.reverb.mix", 0.18f },
+            { "lfo.rate", 0.8692f },
+            { "lfo.depth", 0.0f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.1429f },
+            { "unison.detune", 0.1f },
+            { "unison.width", 0.4f },
+    }} },
+    { "Big Brass", {{
+            { "master.volume", 0.8f },
+            { "osc.waveform", 0.0f },
+            { "osc.level", 0.275f },
+            { "filter.cutoff", 0.5927f },
+            { "filter.resonance", 0.1636f },
+            { "filter.envAmount", 0.35f },
+            { "filter.attack", 0.5f },
+            { "filter.decay", 0.65f },
+            { "filter.sustain", 0.5f },
+            { "filter.release", 0.62f },
+            { "amp.attack", 0.5621f },
+            { "amp.decay", 0.55f },
+            { "amp.sustain", 0.78f },
+            { "amp.release", 0.65f },
+            { "fx.delay.time", 0.2922f },
+            { "fx.delay.feedback", 0.0f },
+            { "fx.delay.mix", 0.0f },
+            { "fx.reverb.size", 0.65f },
+            { "fx.reverb.mix", 0.3f },
+            { "lfo.rate", 0.8692f },
+            { "lfo.depth", 0.0f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.4286f },
+            { "unison.detune", 0.16f },
+            { "unison.width", 0.75f },
+    }} },
+    { "Muted Brass", {{
+            { "master.volume", 0.8f },
+            { "osc.waveform", 0.0f },
+            { "osc.level", 0.55f },
+            { "filter.cutoff", 0.5511f },
+            { "filter.resonance", 0.1156f },
+            { "filter.envAmount", 0.25f },
+            { "filter.attack", 0.4f },
+            { "filter.decay", 0.45f },
+            { "filter.sustain", 0.3f },
+            { "filter.release", 0.45f },
+            { "amp.attack", 0.4807f },
+            { "amp.decay", 0.52f },
+            { "amp.sustain", 0.65f },
+            { "amp.release", 0.5f },
+            { "fx.delay.time", 0.2922f },
+            { "fx.delay.feedback", 0.0f },
+            { "fx.delay.mix", 0.0f },
+            { "fx.reverb.size", 0.3f },
+            { "fx.reverb.mix", 0.1f },
+            { "lfo.rate", 0.8692f },
+            { "lfo.depth", 0.0f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.1429f },
+            { "unison.detune", 0.08f },
+            { "unison.width", 0.35f },
+    }} },
+    { "Stab Brass", {{
+            { "master.volume", 0.8f },
+            { "osc.waveform", 0.0f },
+            { "osc.level", 0.55f },
+            { "filter.cutoff", 0.625f },
+            { "filter.resonance", 0.1773f },
+            { "filter.envAmount", 0.35f },
+            { "filter.attack", 0.35f },
+            { "filter.decay", 0.6221f },
+            { "filter.sustain", 0.15f },
+            { "filter.release", 0.4f },
+            { "amp.attack", 0.12f },
+            { "amp.decay", 0.55f },
+            { "amp.sustain", 0.15f },
+            { "amp.release", 0.45f },
+            { "fx.delay.time", 0.2922f },
+            { "fx.delay.feedback", 0.2f },
+            { "fx.delay.mix", 0.06f },
+            { "fx.reverb.size", 0.4f },
+            { "fx.reverb.mix", 0.16f },
+            { "lfo.rate", 0.8692f },
+            { "lfo.depth", 0.0f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.1429f },
+            { "unison.detune", 0.08f },
+            { "unison.width", 0.35f },
+    }} },
+    { "Felt Piano", {{
+            { "master.volume", 0.8f },
+            { "osc.waveform", 1.0f },
+            { "osc.level", 0.8f },
+            { "filter.cutoff", 0.5511f },
+            { "filter.resonance", 0.08f },
+            { "filter.envAmount", 0.22f },
+            { "filter.attack", 0.1f },
+            { "filter.decay", 0.5f },
+            { "filter.sustain", 0.15f },
+            { "filter.release", 0.45f },
+            { "amp.attack", 0.15f },
+            { "amp.decay", 0.85f },
+            { "amp.sustain", 0.15f },
+            { "amp.release", 0.55f },
+            { "fx.delay.time", 0.2922f },
+            { "fx.delay.feedback", 0.1f },
+            { "fx.delay.mix", 0.04f },
+            { "fx.reverb.size", 0.4f },
+            { "fx.reverb.mix", 0.18f },
+            { "lfo.rate", 0.8018f },
+            { "lfo.depth", 0.04f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.0f },
+            { "unison.detune", 0.0f },
+            { "unison.width", 0.0f },
+    }} },
+    { "Bell Piano", {{
+            { "master.volume", 0.8f },
+            { "osc.waveform", 1.0f },
+            { "osc.level", 0.55f },
+            { "filter.cutoff", 0.62f },
+            { "filter.resonance", 0.26f },
+            { "filter.envAmount", 0.3333f },
+            { "filter.attack", 0.09f },
+            { "filter.decay", 0.58f },
+            { "filter.sustain", 0.1f },
+            { "filter.release", 0.45f },
+            { "amp.attack", 0.14f },
+            { "amp.decay", 0.75f },
+            { "amp.sustain", 0.12f },
+            { "amp.release", 0.5f },
+            { "fx.delay.time", 0.3883f },
+            { "fx.delay.feedback", 0.15f },
+            { "fx.delay.mix", 0.06f },
+            { "fx.reverb.size", 0.45f },
+            { "fx.reverb.mix", 0.22f },
+            { "lfo.rate", 0.8493f },
+            { "lfo.depth", 0.04f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.1429f },
+            { "unison.detune", 0.04f },
+            { "unison.width", 0.15f },
+    }} },
+    { "Soft Piano", {{
+            { "master.volume", 0.8f },
+            { "osc.waveform", 1.0f },
+            { "osc.level", 0.55f },
+            { "filter.cutoff", 0.625f },
+            { "filter.resonance", 0.1f },
+            { "filter.envAmount", 0.25f },
+            { "filter.attack", 0.1f },
+            { "filter.decay", 0.52f },
+            { "filter.sustain", 0.2f },
+            { "filter.release", 0.5f },
+            { "amp.attack", 0.13f },
+            { "amp.decay", 0.82f },
+            { "amp.sustain", 0.25f },
+            { "amp.release", 0.55f },
+            { "fx.delay.time", 0.2922f },
+            { "fx.delay.feedback", 0.1f },
+            { "fx.delay.mix", 0.04f },
+            { "fx.reverb.size", 0.45f },
+            { "fx.reverb.mix", 0.24f },
+            { "lfo.rate", 0.7727f },
+            { "lfo.depth", 0.03f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.1429f },
+            { "unison.detune", 0.06f },
+            { "unison.width", 0.2f },
+    }} },
+    { "Bright Piano", {{
+            { "master.volume", 0.8f },
+            { "osc.waveform", 0.0f },
+            { "osc.level", 0.3667f },
+            { "filter.cutoff", 0.7477f },
+            { "filter.resonance", 0.12f },
+            { "filter.envAmount", 0.28f },
+            { "filter.attack", 0.09f },
+            { "filter.decay", 0.5f },
+            { "filter.sustain", 0.25f },
+            { "filter.release", 0.45f },
+            { "amp.attack", 0.12f },
+            { "amp.decay", 0.78f },
+            { "amp.sustain", 0.2f },
+            { "amp.release", 0.5f },
+            { "fx.delay.time", 0.4276f },
+            { "fx.delay.feedback", 0.18f },
+            { "fx.delay.mix", 0.06f },
+            { "fx.reverb.size", 0.4f },
+            { "fx.reverb.mix", 0.2f },
+            { "lfo.rate", 0.8872f },
+            { "lfo.depth", 0.03f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.2857f },
+            { "unison.detune", 0.04f },
+            { "unison.width", 0.3f },
+    }} },
+    { "Lo-fi Piano", {{
+            { "master.volume", 0.8f },
+            { "osc.waveform", 1.0f },
+            { "osc.level", 0.55f },
+            { "filter.cutoff", 0.5147f },
+            { "filter.resonance", 0.16f },
+            { "filter.envAmount", 0.2f },
+            { "filter.attack", 0.12f },
+            { "filter.decay", 0.5f },
+            { "filter.sustain", 0.1f },
+            { "filter.release", 0.45f },
+            { "amp.attack", 0.15f },
+            { "amp.decay", 0.76f },
+            { "amp.sustain", 0.18f },
+            { "amp.release", 0.5f },
+            { "fx.delay.time", 0.2922f },
+            { "fx.delay.feedback", 0.2f },
+            { "fx.delay.mix", 0.1f },
+            { "fx.reverb.size", 0.3f },
+            { "fx.reverb.mix", 0.15f },
+            { "lfo.rate", 0.7384f },
+            { "lfo.depth", 0.06f },
+            { "lfo.waveform", 1.0f },
+            { "unison.voices", 0.1429f },
+            { "unison.detune", 0.06f },
+            { "unison.width", 0.15f },
+    }} },
+    { "Warm Strings", {{
+            { "master.volume", 0.78f },
+            { "osc.waveform", 0.0f },
+            { "osc.level", 0.3667f },
+            { "filter.cutoff", 0.625f },
+            { "filter.resonance", 0.1f },
+            { "filter.envAmount", 0.2f },
+            { "filter.attack", 0.6f },
+            { "filter.decay", 0.68f },
+            { "filter.sustain", 0.55f },
+            { "filter.release", 0.7f },
+            { "amp.attack", 0.67f },
+            { "amp.decay", 0.62f },
+            { "amp.sustain", 0.85f },
+            { "amp.release", 0.7f },
+            { "fx.delay.time", 0.5981f },
+            { "fx.delay.feedback", 0.2f },
+            { "fx.delay.mix", 0.06f },
+            { "fx.reverb.size", 0.55f },
+            { "fx.reverb.mix", 0.3f },
+            { "lfo.rate", 0.4526f },
+            { "lfo.depth", 0.1f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.2857f },
+            { "unison.detune", 0.2f },
+            { "unison.width", 0.8f },
+    }} },
+    { "Wide Strings", {{
+            { "master.volume", 0.78f },
+            { "osc.waveform", 0.0f },
+            { "osc.level", 0.275f },
+            { "filter.cutoff", 0.65f },
+            { "filter.resonance", 0.1f },
+            { "filter.envAmount", 0.22f },
+            { "filter.attack", 0.62f },
+            { "filter.decay", 0.7f },
+            { "filter.sustain", 0.55f },
+            { "filter.release", 0.72f },
+            { "amp.attack", 0.67f },
+            { "amp.decay", 0.65f },
+            { "amp.sustain", 0.88f },
+            { "amp.release", 0.74f },
+            { "fx.delay.time", 0.6496f },
+            { "fx.delay.feedback", 0.22f },
+            { "fx.delay.mix", 0.08f },
+            { "fx.reverb.size", 0.6f },
+            { "fx.reverb.mix", 0.35f },
+            { "lfo.rate", 0.469f },
+            { "lfo.depth", 0.12f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.4286f },
+            { "unison.detune", 0.28f },
+            { "unison.width", 0.9f },
+    }} },
+    { "Soft Strings", {{
+            { "master.volume", 0.78f },
+            { "osc.waveform", 1.0f },
+            { "osc.level", 0.3667f },
+            { "filter.cutoff", 0.534f },
+            { "filter.resonance", 0.08f },
+            { "filter.envAmount", 0.15f },
+            { "filter.attack", 0.58f },
+            { "filter.decay", 0.62f },
+            { "filter.sustain", 0.6f },
+            { "filter.release", 0.7f },
+            { "amp.attack", 0.72f },
+            { "amp.decay", 0.68f },
+            { "amp.sustain", 0.88f },
+            { "amp.release", 0.72f },
+            { "fx.delay.time", 0.5372f },
+            { "fx.delay.feedback", 0.18f },
+            { "fx.delay.mix", 0.05f },
+            { "fx.reverb.size", 0.65f },
+            { "fx.reverb.mix", 0.35f },
+            { "lfo.rate", 0.3925f },
+            { "lfo.depth", 0.06f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.2857f },
+            { "unison.detune", 0.16f },
+            { "unison.width", 0.75f },
+    }} },
+    { "Bright Strings", {{
+            { "master.volume", 0.78f },
+            { "osc.waveform", 0.0f },
+            { "osc.level", 0.275f },
+            { "filter.cutoff", 0.7204f },
+            { "filter.resonance", 0.12f },
+            { "filter.envAmount", 0.3f },
+            { "filter.attack", 0.52f },
+            { "filter.decay", 0.6f },
+            { "filter.sustain", 0.45f },
+            { "filter.release", 0.66f },
+            { "amp.attack", 0.56f },
+            { "amp.decay", 0.58f },
+            { "amp.sustain", 0.82f },
+            { "amp.release", 0.66f },
+            { "fx.delay.time", 0.5981f },
+            { "fx.delay.feedback", 0.25f },
+            { "fx.delay.mix", 0.1f },
+            { "fx.reverb.size", 0.45f },
+            { "fx.reverb.mix", 0.25f },
+            { "lfo.rate", 0.5233f },
+            { "lfo.depth", 0.1f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.4286f },
+            { "unison.detune", 0.24f },
+            { "unison.width", 0.88f },
+    }} },
+    { "Cinematic Strings", {{
+            { "master.volume", 0.78f },
+            { "osc.waveform", 0.0f },
+            { "osc.level", 0.275f },
+            { "filter.cutoff", 0.6f },
+            { "filter.resonance", 0.12f },
+            { "filter.envAmount", 0.25f },
+            { "filter.attack", 0.66f },
+            { "filter.decay", 0.72f },
+            { "filter.sustain", 0.55f },
+            { "filter.release", 0.75f },
+            { "amp.attack", 0.75f },
+            { "amp.decay", 0.72f },
+            { "amp.sustain", 0.9f },
+            { "amp.release", 0.76f },
+            { "fx.delay.time", 0.6941f },
+            { "fx.delay.feedback", 0.28f },
+            { "fx.delay.mix", 0.12f },
+            { "fx.reverb.size", 0.85f },
+            { "fx.reverb.mix", 0.45f },
+            { "lfo.rate", 0.3673f },
+            { "lfo.depth", 0.12f },
+            { "lfo.waveform", 0.6667f },
+            { "unison.voices", 0.4286f },
+            { "unison.detune", 0.3f },
+            { "unison.width", 0.95f },
+    }} },
+}};
 
 } // namespace
 
 std::vector<Preset> makeFactoryPresets()
 {
     std::vector<Preset> presets;
-
+    presets.reserve (factoryPresets.size() + 1);
     presets.push_back ({ "Default", makeDefaultParameters() });
 
-    // Pluck: ataque rapido, caida corta, brillante. Unison suave para grosor.
-    auto pluck = makeDefaultParameters();
-    pluck["amp.attack"]       = 0.02f;
-    pluck["amp.decay"]        = 0.35f;
-    pluck["amp.sustain"]      = 0.15f;
-    pluck["amp.release"]      = 0.25f;
-    pluck["filter.cutoff"]    = 0.72f;
-    pluck["filter.resonance"] = 0.25f;
-    pluck["filter.envAmount"] = 0.65f;          // "wah" de pluck
-    pluck["filter.attack"]    = 0.1f;
-    pluck["filter.decay"]     = 0.45f;
-    pluck["filter.sustain"]   = 0.0f;
-    pluck["filter.release"]   = 0.4f;
-    pluck["unison.voices"]    = 1.0f / 7.0f;    // 2 voces
-    pluck["unison.detune"]    = 8.0f / 50.0f;   // 8 cents
-    pluck["unison.width"]     = 0.25f;
-    presets.push_back ({ "Pluck", pluck });
+    for (const auto& data : factoryPresets)
+    {
+        auto values = makeDefaultParameters();
 
-    // Acid Bass: estilo TB-303 (squelch). Sin unison/LFO (acido "apretado").
-    auto acid = makeDefaultParameters();
-    acid["osc.waveform"]      = 1.0f / 3.0f;   // Square
-    acid["osc.level"]         = 0.6f;
-    acid["filter.cutoff"]     = 0.35f;
-    acid["filter.resonance"]  = 0.82f;
-    acid["filter.envAmount"]  = 0.75f;          // squelch acido
-    acid["filter.attack"]     = 0.08f;
-    acid["filter.decay"]      = 0.35f;
-    acid["filter.sustain"]    = 0.05f;
-    acid["filter.release"]    = 0.3f;
-    acid["unison.width"]      = 0.0f;           // mono y apretado
-    acid["amp.attack"]        = 0.02f;
-    acid["amp.decay"]         = 0.6f;
-    acid["amp.sustain"]       = 0.15f;
-    acid["amp.release"]       = 0.35f;
-    acid["fx.delay.time"]     = 0.4f;
-    acid["fx.delay.feedback"] = 0.45f;
-    acid["fx.delay.mix"]      = 0.18f;
-    acid["fx.reverb.mix"]     = 0.1f;
-    presets.push_back ({ "Acid Bass", acid });
+        for (const auto& entry : data.values)
+            values[entry.id] = entry.value;
 
-    // Pads cinematograficos/espaciales (con unison + LFO).
-    presets.push_back (makePadPreset ("Warm Pad",   0.32f, 0.72f, 0.70f, 0.45f, 0.60f, 0.00f, 2,  8.0f, 0.25f, 0.20f));
-    presets.push_back (makePadPreset ("Lush Pad",   0.50f, 0.76f, 0.75f, 0.50f, 0.65f, 0.12f, 3, 12.0f, 0.35f, 0.30f));
-    presets.push_back (makePadPreset ("Dark Pad",   0.20f, 0.82f, 0.80f, 0.40f, 0.70f, 0.00f, 2,  6.0f, 0.20f, 0.25f));
-    presets.push_back (makePadPreset ("Space Pad",  0.35f, 0.80f, 0.85f, 0.65f, 0.75f, 0.25f, 4, 18.0f, 0.40f, 0.40f));
-    presets.push_back (makePadPreset ("Bright Pad", 0.60f, 0.70f, 0.65f, 0.40f, 0.55f, 0.00f, 3, 10.0f, 0.30f, 0.25f, 1.0f));
-
-    // ---- Leads: ataque rapido, sustain medio y presencia en el corte. ----
-
-    // Lead Saw: sierra clasica con unison suave y delay corto.
-    auto leadSaw = makeDefaultParameters();
-    leadSaw["osc.waveform"]      = 0.0f;            // Saw
-    leadSaw["osc.level"]         = 0.55f;
-    leadSaw["filter.cutoff"]     = 0.78f;           // ~4 kHz
-    leadSaw["filter.resonance"]  = 0.30f;
-    leadSaw["filter.envAmount"]  = 0.45f;
-    leadSaw["filter.attack"]     = 0.06f;
-    leadSaw["filter.decay"]      = 0.38f;
-    leadSaw["filter.sustain"]    = 0.30f;
-    leadSaw["filter.release"]    = 0.40f;
-    leadSaw["amp.attack"]        = 0.10f;           // ~2 ms
-    leadSaw["amp.decay"]         = 0.40f;
-    leadSaw["amp.sustain"]       = 0.75f;
-    leadSaw["amp.release"]       = 0.50f;
-    leadSaw["unison.voices"]     = 1.0f / 7.0f;     // 2 voces
-    leadSaw["unison.detune"]     = 7.0f / 50.0f;    // 7 cents
-    leadSaw["unison.width"]      = 0.25f;
-    leadSaw["fx.delay.time"]     = 0.50f;           // ~220 ms
-    leadSaw["fx.delay.feedback"] = 0.35f;
-    leadSaw["fx.delay.mix"]      = 0.18f;
-    leadSaw["fx.reverb.size"]    = 0.45f;
-    leadSaw["fx.reverb.mix"]     = 0.12f;
-    leadSaw["lfo.rate"]          = lfoRateNormalised (5.0f);
-    leadSaw["lfo.depth"]         = 0.06f;
-    presets.push_back ({ "Lead Saw", leadSaw });
-
-    // Lead Square: cuadrada hueca, mas resonancia y delay mas largo.
-    auto leadSquare = makeDefaultParameters();
-    leadSquare["osc.waveform"]      = 1.0f / 3.0f;  // Square
-    leadSquare["osc.level"]         = 0.45f;
-    leadSquare["filter.cutoff"]     = 0.72f;        // ~2,9 kHz
-    leadSquare["filter.resonance"]  = 0.45f;
-    leadSquare["filter.envAmount"]  = 0.55f;
-    leadSquare["filter.attack"]     = 0.05f;
-    leadSquare["filter.decay"]      = 0.30f;
-    leadSquare["filter.sustain"]    = 0.25f;
-    leadSquare["filter.release"]    = 0.35f;
-    leadSquare["amp.attack"]        = 0.08f;
-    leadSquare["amp.decay"]         = 0.35f;
-    leadSquare["amp.sustain"]       = 0.65f;
-    leadSquare["amp.release"]       = 0.45f;
-    leadSquare["unison.voices"]     = 1.0f / 7.0f;  // 2 voces
-    leadSquare["unison.detune"]     = 5.0f / 50.0f; // 5 cents
-    leadSquare["unison.width"]      = 0.15f;
-    leadSquare["fx.delay.time"]     = 0.55f;        // ~260 ms
-    leadSquare["fx.delay.feedback"] = 0.42f;
-    leadSquare["fx.delay.mix"]      = 0.22f;
-    leadSquare["fx.reverb.size"]    = 0.40f;
-    leadSquare["fx.reverb.mix"]     = 0.10f;
-    leadSquare["lfo.rate"]          = lfoRateNormalised (6.0f);
-    leadSquare["lfo.depth"]         = 0.05f;
-    presets.push_back ({ "Lead Square", leadSquare });
-
-    // Lead Soft: triangulo, mas unison y reverb para un lead cantable.
-    auto leadSoft = makeDefaultParameters();
-    leadSoft["osc.waveform"]      = 1.0f;           // Triangle
-    leadSoft["osc.level"]         = 0.60f;
-    leadSoft["filter.cutoff"]     = 0.65f;          // ~1,8 kHz
-    leadSoft["filter.resonance"]  = 0.15f;
-    leadSoft["filter.envAmount"]  = 0.20f;
-    leadSoft["filter.attack"]     = 0.30f;
-    leadSoft["filter.decay"]      = 0.55f;
-    leadSoft["filter.sustain"]    = 0.55f;
-    leadSoft["filter.release"]    = 0.55f;
-    leadSoft["amp.attack"]        = 0.22f;          // ~7 ms
-    leadSoft["amp.decay"]         = 0.50f;
-    leadSoft["amp.sustain"]       = 0.85f;
-    leadSoft["amp.release"]       = 0.60f;
-    leadSoft["unison.voices"]     = 2.0f / 7.0f;    // 3 voces
-    leadSoft["unison.detune"]     = 6.0f / 50.0f;   // 6 cents
-    leadSoft["unison.width"]      = 0.45f;
-    leadSoft["fx.delay.time"]     = 0.60f;          // ~300 ms
-    leadSoft["fx.delay.feedback"] = 0.45f;
-    leadSoft["fx.delay.mix"]      = 0.28f;
-    leadSoft["fx.reverb.size"]    = 0.55f;
-    leadSoft["fx.reverb.mix"]     = 0.25f;
-    leadSoft["lfo.rate"]          = lfoRateNormalised (4.5f);
-    leadSoft["lfo.depth"]         = 0.12f;
-    presets.push_back ({ "Lead Soft", leadSoft });
-
-    // ---- Strings: ataque lento, sustain alto y ensemble ancho. ----
-
-    // String Ensemble: sierra con unison amplio, el "string machine" clasico.
-    auto stringEnsemble = makeDefaultParameters();
-    stringEnsemble["osc.waveform"]      = 0.0f;            // Saw
-    stringEnsemble["osc.level"]         = 0.50f;
-    stringEnsemble["filter.cutoff"]     = 0.62f;           // ~1,5 kHz
-    stringEnsemble["filter.resonance"]  = 0.10f;
-    stringEnsemble["filter.envAmount"]  = 0.15f;
-    stringEnsemble["filter.attack"]     = 0.50f;
-    stringEnsemble["filter.decay"]      = 0.65f;
-    stringEnsemble["filter.sustain"]    = 0.65f;
-    stringEnsemble["filter.release"]    = 0.70f;
-    stringEnsemble["amp.attack"]        = 0.68f;           // ~300 ms
-    stringEnsemble["amp.decay"]         = 0.60f;
-    stringEnsemble["amp.sustain"]       = 0.90f;
-    stringEnsemble["amp.release"]       = 0.70f;
-    stringEnsemble["unison.voices"]     = 4.0f / 7.0f;     // 5 voces
-    stringEnsemble["unison.detune"]     = 14.0f / 50.0f;   // 14 cents
-    stringEnsemble["unison.width"]      = 0.90f;
-    stringEnsemble["fx.delay.time"]     = 0.55f;
-    stringEnsemble["fx.delay.feedback"] = 0.30f;
-    stringEnsemble["fx.delay.mix"]      = 0.08f;
-    stringEnsemble["fx.reverb.size"]    = 0.65f;
-    stringEnsemble["fx.reverb.mix"]     = 0.40f;
-    stringEnsemble["lfo.rate"]          = lfoRateNormalised (0.6f);
-    stringEnsemble["lfo.depth"]         = 0.12f;
-    presets.push_back ({ "String Ensemble", stringEnsemble });
-
-    // String Soft: triangulo y corte bajo, para colchones suaves.
-    auto stringSoft = makeDefaultParameters();
-    stringSoft["osc.waveform"]      = 1.0f;           // Triangle
-    stringSoft["osc.level"]         = 0.55f;
-    stringSoft["filter.cutoff"]     = 0.52f;          // ~800 Hz
-    stringSoft["filter.resonance"]  = 0.08f;
-    stringSoft["filter.envAmount"]  = 0.10f;
-    stringSoft["filter.attack"]     = 0.55f;
-    stringSoft["filter.decay"]      = 0.70f;
-    stringSoft["filter.sustain"]    = 0.70f;
-    stringSoft["filter.release"]    = 0.72f;
-    stringSoft["amp.attack"]        = 0.72f;          // ~420 ms
-    stringSoft["amp.decay"]         = 0.65f;
-    stringSoft["amp.sustain"]       = 0.95f;
-    stringSoft["amp.release"]       = 0.72f;
-    stringSoft["unison.voices"]     = 3.0f / 7.0f;    // 4 voces
-    stringSoft["unison.detune"]     = 10.0f / 50.0f;  // 10 cents
-    stringSoft["unison.width"]      = 0.80f;
-    stringSoft["fx.delay.time"]     = 0.50f;
-    stringSoft["fx.delay.feedback"] = 0.25f;
-    stringSoft["fx.delay.mix"]      = 0.05f;
-    stringSoft["fx.reverb.size"]    = 0.70f;
-    stringSoft["fx.reverb.mix"]     = 0.45f;
-    stringSoft["lfo.rate"]          = lfoRateNormalised (0.35f);
-    stringSoft["lfo.depth"]         = 0.08f;
-    presets.push_back ({ "String Soft", stringSoft });
-
-    // String Bright: mas corte, mas voces de unison y movimiento algo mayor.
-    auto stringBright = makeDefaultParameters();
-    stringBright["osc.waveform"]      = 0.0f;            // Saw
-    stringBright["osc.level"]         = 0.50f;
-    stringBright["filter.cutoff"]     = 0.72f;           // ~2,9 kHz
-    stringBright["filter.resonance"]  = 0.12f;
-    stringBright["filter.envAmount"]  = 0.25f;
-    stringBright["filter.attack"]     = 0.45f;
-    stringBright["filter.decay"]      = 0.60f;
-    stringBright["filter.sustain"]    = 0.60f;
-    stringBright["filter.release"]    = 0.65f;
-    stringBright["amp.attack"]        = 0.65f;           // ~240 ms
-    stringBright["amp.decay"]         = 0.55f;
-    stringBright["amp.sustain"]       = 0.90f;
-    stringBright["amp.release"]       = 0.68f;
-    stringBright["unison.voices"]     = 5.0f / 7.0f;     // 6 voces
-    stringBright["unison.detune"]     = 16.0f / 50.0f;   // 16 cents
-    stringBright["unison.width"]      = 0.95f;
-    stringBright["fx.delay.time"]     = 0.58f;
-    stringBright["fx.delay.feedback"] = 0.35f;
-    stringBright["fx.delay.mix"]      = 0.12f;
-    stringBright["fx.reverb.size"]    = 0.60f;
-    stringBright["fx.reverb.mix"]     = 0.35f;
-    stringBright["lfo.rate"]          = lfoRateNormalised (0.8f);
-    stringBright["lfo.depth"]         = 0.15f;
-    presets.push_back ({ "String Bright", stringBright });
+        presets.push_back ({ data.name, std::move (values) });
+    }
 
     return presets;
 }

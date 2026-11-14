@@ -228,19 +228,16 @@ PresetMetadata& PresetLibrary::entryFor (const juce::String& name, bool factory)
 
 PresetCategory factoryCategoryFor (const juce::String& name)
 {
-    if (name == "Default")   return PresetCategory::initiation;
-    if (name == "Pluck")     return PresetCategory::keys;
-    if (name == "Acid Bass") return PresetCategory::bass;
+    if (name == "Default") return PresetCategory::initiation;
 
-    if (name == "Lead Saw" || name == "Lead Square" || name == "Lead Soft")
-        return PresetCategory::lead;
-
-    if (name == "String Ensemble" || name == "String Soft" || name == "String Bright")
-        return PresetCategory::strings;
-
-    if (name == "Warm Pad" || name == "Lush Pad" || name == "Dark Pad"
-        || name == "Space Pad" || name == "Bright Pad")
-        return PresetCategory::pad;
+    // La biblioteca v1 usa el sufijo de familia en el nombre visible.
+    if (name.endsWith (" Pad"))     return PresetCategory::pad;
+    if (name.endsWith (" Pluck"))   return PresetCategory::keys;
+    if (name.endsWith (" Lead"))    return PresetCategory::lead;
+    if (name.endsWith (" Bass"))    return PresetCategory::bass;
+    if (name.endsWith (" Brass"))   return PresetCategory::other;
+    if (name.endsWith (" Piano"))   return PresetCategory::keys;
+    if (name.endsWith (" Strings")) return PresetCategory::strings;
 
     return PresetCategory::other;
 }

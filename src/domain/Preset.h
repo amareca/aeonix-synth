@@ -20,7 +20,7 @@ struct Preset
 // Parametros del patch por defecto (id -> normalizado).
 std::map<std::string, float> makeDefaultParameters();
 
-// Presets de fabrica: Default, Pluck y Pad.
+// Presets de fabrica: Default + biblioteca v1 (7 familias, 35 presets).
 std::vector<Preset> makeFactoryPresets();
 
 } // namespace aeonix

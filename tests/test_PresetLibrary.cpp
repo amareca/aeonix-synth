@@ -51,22 +51,23 @@ TEST_CASE ("Preset categories round-trip their stable keys", "[preset][library]"
 TEST_CASE ("Factory presets have a static category", "[preset][library]")
 {
     REQUIRE (factoryCategoryFor ("Default") == PresetCategory::initiation);
-    REQUIRE (factoryCategoryFor ("Pluck") == PresetCategory::keys);
-    REQUIRE (factoryCategoryFor ("Acid Bass") == PresetCategory::bass);
+    REQUIRE (factoryCategoryFor ("Glass Pluck") == PresetCategory::keys);
+    REQUIRE (factoryCategoryFor ("Acid Line Bass") == PresetCategory::bass);
 
-    REQUIRE (factoryCategoryFor ("Lead Saw") == PresetCategory::lead);
-    REQUIRE (factoryCategoryFor ("Lead Square") == PresetCategory::lead);
-    REQUIRE (factoryCategoryFor ("Lead Soft") == PresetCategory::lead);
+    REQUIRE (factoryCategoryFor ("Copper Lead") == PresetCategory::lead);
+    REQUIRE (factoryCategoryFor ("Hollow Lead") == PresetCategory::lead);
+    REQUIRE (factoryCategoryFor ("Velvet Lead") == PresetCategory::lead);
 
-    REQUIRE (factoryCategoryFor ("String Ensemble") == PresetCategory::strings);
-    REQUIRE (factoryCategoryFor ("String Soft") == PresetCategory::strings);
-    REQUIRE (factoryCategoryFor ("String Bright") == PresetCategory::strings);
+    REQUIRE (factoryCategoryFor ("Warm Strings") == PresetCategory::strings);
+    REQUIRE (factoryCategoryFor ("Soft Strings") == PresetCategory::strings);
+    REQUIRE (factoryCategoryFor ("Bright Strings") == PresetCategory::strings);
 
-    REQUIRE (factoryCategoryFor ("Warm Pad") == PresetCategory::pad);
-    REQUIRE (factoryCategoryFor ("Lush Pad") == PresetCategory::pad);
-    REQUIRE (factoryCategoryFor ("Dark Pad") == PresetCategory::pad);
-    REQUIRE (factoryCategoryFor ("Space Pad") == PresetCategory::pad);
-    REQUIRE (factoryCategoryFor ("Bright Pad") == PresetCategory::pad);
+    REQUIRE (factoryCategoryFor ("Aurora Pad") == PresetCategory::pad);
+    REQUIRE (factoryCategoryFor ("Nocturne Pad") == PresetCategory::pad);
+    REQUIRE (factoryCategoryFor ("Frost Pad") == PresetCategory::pad);
+
+    REQUIRE (factoryCategoryFor ("Soft Brass") == PresetCategory::other);
+    REQUIRE (factoryCategoryFor ("Felt Piano") == PresetCategory::keys);
 
     REQUIRE (factoryCategoryFor ("Lush Pad43") == PresetCategory::other);
     REQUIRE (factoryCategoryFor ("") == PresetCategory::other);
@@ -82,7 +83,7 @@ TEST_CASE ("Missing sidecar falls back to factory categories", "[preset][library
     REQUIRE (library.factoryEntries().empty());
     REQUIRE (library.userEntries().empty());
 
-    const auto lead = library.metadataFor ("Lead Saw", true);
+    const auto lead = library.metadataFor ("Copper Lead", true);
     REQUIRE (lead.category == PresetCategory::lead);
     REQUIRE_FALSE (lead.favorite);
     REQUIRE (lead.lastUsed == 0);
@@ -104,7 +105,7 @@ TEST_CASE ("Sidecar keeps categories, favourites and last use", "[preset][librar
     library.setCategory ("Lush Pad43", false, PresetCategory::pad);
     library.setFavorite ("Lush Pad43", false, true);
     library.markUsed ("Lush Pad43", false, 1234567890123LL);
-    library.setFavorite ("Lead Saw", true, true);
+    library.setFavorite ("Copper Lead", true, true);
 
     REQUIRE (library.save());
     REQUIRE (file.existsAsFile());
@@ -118,7 +119,7 @@ TEST_CASE ("Sidecar keeps categories, favourites and last use", "[preset][librar
     REQUIRE (user.lastUsed == 1234567890123LL);
 
     // Un favorito de fabrica sin categoria explicita conserva la tabla estatica.
-    const auto factory = reloaded.metadataFor ("Lead Saw", true);
+    const auto factory = reloaded.metadataFor ("Copper Lead", true);
     REQUIRE (factory.category == PresetCategory::lead);
     REQUIRE (factory.favorite);
 }
@@ -134,7 +135,7 @@ TEST_CASE ("Corrupt sidecar is ignored without losing factory table", "[preset][
 
     REQUIRE (library.factoryEntries().empty());
     REQUIRE (library.userEntries().empty());
-    REQUIRE (library.metadataFor ("Pluck", true).category == PresetCategory::keys);
+    REQUIRE (library.metadataFor ("Glass Pluck", true).category == PresetCategory::keys);
     REQUIRE (library.metadataFor ("Cualquiera", false).category == PresetCategory::other);
 }
 
@@ -144,7 +145,7 @@ TEST_CASE ("Unknown category keys fall back to other", "[preset][library]")
     const auto file = root.getChildFile ("library.json");
 
     file.replaceWithText (
-        R"({"version":1,"factory":{"Lead Saw":{"favorite":true}},)"
+        R"({"version":1,"factory":{"Copper Lead":{"favorite":true}},)"
         R"("user":{"Raro":{"category":"desconocida","favorite":true}}})");
 
     PresetLibrary library (file);
@@ -152,8 +153,8 @@ TEST_CASE ("Unknown category keys fall back to other", "[preset][library]")
 
     REQUIRE (library.metadataFor ("Raro", false).category == PresetCategory::other);
     REQUIRE (library.metadataFor ("Raro", false).favorite);
-    REQUIRE (library.metadataFor ("Lead Saw", true).category == PresetCategory::lead);
-    REQUIRE (library.metadataFor ("Lead Saw", true).favorite);
+    REQUIRE (library.metadataFor ("Copper Lead", true).category == PresetCategory::lead);
+    REQUIRE (library.metadataFor ("Copper Lead", true).favorite);
 }
 
 TEST_CASE ("Reconcile adds new presets and flags orphans", "[preset][library]")

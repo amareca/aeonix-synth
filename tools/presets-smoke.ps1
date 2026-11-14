@@ -22,8 +22,8 @@ $Queries = @($Queries | ForEach-Object { $_ -split "," } |
              ForEach-Object { $_.Trim() } | Where-Object { $_ })
 
 $expected = @{
-    "lead"   = "Lead Saw"
-    "string" = "String Ensemble"
+    "lead"   = "Copper Lead"
+    "string" = "Warm Strings"
 }
 
 $cases = @()
