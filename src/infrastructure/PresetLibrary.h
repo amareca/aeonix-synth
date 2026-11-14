@@ -14,8 +14,9 @@ namespace aeonix
 //  separado de los presets. Nunca escribe dentro del JSON de cada preset.
 // ============================================================================
 
-// Ocho categorias cerradas. Las claves son estables y no se traducen; las
-// etiquetas visibles viven en el catalogo de textos de la interfaz.
+// Diez categorias cerradas. Las claves son estables y no se traducen; las
+// etiquetas visibles viven en el catalogo de textos de la interfaz. El orden
+// del enum es el orden del lateral del gestor.
 enum class PresetCategory
 {
     initiation,
@@ -23,12 +24,14 @@ enum class PresetCategory
     lead,
     pad,
     strings,
+    brass,
     keys,
+    pluck,
     fx,
     other
 };
 
-inline constexpr int presetCategoryCount = 8;
+inline constexpr int presetCategoryCount = 10;
 
 struct PresetMetadata
 {

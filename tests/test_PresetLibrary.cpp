@@ -28,7 +28,9 @@ TEST_CASE ("Preset categories round-trip their stable keys", "[preset][library]"
         PresetCategory::lead,
         PresetCategory::pad,
         PresetCategory::strings,
+        PresetCategory::brass,
         PresetCategory::keys,
+        PresetCategory::pluck,
         PresetCategory::fx,
         PresetCategory::other
     };
@@ -41,7 +43,9 @@ TEST_CASE ("Preset categories round-trip their stable keys", "[preset][library]"
     REQUIRE (PresetLibrary::categoryKey (PresetCategory::initiation) == "iniciacion");
     REQUIRE (PresetLibrary::categoryKey (PresetCategory::bass) == "bajo");
     REQUIRE (PresetLibrary::categoryKey (PresetCategory::strings) == "cuerdas");
+    REQUIRE (PresetLibrary::categoryKey (PresetCategory::brass) == "metales");
     REQUIRE (PresetLibrary::categoryKey (PresetCategory::keys) == "teclas");
+    REQUIRE (PresetLibrary::categoryKey (PresetCategory::pluck) == "pluck");
     REQUIRE (PresetLibrary::categoryKey (PresetCategory::other) == "otros");
 
     REQUIRE (PresetLibrary::categoryFromKey ("desconocida") == PresetCategory::other);
@@ -51,7 +55,7 @@ TEST_CASE ("Preset categories round-trip their stable keys", "[preset][library]"
 TEST_CASE ("Factory presets have a static category", "[preset][library]")
 {
     REQUIRE (factoryCategoryFor ("Default") == PresetCategory::initiation);
-    REQUIRE (factoryCategoryFor ("Glass Pluck") == PresetCategory::keys);
+    REQUIRE (factoryCategoryFor ("Glass Pluck") == PresetCategory::pluck);
     REQUIRE (factoryCategoryFor ("Acid Line Bass") == PresetCategory::bass);
 
     REQUIRE (factoryCategoryFor ("Copper Lead") == PresetCategory::lead);
@@ -66,8 +70,10 @@ TEST_CASE ("Factory presets have a static category", "[preset][library]")
     REQUIRE (factoryCategoryFor ("Nocturne Pad") == PresetCategory::pad);
     REQUIRE (factoryCategoryFor ("Frost Pad") == PresetCategory::pad);
 
-    REQUIRE (factoryCategoryFor ("Soft Brass") == PresetCategory::other);
+    REQUIRE (factoryCategoryFor ("Soft Brass") == PresetCategory::brass);
+    REQUIRE (factoryCategoryFor ("Big Brass") == PresetCategory::brass);
     REQUIRE (factoryCategoryFor ("Felt Piano") == PresetCategory::keys);
+    REQUIRE (factoryCategoryFor ("Bell Pluck") == PresetCategory::pluck);
 
     REQUIRE (factoryCategoryFor ("Lush Pad43") == PresetCategory::other);
     REQUIRE (factoryCategoryFor ("") == PresetCategory::other);
@@ -135,7 +141,7 @@ TEST_CASE ("Corrupt sidecar is ignored without losing factory table", "[preset][
 
     REQUIRE (library.factoryEntries().empty());
     REQUIRE (library.userEntries().empty());
-    REQUIRE (library.metadataFor ("Glass Pluck", true).category == PresetCategory::keys);
+    REQUIRE (library.metadataFor ("Glass Pluck", true).category == PresetCategory::pluck);
     REQUIRE (library.metadataFor ("Cualquiera", false).category == PresetCategory::other);
 }
 
@@ -155,6 +161,31 @@ TEST_CASE ("Unknown category keys fall back to other", "[preset][library]")
     REQUIRE (library.metadataFor ("Raro", false).favorite);
     REQUIRE (library.metadataFor ("Copper Lead", true).category == PresetCategory::lead);
     REQUIRE (library.metadataFor ("Copper Lead", true).favorite);
+}
+
+TEST_CASE ("Factory categories ignore stale sidecar values", "[preset][library]")
+{
+    const auto root = makeTempRoot ("library-factory-authoritative");
+    const auto file = root.getChildFile ("library.json");
+
+    // Un sidecar de antes del cambio de taxonomia guarda los plucks en Teclas
+    // y los brass en Otros. La tabla estatica debe mandar sin migrar el JSON.
+    file.replaceWithText (
+        R"({"version":1,"factory":{"Glass Pluck":{"category":"teclas","favorite":true},)"
+        R"("Big Brass":{"category":"otros"}},)"
+        R"("user":{"Mi Pluck":{"category":"teclas","favorite":true}}})");
+
+    PresetLibrary library (file);
+    library.load();
+
+    const auto pluck = library.metadataFor ("Glass Pluck", true);
+    REQUIRE (pluck.category == PresetCategory::pluck);
+    REQUIRE (pluck.favorite);
+
+    REQUIRE (library.metadataFor ("Big Brass", true).category == PresetCategory::brass);
+
+    // El sidecar de usuario no se toca: su categoria sigue siendo la guardada.
+    REQUIRE (library.metadataFor ("Mi Pluck", false).category == PresetCategory::keys);
 }
 
 TEST_CASE ("Reconcile adds new presets and flags orphans", "[preset][library]")
