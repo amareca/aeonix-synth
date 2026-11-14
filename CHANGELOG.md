@@ -32,6 +32,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - **Preset sorting**: a 120×22 sort button in the manager header opens a menu
   with `Name A–Z`, `Name Z–A`, `Category`, `Origin` and `Last used`. The choice
   is stored in `config.json` (`presets.sort`) and `Origin` is the default.
+- **Themed popup menus**: the sort menu and every dropdown now share the app
+  palette, with 24 px rows, a 1 px border, accent tint and a drawn check on the
+  active option.
 - **Pluck and Brass categories** (`pluck`, `metales`): the library now shows
   five plucks and five brass presets in their own rows.
 

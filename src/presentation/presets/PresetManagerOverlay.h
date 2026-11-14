@@ -150,6 +150,7 @@ private:
     public:
         void setTheme (ThemeId theme);
         void setLocked (bool locked);
+        void setOpen (bool open);
         void paintButton (juce::Graphics& g,
                           bool shouldDrawButtonAsHighlighted,
                           bool shouldDrawButtonAsDown) override;
@@ -157,6 +158,7 @@ private:
     private:
         ThemeId theme_ = ThemeId::holoAccents;
         bool locked_ = false;
+        bool open_ = false;
     };
 
     // Capa modal de los formularios: atenua el panel y dibuja la tarjeta.

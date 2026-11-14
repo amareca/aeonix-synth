@@ -298,6 +298,15 @@ void PresetManagerOverlay::SortButton::setLocked (bool locked)
     }
 }
 
+void PresetManagerOverlay::SortButton::setOpen (bool open)
+{
+    if (open_ != open)
+    {
+        open_ = open;
+        repaint();
+    }
+}
+
 void PresetManagerOverlay::SortButton::paintButton (
     juce::Graphics& g,
     bool shouldDrawButtonAsHighlighted,
@@ -314,6 +323,11 @@ void PresetManagerOverlay::SortButton::paintButton (
         border = colours.panelBorder.withAlpha (0.55f);
         text = colours.muted.withAlpha (0.45f);
     }
+    else if (open_)
+    {
+        border = colours.accent.withAlpha (0.55f);
+        text = colours.accent;
+    }
     else if (shouldDrawButtonAsDown)
     {
         border = colours.accent.withAlpha (0.55f);
@@ -325,7 +339,7 @@ void PresetManagerOverlay::SortButton::paintButton (
         text = colours.text;
     }
 
-    g.setColour (colours.panel);
+    g.setColour (open_ ? colours.accent.withAlpha (0.14f) : colours.panel);
     g.fillRoundedRectangle (bounds, 4.0f);
     g.setColour (border);
     g.drawRoundedRectangle (bounds, 4.0f, 1.0f);
@@ -834,7 +848,6 @@ void PresetManagerOverlay::showSortMenu()
                   sortMode_ == SortMode::nameAsc);
     menu.addItem (2, tr (TextId::presetManagerSortNameDesc), true,
                   sortMode_ == SortMode::nameDesc);
-    menu.addSeparator();
     menu.addItem (3, tr (TextId::presetManagerSortCategory), true,
                   sortMode_ == SortMode::category);
     menu.addItem (4, tr (TextId::presetManagerSortOrigin), true,
@@ -842,11 +855,37 @@ void PresetManagerOverlay::showSortMenu()
     menu.addItem (5, tr (TextId::presetManagerSortRecent), true,
                   sortMode_ == SortMode::lastUsed);
 
+    // Ancho: 240 nominales o el que pida el texto mas largo. El calculo imita
+    // el de JUCE (texto + 2 x alto + 8) para alinear el borde derecho con el
+    // boton y que el menu no se salga del panel.
+    const auto font = getLookAndFeel().getPopupMenuFont();
+    int widest = 0;
+
+    for (const auto id : { TextId::presetManagerSortNameAsc,
+                           TextId::presetManagerSortNameDesc,
+                           TextId::presetManagerSortCategory,
+                           TextId::presetManagerSortOrigin,
+                           TextId::presetManagerSortRecent })
+        widest = juce::jmax (widest,
+                             juce::GlyphArrangement::getStringWidthInt (font, tr (id)));
+
+    const auto menuWidth = juce::jmax (ui::px (240), widest + ui::px (64));
+
+    auto target = sortButton_.getScreenBounds();
+    target.setX (target.getRight() - menuWidth);
+    target.setWidth (menuWidth);
+
+    sortButton_.setOpen (true);
+    menu.setLookAndFeel (&getLookAndFeel());
+
     menu.showMenuAsync (juce::PopupMenu::Options()
-                            .withTargetComponent (&sortButton_)
-                            .withMinimumWidth (sortButton_.getWidth()),
+                            .withTargetScreenArea (target)
+                            .withMinimumWidth (menuWidth)
+                            .withStandardItemHeight (ui::px (24)),
                         [this] (int result)
                         {
+                            sortButton_.setOpen (false);
+
                             switch (result)
                             {
                                 case 1: setSortMode (SortMode::nameAsc); break;
