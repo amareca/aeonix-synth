@@ -6,6 +6,7 @@ on:
     paths:
       - "site/**"
       - ".github/workflows/pages.yml"
+      - "tools/site-seo-check.mjs"
   workflow_dispatch:
 
 permissions:
@@ -29,6 +30,9 @@ jobs:
 
       - name: Configure Pages
         uses: actions/configure-pages@v6
+
+      - name: Check SEO and local links
+        run: node tools/site-seo-check.mjs
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5

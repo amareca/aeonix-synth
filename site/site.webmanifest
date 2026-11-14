@@ -1,7 +1,8 @@
 {
   "name": "AEONIX",
   "short_name": "AEONIX",
-  "description": "Sintetizador sustractivo standalone para Windows",
+  "description": "Free, open-source subtractive synthesizer for Windows 10/11",
+  "lang": "en",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#080c12",
