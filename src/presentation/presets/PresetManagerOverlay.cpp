@@ -1510,8 +1510,8 @@ void PresetManagerOverlay::focusNextInOverlay (bool backwards)
     else
     {
         focusables.push_back (&searchEditor_);
-        focusables.push_back (&listBox_);
         focusables.push_back (&sortButton_);
+        focusables.push_back (&listBox_);
 
         if (auditionButton_.isEnabled())
             focusables.push_back (&auditionButton_);
@@ -1951,23 +1951,32 @@ void PresetManagerOverlay::resized()
 
     panelBounds_ = full.withSizeKeepingCentre (panelW, panelH);
 
-    auto p = panelBounds_.reduced (ui::px (20));
+    // El pie absorbe el padding inferior: la linea queda donde estaba y los
+    // controles se centran entre ella y el borde del overlay.
+    auto p = panelBounds_;
+    p.removeFromTop (ui::px (20));
+    p.removeFromLeft (ui::px (20));
+    p.removeFromRight (ui::px (20));
 
     auto header = p.removeFromTop (ui::px (44));
     closeButton_.setBounds (header.removeFromRight (ui::px (28))
                                   .withSizeKeepingCentre (ui::px (28), ui::px (24)));
     header.removeFromRight (ui::px (10));
+    sortButton_.setBounds (header.removeFromRight (ui::px (120))
+                               .withSizeKeepingCentre (ui::px (120), ui::px (22)));
+    header.removeFromRight (ui::px (8));
     searchEditor_.setBounds (header.removeFromRight (ui::px (320))
                                    .withSizeKeepingCentre (ui::px (320), ui::px (26)));
     header.removeFromRight (ui::px (12));
     titleLabel_.setBounds (header);
 
-    auto meta = p.removeFromTop (ui::px (28));
+    // La meta crece con la tipografia: 20 / 21 / 23 con los tamanos actuales.
+    const int metaH = juce::jmax (ui::px (20),
+                                  juce::roundToInt (ui::font (10.5f).getHeight()) + ui::px (4));
+    auto meta = p.removeFromTop (metaH);
     countLabel_.setBounds (meta.removeFromLeft (ui::px (220)));
-    sortButton_.setBounds (meta.removeFromRight (ui::px (120))
-                               .withSizeKeepingCentre (ui::px (120), ui::px (22)));
 
-    auto footer = p.removeFromBottom (ui::px (32));
+    auto footer = p.removeFromBottom (ui::px (52));
 
     auto body = p;
 
