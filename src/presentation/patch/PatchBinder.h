@@ -9,12 +9,12 @@ namespace aeonix
 {
 
 // ============================================================================
-//  PatchBinder — puente entre un patch (mapa id -> valor normalizado) y los
-//  ViewModels de la interfaz.
+//  PatchBinder - bridge between a patch (id -> normalised value map) and the
+//  interface ViewModels.
 //
-//  - capture(): lee el estado actual de los ViewModels.
-//  - apply():    parte de los valores por defecto y aplica el patch recibido,
-//                de modo que los presets antiguos queden completos.
+//  - capture(): reads the current state of the ViewModels.
+//  - apply():    starts from the default values and applies the received
+//                patch, so old presets end up complete.
 // ============================================================================
 class PatchBinder
 {

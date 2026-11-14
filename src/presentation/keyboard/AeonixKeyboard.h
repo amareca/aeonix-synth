@@ -9,11 +9,11 @@ namespace aeonix
 {
 
 // ============================================================================
-//  AeonixKeyboard — teclado "Studio Ivory".
+//  AeonixKeyboard - "Studio Ivory" keyboard.
 //
-//  Hereda de MidiKeyboardComponent para dibujar las teclas a mano:
-//  marfil cálido, negras de carbón, sombras, hover sutil y glow teal al
-//  pulsar. Mantiene intacto el estado MIDI, el clic y el feedback.
+//  Inherits from MidiKeyboardComponent to draw the keys by hand:
+//  warm ivory, charcoal blacks, shadows, subtle hover and teal glow while
+//  pressed. Keeps MIDI state, clicking and feedback intact.
 // ============================================================================
 class AeonixKeyboard : public juce::MidiKeyboardComponent
 {
@@ -67,11 +67,11 @@ public:
         g.setGradientFill (gradient);
         g.fillPath (key);
 
-        // Borde y separador.
+        // Border and separator.
         g.setColour (lineColour.withAlpha (0.9f));
         g.strokePath (key, juce::PathStrokeType (1.0f));
 
-        // Sombra inferior muy suave.
+        // Very soft bottom shadow.
         g.setColour (juce::Colour (0x18000000));
         g.fillRect (r.getX() + 1.0f, r.getBottom() - 2.0f, r.getWidth() - 2.0f, 2.0f);
 
@@ -104,7 +104,7 @@ public:
             g.strokePath (key, juce::PathStrokeType (1.4f));
         }
 
-        // Etiqueta solo en las C (la base devuelve vacio para el resto).
+        // Label only on the Cs (the base returns empty for the rest).
         if (const auto label = getWhiteNoteText (midiNoteNumber); label.isNotEmpty())
         {
             g.setColour (juce::Colour (0xff6f6a60));
@@ -128,7 +128,7 @@ public:
 
         auto r = area.reduced (0.5f);
 
-        // Sombra proyectada.
+        // Drop shadow.
         const auto shadowRect = r.translated (0.0f, 2.5f);
         juce::Path shadow;
         shadow.addRoundedRectangle (shadowRect.getX(), shadowRect.getY(),
@@ -181,7 +181,7 @@ public:
             g.strokePath (key, juce::PathStrokeType (1.4f));
         }
 
-        // Brillo superior (se dibuja al final para que siga visible al pulsar).
+        // Top highlight (drawn last so it stays visible while pressed).
         g.setColour (juce::Colour (0x22ffffff));
         g.fillRoundedRectangle (r.getX() + 1.0f, r.getY() + 1.0f,
                                 r.getWidth() - 2.0f, 2.0f, 1.0f);

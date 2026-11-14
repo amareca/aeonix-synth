@@ -8,10 +8,10 @@ namespace aeonix
 {
 
 // ============================================================================
-//  SynthViewModels — agregado de los ViewModels de la interfaz.
+//  SynthViewModels - aggregate of the interface ViewModels.
 //
-//  Agrupa los ocho ViewModels para pasarlos como una sola dependencia al
-//  PatchBinder y a las secciones, en lugar de repetir ocho parametros.
+//  Groups the eight ViewModels so they can be passed as a single dependency to
+//  PatchBinder and the sections, instead of repeating eight parameters.
 // ============================================================================
 struct SynthViewModels
 {

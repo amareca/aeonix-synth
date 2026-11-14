@@ -42,8 +42,8 @@ std::map<std::string, float> PatchBinder::capture() const
 
 void PatchBinder::apply (const std::map<std::string, float>& p)
 {
-    // Parte de los valores por defecto: los presets antiguos (guardados antes
-    // de anadir parametros nuevos) quedan completos y predecibles.
+    // Starts from the default values: old presets (saved before new
+    // parameters were added) end up complete and predictable.
     std::map<std::string, float> values = makeDefaultParameters();
     for (const auto& [key, value] : p)
         values[key] = value;

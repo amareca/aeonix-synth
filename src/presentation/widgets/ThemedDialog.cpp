@@ -197,7 +197,7 @@ bool ThemedDialog::keyPressed (const juce::KeyPress& key)
         return true;
     }
 
-    // Modal: consumir el resto para que el teclado QWERTY no toque el sintetizador.
+    // Modal: consume the rest so the QWERTY keyboard does not hit the synth.
     return true;
 }
 

@@ -11,7 +11,7 @@ namespace aeonix
 {
 
 // ============================================================================
-//  ComboControl — etiqueta + ComboBox con el mismo layout que los knobs.
+//  ComboControl - label + ComboBox with the same layout as the knobs.
 // ============================================================================
 class ComboControl final : public juce::Component
 {
