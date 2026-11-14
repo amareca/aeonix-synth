@@ -83,7 +83,7 @@ TEST_CASE ("Factory preset values are valid and normalised", "[preset]")
 
         for (const auto& [id, value] : p.parameters)
         {
-            REQUIRE (defaults.count (id) == 1);   // sin ids desconocidos
+            REQUIRE (defaults.count (id) == 1);   // no unknown ids
             REQUIRE (value >= 0.0f);
             REQUIRE (value <= 1.0f);
         }

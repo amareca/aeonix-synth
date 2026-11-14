@@ -13,7 +13,7 @@ TEST_CASE ("pitchBendRatio follows the semitone range and clamps", "[math]")
     REQUIRE (pitchBendRatio (1.0f) == Catch::Approx (std::pow (2.0, 2.0 / 12.0)));
     REQUIRE (pitchBendRatio (-1.0f) == Catch::Approx (std::pow (2.0, -2.0 / 12.0)));
 
-    // Fuera de rango se limita a -1..+1.
+    // Out of range it is clamped to -1..+1.
     REQUIRE (pitchBendRatio (5.0f) == Catch::Approx (pitchBendRatio (1.0f)));
 }
 
@@ -48,16 +48,16 @@ TEST_CASE ("effectiveLfoDepth adds the mod wheel and clamps", "[math]")
 
 TEST_CASE ("effectiveCutoff combines base, filter envelope and LFO", "[math]")
 {
-    // Sin envolvente ni LFO: cutoff base.
+    // No envelope and no LFO: base cutoff.
     REQUIRE (effectiveCutoff (1000.0f, 1.0f, 0.0f, 0.0f) == Catch::Approx (1000.0f));
 
-    // Envolvente a tope y cantidad 1 -> +6 octavas (x64).
+    // Envelope at maximum and amount 1 -> +6 octaves (x64).
     REQUIRE (effectiveCutoff (100.0f, 1.0f, 1.0f, 0.0f) == Catch::Approx (6400.0f));
 
-    // LFO bipolar multiplica el cutoff.
+    // Bipolar LFO multiplies the cutoff.
     REQUIRE (effectiveCutoff (1000.0f, 0.0f, 0.0f, 0.5f) == Catch::Approx (1500.0f));
 
-    // Se limita al rango audible.
+    // It is clamped to the audible range.
     REQUIRE (effectiveCutoff (1000.0f, 1.0f, 1.0f, 0.0f) == Catch::Approx (20000.0f));
     REQUIRE (effectiveCutoff (20.0f, 0.0f, 0.0f, -1.0f) == Catch::Approx (20.0f));
 }

@@ -11,8 +11,8 @@ using namespace aeonix;
 namespace
 {
 
-// Renderiza "blocks" bloques y comprueba que toda la señal es finita.
-// Devuelve el pico absoluto encontrado.
+// Renders "blocks" blocks and checks that the whole signal is finite.
+// Returns the absolute peak found.
 bool renderIsFinite (SynthEngine& engine, int blocks, int blockSize, float& peak)
 {
     std::vector<float> left (static_cast<size_t> (blockSize), 0.0f);
@@ -51,7 +51,7 @@ TEST_CASE ("SynthEngine stays finite with extreme settings", "[stability]")
     setParam (engine, param::masterVolume,    1.0f);
     setParam (engine, param::oscLevel,        1.0f);
     setParam (engine, param::filterCutoff,    0.0f);   // 20 Hz
-    setParam (engine, param::filterResonance, 1.0f);   // Q máxima
+    setParam (engine, param::filterResonance, 1.0f);   // max Q
     setParam (engine, param::filterEnvAmount, 1.0f);
     setParam (engine, param::filterAttack,    0.0f);
     setParam (engine, param::filterDecay,     0.0f);
@@ -68,7 +68,7 @@ TEST_CASE ("SynthEngine stays finite with extreme settings", "[stability]")
     setParam (engine, param::reverbMix,       1.0f);
     setParam (engine, param::lfoRate,         1.0f);
     setParam (engine, param::lfoDepth,        1.0f);
-    setParam (engine, param::unisonVoices,    1.0f);   // 8 voces
+    setParam (engine, param::unisonVoices,    1.0f);   // 8 voices
     setParam (engine, param::unisonDetune,    1.0f);
     setParam (engine, param::unisonWidth,     1.0f);
 
@@ -85,7 +85,7 @@ TEST_CASE ("SynthEngine stays finite with extreme settings", "[stability]")
     for (int note : notes)
         engine.noteOff (note);
 
-    // Cola larga con delay/reverb al máximo: sigue siendo finita.
+    // Long tail with delay/reverb at maximum: it stays finite.
     REQUIRE (renderIsFinite (engine, 200, 256, peak));
     REQUIRE (peak < 1000.0f);
 }

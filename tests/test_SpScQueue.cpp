@@ -10,7 +10,7 @@ TEST_CASE ("SPSC queue pushes and pops in order", "[queue]")
     SpScQueue<int, 4> q;
     int out = 0;
 
-    REQUIRE_FALSE (q.tryPop (out));   // vacia al principio
+    REQUIRE_FALSE (q.tryPop (out));   // empty at the start
 
     REQUIRE (q.tryPush (10));
     REQUIRE (q.tryPush (20));
@@ -33,7 +33,7 @@ TEST_CASE ("SPSC queue rejects push when full", "[queue]")
     REQUIRE (q.tryPush (2));
     REQUIRE (q.tryPush (3));
     REQUIRE (q.tryPush (4));
-    REQUIRE_FALSE (q.tryPush (5));   // llena
+    REQUIRE_FALSE (q.tryPush (5));   // full
 }
 
 TEST_CASE ("SPSC queue size tracks the element count", "[queue]")

@@ -124,7 +124,7 @@ TEST_CASE ("Sidecar keeps categories, favourites and last use", "[preset][librar
     REQUIRE (user.favorite);
     REQUIRE (user.lastUsed == 1234567890123LL);
 
-    // Un favorito de fabrica sin categoria explicita conserva la tabla estatica.
+    // A factory favourite without an explicit category keeps the static table.
     const auto factory = reloaded.metadataFor ("Copper Lead", true);
     REQUIRE (factory.category == PresetCategory::lead);
     REQUIRE (factory.favorite);
@@ -168,8 +168,8 @@ TEST_CASE ("Factory categories ignore stale sidecar values", "[preset][library]"
     const auto root = makeTempRoot ("library-factory-authoritative");
     const auto file = root.getChildFile ("library.json");
 
-    // Un sidecar de antes del cambio de taxonomia guarda los plucks en Teclas
-    // y los brass en Otros. La tabla estatica debe mandar sin migrar el JSON.
+    // A sidecar from before the taxonomy change stores the plucks in Teclas
+    // and the brass in Otros. The static table must rule without migrating the JSON.
     file.replaceWithText (
         R"({"version":1,"factory":{"Glass Pluck":{"category":"teclas","favorite":true},)"
         R"("Big Brass":{"category":"otros"}},)"
@@ -184,7 +184,7 @@ TEST_CASE ("Factory categories ignore stale sidecar values", "[preset][library]"
 
     REQUIRE (library.metadataFor ("Big Brass", true).category == PresetCategory::brass);
 
-    // El sidecar de usuario no se toca: su categoria sigue siendo la guardada.
+    // The user sidecar is not touched: its category is still the stored one.
     REQUIRE (library.metadataFor ("Mi Pluck", false).category == PresetCategory::keys);
 }
 
@@ -254,8 +254,8 @@ TEST_CASE ("Saving twice replaces the sidecar without losing entries", "[preset]
     REQUIRE (reloaded.metadataFor ("Primero", false).favorite);
     REQUIRE (reloaded.metadataFor ("Segundo", false).favorite);
 
-    // El var debe seguir vivo: getDynamicObject() devuelve un puntero al objeto
-    // que posee, no una copia.
+    // The var must stay alive: getDynamicObject() returns a pointer to the object
+    // it owns, not a copy.
     const auto parsed = juce::JSON::parse (file);
     const auto rootObject = parsed.getDynamicObject();
     REQUIRE (rootObject != nullptr);
