@@ -33,8 +33,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   with `Name A–Z`, `Name Z–A`, `Category`, `Origin` and `Last used`. The choice
   is stored in `config.json` (`presets.sort`) and `Origin` is the default.
 - **Themed popup menus**: the sort menu and every dropdown now share the app
-  palette, with 24 px rows, a 1 px border, accent tint and a drawn check on the
-  active option.
+  palette, with a 1 px border, accent tint and a drawn check on the active
+  option. The sort menu is 24 px per row and grows to fit its longest label.
 - **Pluck and Brass categories** (`pluck`, `metales`): the library now shows
   five plucks and five brass presets in their own rows.
 

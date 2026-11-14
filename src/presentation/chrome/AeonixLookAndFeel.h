@@ -254,7 +254,7 @@ public:
     // ------------------------------------------------------------------------
     int getPopupMenuBorderSize() override { return ui::px (4); }
 
-    juce::Font getPopupMenuFont() override { return ui::font (11.0f); }
+    juce::Font getPopupMenuFont() override { return ui::font (12.0f); }
 
     void drawPopupMenuBackground (juce::Graphics& g, int width, int height) override
     {

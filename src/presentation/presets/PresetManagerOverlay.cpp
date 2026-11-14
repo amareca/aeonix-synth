@@ -855,10 +855,17 @@ void PresetManagerOverlay::showSortMenu()
     menu.addItem (5, tr (TextId::presetManagerSortRecent), true,
                   sortMode_ == SortMode::lastUsed);
 
-    // Ancho: 240 nominales o el que pida el texto mas largo. El calculo imita
-    // el de JUCE (texto + 2 x alto + 8) para alinear el borde derecho con el
-    // boton y que el menu no se salga del panel.
-    const auto font = getLookAndFeel().getPopupMenuFont();
+    // Ancho: el que pida el texto mas largo, con el minimo del boton (120).
+    // El chrome imita el de JUCE: 2 x alto de fila + 8 de relleno propio del
+    // LookAndFeel + 2 x borde. La fuente se recorta igual que en JUCE cuando
+    // no cabe en la fila, para medir exactamente lo que pintara.
+    auto font = getLookAndFeel().getPopupMenuFont();
+    const auto rowHeight = ui::px (24);
+    const auto maxFontHeight = static_cast<float> (rowHeight) / 1.3f;
+
+    if (font.getHeight() > maxFontHeight)
+        font.setHeight (maxFontHeight);
+
     int widest = 0;
 
     for (const auto id : { TextId::presetManagerSortNameAsc,
@@ -869,7 +876,8 @@ void PresetManagerOverlay::showSortMenu()
         widest = juce::jmax (widest,
                              juce::GlyphArrangement::getStringWidthInt (font, tr (id)));
 
-    const auto menuWidth = juce::jmax (ui::px (240), widest + ui::px (64));
+    const auto chrome = 2 * rowHeight + ui::px (8) + 2 * ui::px (4);
+    const auto menuWidth = juce::jmax (ui::px (120), widest + chrome);
 
     auto target = sortButton_.getScreenBounds();
     target.setX (target.getRight() - menuWidth);
