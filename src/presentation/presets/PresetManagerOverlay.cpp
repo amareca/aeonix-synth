@@ -16,7 +16,9 @@ juce::Colour categoryColour (aeonix::PresetCategory category,
         case aeonix::PresetCategory::lead:       return juce::Colour (0xfff6a54a);
         case aeonix::PresetCategory::pad:        return juce::Colour (0xffa78bfa);
         case aeonix::PresetCategory::strings:    return juce::Colour (0xff7dd3a8);
+        case aeonix::PresetCategory::brass:      return juce::Colour (0xffd97a9e);
         case aeonix::PresetCategory::keys:       return juce::Colour (0xffe6c15a);
+        case aeonix::PresetCategory::pluck:      return juce::Colour (0xffa8d95f);
         case aeonix::PresetCategory::fx:         return juce::Colour (0xffe8836b);
         case aeonix::PresetCategory::other:      return colours.muted;
     }
@@ -275,6 +277,80 @@ void PresetManagerOverlay::AuditionButton::paintButton (
 }
 
 // ============================================================================
+//  Boton de orden
+// ============================================================================
+
+void PresetManagerOverlay::SortButton::setTheme (ThemeId theme)
+{
+    if (theme_ != theme)
+    {
+        theme_ = theme;
+        repaint();
+    }
+}
+
+void PresetManagerOverlay::SortButton::setLocked (bool locked)
+{
+    if (locked_ != locked)
+    {
+        locked_ = locked;
+        repaint();
+    }
+}
+
+void PresetManagerOverlay::SortButton::paintButton (
+    juce::Graphics& g,
+    bool shouldDrawButtonAsHighlighted,
+    bool shouldDrawButtonAsDown)
+{
+    const auto colours = themeColours (theme_);
+    const auto bounds = getLocalBounds().toFloat().reduced (0.5f);
+
+    auto border = colours.panelBorder;
+    auto text = colours.muted;
+
+    if (locked_)
+    {
+        border = colours.panelBorder.withAlpha (0.55f);
+        text = colours.muted.withAlpha (0.45f);
+    }
+    else if (shouldDrawButtonAsDown)
+    {
+        border = colours.accent.withAlpha (0.55f);
+        text = colours.accent;
+    }
+    else if (shouldDrawButtonAsHighlighted)
+    {
+        border = colours.muted.withAlpha (0.50f);
+        text = colours.text;
+    }
+
+    g.setColour (colours.panel);
+    g.fillRoundedRectangle (bounds, 4.0f);
+    g.setColour (border);
+    g.drawRoundedRectangle (bounds, 4.0f, 1.0f);
+
+    auto area = getLocalBounds().reduced (ui::px (8), 0);
+    auto chevron = area.removeFromRight (ui::px (8));
+
+    g.setColour (text);
+    g.setFont (ui::font (11.0f));
+    g.drawFittedText (getButtonText(), area, juce::Justification::centredLeft, 1);
+
+    // Chevron dibujado: no depende de la fuente ni del tamano de texto.
+    const auto cx = static_cast<float> (chevron.getCentreX());
+    const auto cy = static_cast<float> (chevron.getCentreY());
+    const auto halfW = static_cast<float> (ui::px (3));
+    const auto halfH = static_cast<float> (ui::px (2));
+
+    juce::Path path;
+    path.startNewSubPath (cx - halfW, cy - halfH);
+    path.lineTo (cx, cy + halfH);
+    path.lineTo (cx + halfW, cy - halfH);
+    g.strokePath (path, juce::PathStrokeType (1.2f));
+}
+
+// ============================================================================
 //  Construccion
 // ============================================================================
 
@@ -314,9 +390,10 @@ PresetManagerOverlay::PresetManagerOverlay()
     countLabel_.setJustificationType (juce::Justification::centredLeft);
     addAndMakeVisible (countLabel_);
 
-    sortLabel_.setFont (ui::font (11.0f));
-    sortLabel_.setJustificationType (juce::Justification::centredRight);
-    addAndMakeVisible (sortLabel_);
+    sortButton_.setName ("PresetSort");
+    sortButton_.setTooltip (tr (TextId::presetManagerSortTooltip));
+    sortButton_.onClick = [this] { showSortMenu(); };
+    addAndMakeVisible (sortButton_);
 
     newButton_.setButtonText (tr (TextId::presetManagerNew));
     newButton_.setTitle (tr (TextId::presetManagerNew));
@@ -627,6 +704,10 @@ void PresetManagerOverlay::filter()
         if (static_cast<int> (visible_.size()) > recentLimit)
             visible_.resize (static_cast<size_t> (recentLimit));
     }
+    else
+    {
+        sortVisible();
+    }
 
     updating_ = true;
     listBox_.updateContent();
@@ -638,6 +719,73 @@ void PresetManagerOverlay::filter()
     repaint();
 }
 
+void PresetManagerOverlay::sortVisible()
+{
+    const auto entry = [this] (int index) -> const PresetEntry&
+    {
+        return entries_[static_cast<size_t> (index)];
+    };
+
+    const auto byName = [&entry] (int left, int right)
+    {
+        const auto cmp = entry (left).name.compareIgnoreCase (entry (right).name);
+        return cmp != 0 ? cmp < 0 : left < right;
+    };
+
+    switch (sortMode_)
+    {
+        case SortMode::nameAsc:
+            std::stable_sort (visible_.begin(), visible_.end(), byName);
+            break;
+
+        case SortMode::nameDesc:
+            std::stable_sort (visible_.begin(), visible_.end(),
+                              [&byName] (int left, int right)
+                              {
+                                  if (byName (left, right))
+                                      return false;
+
+                                  if (byName (right, left))
+                                      return true;
+
+                                  return false;
+                              });
+            break;
+
+        case SortMode::category:
+            std::stable_sort (visible_.begin(), visible_.end(),
+                              [&] (int left, int right)
+                              {
+                                  const auto a = static_cast<int> (entry (left).metadata.category);
+                                  const auto b = static_cast<int> (entry (right).metadata.category);
+                                  return a != b ? a < b : byName (left, right);
+                              });
+            break;
+
+        case SortMode::lastUsed:
+            std::stable_sort (visible_.begin(), visible_.end(),
+                              [&] (int left, int right)
+                              {
+                                  const auto a = entry (left).metadata.lastUsed;
+                                  const auto b = entry (right).metadata.lastUsed;
+                                  return a != b ? a > b : byName (left, right);
+                              });
+            break;
+
+        case SortMode::origin:
+        default:
+            std::stable_sort (visible_.begin(), visible_.end(),
+                              [&] (int left, int right)
+                              {
+                                  if (entry (left).factory != entry (right).factory)
+                                      return entry (left).factory;
+
+                                  return byName (left, right);
+                              });
+            break;
+    }
+}
+
 void PresetManagerOverlay::updateMeta()
 {
     countLabel_.setText (filteredCount() == 1
@@ -646,9 +794,142 @@ void PresetManagerOverlay::updateMeta()
                                     { juce::String (filteredCount()) }),
                          juce::dontSendNotification);
 
-    sortLabel_.setText (filter_ == Filter::recent ? tr (TextId::presetManagerSortRecent)
-                                                  : tr (TextId::presetManagerSort),
-                        juce::dontSendNotification);
+    updateSortButton();
+}
+
+void PresetManagerOverlay::updateSortButton()
+{
+    const bool locked = filter_ == Filter::recent;
+
+    juce::String label;
+
+    switch (sortMode_)
+    {
+        case SortMode::nameAsc:  label = tr (TextId::presetManagerSortNameAsc); break;
+        case SortMode::nameDesc: label = tr (TextId::presetManagerSortNameDesc); break;
+        case SortMode::category: label = tr (TextId::presetManagerSortCategory); break;
+        case SortMode::lastUsed: label = tr (TextId::presetManagerSortRecent); break;
+        case SortMode::origin:
+        default:                 label = tr (TextId::presetManagerSortOrigin); break;
+    }
+
+    if (locked)
+        label = tr (TextId::presetManagerSortRecent);
+
+    sortButton_.setButtonText (label);
+    sortButton_.setLocked (locked);
+    sortButton_.setTooltip (locked ? tr (TextId::presetManagerSortLockedTooltip)
+                                   : tr (TextId::presetManagerSortTooltip));
+    sortButton_.setTitle (locked ? tr (TextId::presetManagerSortLockedTooltip)
+                                 : tr (TextId::presetManagerSortButton));
+}
+
+void PresetManagerOverlay::showSortMenu()
+{
+    if (filter_ == Filter::recent)
+        return;
+
+    juce::PopupMenu menu;
+    menu.addItem (1, tr (TextId::presetManagerSortNameAsc), true,
+                  sortMode_ == SortMode::nameAsc);
+    menu.addItem (2, tr (TextId::presetManagerSortNameDesc), true,
+                  sortMode_ == SortMode::nameDesc);
+    menu.addSeparator();
+    menu.addItem (3, tr (TextId::presetManagerSortCategory), true,
+                  sortMode_ == SortMode::category);
+    menu.addItem (4, tr (TextId::presetManagerSortOrigin), true,
+                  sortMode_ == SortMode::origin);
+    menu.addItem (5, tr (TextId::presetManagerSortRecent), true,
+                  sortMode_ == SortMode::lastUsed);
+
+    menu.showMenuAsync (juce::PopupMenu::Options()
+                            .withTargetComponent (&sortButton_)
+                            .withMinimumWidth (sortButton_.getWidth()),
+                        [this] (int result)
+                        {
+                            switch (result)
+                            {
+                                case 1: setSortMode (SortMode::nameAsc); break;
+                                case 2: setSortMode (SortMode::nameDesc); break;
+                                case 3: setSortMode (SortMode::category); break;
+                                case 4: setSortMode (SortMode::origin); break;
+                                case 5: setSortMode (SortMode::lastUsed); break;
+                                default: break;
+                            }
+                        });
+}
+
+void PresetManagerOverlay::setSortMode (SortMode mode, juce::NotificationType notification)
+{
+    if (sortMode_ == mode)
+    {
+        updateSortButton();
+        return;
+    }
+
+    sortMode_ = mode;
+    filter();
+
+    if (notification != juce::dontSendNotification && onSortChanged)
+        onSortChanged (mode);
+}
+
+juce::String PresetManagerOverlay::sortKey (SortMode mode)
+{
+    switch (mode)
+    {
+        case SortMode::nameAsc:  return "nameAsc";
+        case SortMode::nameDesc: return "nameDesc";
+        case SortMode::category: return "category";
+        case SortMode::lastUsed: return "lastUsed";
+        case SortMode::origin:
+        default:                 return "origin";
+    }
+}
+
+PresetManagerOverlay::SortMode PresetManagerOverlay::sortModeFromKey (const juce::String& key)
+{
+    if (key == "nameAsc")  return SortMode::nameAsc;
+    if (key == "nameDesc") return SortMode::nameDesc;
+    if (key == "category") return SortMode::category;
+    if (key == "lastUsed") return SortMode::lastUsed;
+
+    return SortMode::origin;
+}
+
+void PresetManagerOverlay::refreshDetailName()
+{
+    if (detailFullName_.isEmpty())
+    {
+        detailName_.setText ({}, juce::dontSendNotification);
+        return;
+    }
+
+    const auto width = detailName_.getWidth();
+
+    if (width <= 0)
+    {
+        detailName_.setText (detailFullName_, juce::dontSendNotification);
+        return;
+    }
+
+    const auto font = detailName_.getFont();
+    auto text = detailFullName_;
+
+    if (juce::GlyphArrangement::getStringWidth (font, text) <= static_cast<float> (width))
+    {
+        detailName_.setText (text, juce::dontSendNotification);
+        return;
+    }
+
+    const auto ellipsis = juce::String::charToString (0x2026);
+    const auto limit = static_cast<float> (width);
+
+    while (text.isNotEmpty()
+           && juce::GlyphArrangement::getStringWidth (font, text.trimEnd() + ellipsis) > limit)
+        text = text.dropLastCharacters (1);
+
+    detailName_.setText (text.trimEnd() + ellipsis, juce::dontSendNotification);
 }
 
 void PresetManagerOverlay::setFilter (Filter mode, PresetCategory category)
@@ -665,6 +946,7 @@ void PresetManagerOverlay::updateSidebar()
     int user = 0;
     int favorites = 0;
     int recent = 0;
+    bool visibilityChanged = false;
     int categories[presetCategoryCount] = {};
 
     for (const auto& entry : entries_)
@@ -702,13 +984,24 @@ void PresetManagerOverlay::updateSidebar()
     for (int i = 0; i < presetCategoryCount; ++i)
     {
         const auto category = static_cast<PresetCategory> (i);
+        const bool active = filter_ == Filter::category && category_ == category;
+        const bool show = categories[i] > 0 || active;
+
+        if (categoryRows_[i].isVisible() != show)
+        {
+            categoryRows_[i].setVisible (show);
+            visibilityChanged = true;
+        }
 
         categoryRows_[i].setContent (categoryName (category),
                                      categories[i],
-                                     filter_ == Filter::category && category_ == category,
+                                     active,
                                      categoryColour (category, colours),
                                      categories[i] == 0);
     }
+
+    if (visibilityChanged)
+        resized();
 }
 
 bool PresetManagerOverlay::matchesFilter (const PresetEntry& entry) const
@@ -735,7 +1028,9 @@ juce::String PresetManagerOverlay::categoryName (PresetCategory category) const
         case PresetCategory::lead:       return tr (TextId::categoryLead);
         case PresetCategory::pad:        return tr (TextId::categoryPad);
         case PresetCategory::strings:    return tr (TextId::categoryStrings);
+        case PresetCategory::brass:      return tr (TextId::categoryBrass);
         case PresetCategory::keys:       return tr (TextId::categoryKeys);
+        case PresetCategory::pluck:      return tr (TextId::categoryPluck);
         case PresetCategory::fx:         return tr (TextId::categoryFx);
         case PresetCategory::other:      return tr (TextId::categoryOther);
     }
@@ -769,7 +1064,9 @@ void PresetManagerOverlay::updateDetail()
 
     if (! hasEntry)
     {
-        detailName_.setText (tr (TextId::presetManagerNoSelection), juce::dontSendNotification);
+        detailFullName_ = tr (TextId::presetManagerNoSelection);
+        detailName_.setTooltip ({});
+        refreshDetailName();
         detailCurrent_.setText ({}, juce::dontSendNotification);
         updateActionColours();
         updateFavoriteButton();
@@ -777,7 +1074,9 @@ void PresetManagerOverlay::updateDetail()
         return;
     }
 
-    detailName_.setText (entry->name, juce::dontSendNotification);
+    detailFullName_ = entry->name;
+    detailName_.setTooltip (entry->name);
+    refreshDetailName();
     detailCurrent_.setText (isCurrent
                                 ? (modified_
                                        ? tr (TextId::presetManagerCurrent) + " "
@@ -1165,6 +1464,7 @@ void PresetManagerOverlay::focusNextInOverlay (bool backwards)
     {
         focusables.push_back (&searchEditor_);
         focusables.push_back (&listBox_);
+        focusables.push_back (&sortButton_);
 
         if (auditionButton_.isEnabled())
             focusables.push_back (&auditionButton_);
@@ -1175,7 +1475,8 @@ void PresetManagerOverlay::focusNextInOverlay (bool backwards)
             focusables.push_back (row);
 
         for (auto& row : categoryRows_)
-            focusables.push_back (&row);
+            if (row.isVisible())
+                focusables.push_back (&row);
 
         auto addAction = [&focusables] (juce::Component& component)
         {
@@ -1385,6 +1686,7 @@ void PresetManagerOverlay::paintOverChildren (juce::Graphics& g)
 
     drawFocusRing (newButton_, 5.0f);
     drawFocusRing (openFolderButton_, 5.0f);
+    drawFocusRing (sortButton_, 4.0f);
     drawFocusRing (auditionButton_, 4.0f);
 }
 
@@ -1399,7 +1701,7 @@ void PresetManagerOverlay::paintListHeader (juce::Graphics& g)
                     .reduced (ui::px (8), 0);
 
     area.removeFromLeft (ui::px (24));
-    auto origin = area.removeFromRight (ui::px (48));
+    area.removeFromRight (ui::px (12));
     auto category = area.removeFromRight (listCategoryWidth_);
     auto name = area;
 
@@ -1409,8 +1711,6 @@ void PresetManagerOverlay::paintListHeader (juce::Graphics& g)
                       name, juce::Justification::centredLeft, 1);
     g.drawFittedText (tr (TextId::presetManagerColumnCategory).toUpperCase(),
                       category, juce::Justification::centredLeft, 1);
-    g.drawFittedText (tr (TextId::presetManagerColumnOrigin).toUpperCase(),
-                      origin, juce::Justification::centredRight, 1);
 
     // Raya de la cabecera: mismo ancho que las filas y canal de scrollbar
     // reservado, con 4 px de aire antes del primer preset.
@@ -1547,7 +1847,7 @@ void PresetManagerOverlay::paintRow (int row, juce::Graphics& g,
 
     auto area = juce::Rectangle<int> (0, 0, rowWidth, height).reduced (ui::px (8), 0);
     auto star = area.removeFromLeft (ui::px (24));
-    auto origin = area.removeFromRight (ui::px (48));
+    auto mark = area.removeFromRight (ui::px (12));
     auto category = area.removeFromRight (listCategoryWidth_);
     auto name = area;
 
@@ -1573,8 +1873,23 @@ void PresetManagerOverlay::paintRow (int row, juce::Graphics& g,
                     categoryColour (entry.metadata.category, colours), colours, true);
     }
 
-    g.setColour (entry.factory ? colours.muted : colours.accent);
-    g.fillEllipse (origin.toFloat().withSizeKeepingCentre (5.0f, 5.0f));
+    // Origen solo como excepcion: los presets de usuario llevan un rombo de
+    // 6 px de lado. La forma se lee sin depender del color; la fabrica, que es
+    // el 90 % de la biblioteca, no lleva nada.
+    if (! entry.factory)
+    {
+        const auto centre = mark.toFloat().getCentre();
+        const auto radius = static_cast<float> (ui::px (6)) * 0.7071f;
+        juce::Path diamond;
+        diamond.startNewSubPath (centre.x, centre.y - radius);
+        diamond.lineTo (centre.x + radius, centre.y);
+        diamond.lineTo (centre.x, centre.y + radius);
+        diamond.lineTo (centre.x - radius, centre.y);
+        diamond.closeSubPath();
+
+        g.setColour (colours.accent);
+        g.fillPath (diamond);
+    }
 }
 
 // ============================================================================
@@ -1602,7 +1917,8 @@ void PresetManagerOverlay::resized()
 
     auto meta = p.removeFromTop (ui::px (28));
     countLabel_.setBounds (meta.removeFromLeft (ui::px (220)));
-    sortLabel_.setBounds (meta.removeFromRight (ui::px (80)));
+    sortButton_.setBounds (meta.removeFromRight (ui::px (120))
+                               .withSizeKeepingCentre (ui::px (120), ui::px (22)));
 
     auto footer = p.removeFromBottom (ui::px (32));
 
@@ -1683,10 +1999,25 @@ void PresetManagerOverlay::resized()
     side.removeFromTop (ui::px (compactSidebar ? 1 : 2));
 
     for (auto& row : categoryRows_)
+    {
+        if (! row.isVisible())
+            continue;
+
+        // Red de seguridad: una fila sin alto seria un foco invisible.
+        if (side.getHeight() < ui::px (23))
+        {
+            jassertfalse;
+            row.setVisible (false);
+            row.setBounds ({});
+            continue;
+        }
+
         placeRow (row);
+    }
 
     auto detail = detailBounds_.reduced (ui::px (12), ui::px (8));
     detailName_.setBounds (detail.removeFromTop (ui::px (24)));
+    refreshDetailName();
     detail.removeFromTop (ui::px (3));
     detailBadgesBounds_ = detail.removeFromTop (ui::px (20));
     detail.removeFromTop (ui::px (6));
@@ -1836,7 +2167,7 @@ void PresetManagerOverlay::applyThemeToChildren()
 
     titleLabel_.setColour (juce::Label::textColourId, colours.text);
     countLabel_.setColour (juce::Label::textColourId, colours.muted);
-    sortLabel_.setColour (juce::Label::textColourId, colours.muted);
+    sortButton_.setTheme (theme_);
     libraryLabel_.setColour (juce::Label::textColourId, colours.muted);
     categoriesLabel_.setColour (juce::Label::textColourId, colours.muted);
 

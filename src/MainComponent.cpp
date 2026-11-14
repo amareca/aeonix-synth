@@ -107,6 +107,11 @@ MainComponent::MainComponent()
         config_.setInt ("presets.audition", enabled ? 1 : 0);
         config_.save();
     };
+    presetManagerOverlay_->onSortChanged = [this] (aeonix::PresetManagerOverlay::SortMode mode)
+    {
+        config_.setString ("presets.sort", aeonix::PresetManagerOverlay::sortKey (mode));
+        config_.save();
+    };
     presetManagerOverlay_->onOpenFolder = [this] { openPresetsFolder(); };
     presetManagerOverlay_->onFavorite = [this] (const juce::String& name, bool favorite)
     {
@@ -966,6 +971,9 @@ void MainComponent::openPresetManager()
     presetManagerOverlay_->setBounds (getLocalBounds());
     presetManagerOverlay_->setTheme (theme_);
     presetManagerOverlay_->setAudition (config_.getInt ("presets.audition", 0) != 0);
+    presetManagerOverlay_->setSortMode (
+        aeonix::PresetManagerOverlay::sortModeFromKey (config_.getString ("presets.sort", "origin")),
+        juce::dontSendNotification);
     presetManagerOverlay_->show (synthPanel.presetEntries(),
                                  synthPanel.currentPresetName(),
                                  synthPanel.isPresetModified());

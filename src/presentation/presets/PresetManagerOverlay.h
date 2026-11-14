@@ -26,6 +26,15 @@ namespace aeonix
 class PresetManagerOverlay final : public juce::Component
 {
 public:
+    enum class SortMode
+    {
+        nameAsc,
+        nameDesc,
+        category,
+        origin,
+        lastUsed
+    };
+
     PresetManagerOverlay();
     ~PresetManagerOverlay() override;
 
@@ -47,6 +56,12 @@ public:
     void setAudition (bool enabled);
     [[nodiscard]] bool isAuditionEnabled() const;
 
+    // Orden de la lista. Persiste en config.json como presets.sort.
+    void setSortMode (SortMode mode, juce::NotificationType notification = juce::sendNotification);
+    [[nodiscard]] SortMode getSortMode() const noexcept { return sortMode_; }
+    [[nodiscard]] static juce::String sortKey (SortMode mode);
+    [[nodiscard]] static SortMode sortModeFromKey (const juce::String& key);
+
     // Refresca el preset actual sin tocar la seleccion ni el filtro.
     void setCurrentPreset (const juce::String& name, bool modified);
 
@@ -60,6 +75,7 @@ public:
     std::function<void (bool)> onAuditionChanged;
     std::function<void()> onOpenFolder;
     std::function<void()> onClosed;
+    std::function<void (SortMode)> onSortChanged;
     std::function<void (const juce::String&, bool)> onFavorite;
     std::function<bool()> onSaveCurrent;
     std::function<bool (const juce::String&, PresetCategory)> onSaveCopy;
@@ -127,6 +143,22 @@ private:
         ThemeId theme_ = ThemeId::holoAccents;
     };
 
+    // Boton de orden: etiqueta y chevron dibujado. "locked" lo atenua cuando
+    // el filtro fija el orden (Recientes) sin desactivar el tooltip.
+    class SortButton final : public juce::TextButton
+    {
+    public:
+        void setTheme (ThemeId theme);
+        void setLocked (bool locked);
+        void paintButton (juce::Graphics& g,
+                          bool shouldDrawButtonAsHighlighted,
+                          bool shouldDrawButtonAsDown) override;
+
+    private:
+        ThemeId theme_ = ThemeId::holoAccents;
+        bool locked_ = false;
+    };
+
     // Capa modal de los formularios: atenua el panel y dibuja la tarjeta.
     class FormShield final : public juce::Component
     {
@@ -141,10 +173,14 @@ private:
     };
 
     void filter();
+    void sortVisible();
     void setFilter (Filter filter, PresetCategory category = PresetCategory::other);
     void updateMeta();
+    void updateSortButton();
+    void showSortMenu();
     void updateSidebar();
     void updateDetail();
+    void refreshDetailName();
     void updateActionColours();
     void updateFavoriteButton();
     void toggleFavorite();
@@ -183,7 +219,7 @@ private:
     juce::ListBox listBox_ { "Presets", nullptr };
     std::unique_ptr<ListModel> model_;
     juce::Label countLabel_;
-    juce::Label sortLabel_;
+    SortButton sortButton_;
     juce::Label libraryLabel_;
     juce::Label categoriesLabel_;
     juce::TextButton newButton_;
@@ -194,6 +230,7 @@ private:
     SidebarRow recentsRow_;
     SidebarRow categoryRows_[presetCategoryCount];
     juce::Label detailName_;
+    juce::String detailFullName_;
     juce::Label detailCurrent_;
     juce::Label footerEsc_;
     AuditionButton auditionButton_;
@@ -224,6 +261,7 @@ private:
     juce::String currentName_;
     Filter filter_ = Filter::all;
     PresetCategory category_ = PresetCategory::other;
+    SortMode sortMode_ = SortMode::origin;
     bool modified_ = false;
     bool updating_ = false;
     bool pendingClose_ = false;
