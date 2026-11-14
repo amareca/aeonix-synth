@@ -9,15 +9,15 @@ namespace aeonix
 {
 
 // ============================================================================
-//  Parameter — define un parametro del sintetizador.
+//  Parameter - defines a synthesizer parameter.
 //
-//  - Tiene un id unico (texto), un nombre legible y un rango [min, max].
-//  - Internamente guarda un valor NORMALIZADO en [0, 1]. getValue() lo convierte
-//    al rango real.
-//  - Soporta mapeo LOGARITMICO (para frecuencias y tiempos), que hace que un
-//    slider 0..1 sea intuitivo cuando el rango abarca varias decadas.
+//  - Has a unique id (text), a readable name and a range [min, max].
+//  - Internally stores a NORMALIZED value in [0, 1]. getValue() converts it
+//    to the real range.
+//  - Supports LOGARITHMIC mapping (for frequencies and times), which makes a
+//    0..1 slider intuitive when the range spans several decades.
 //
-//  Es un objeto de valor: sin logica de audio, sin dependencias.
+//  It is a value object: no audio logic, no dependencies.
 // ============================================================================
 class Parameter
 {
@@ -45,11 +45,11 @@ public:
     [[nodiscard]] bool  isLogarithmic()        const noexcept { return logarithmic_; }
     [[nodiscard]] float getDefaultNormalised() const noexcept { return defaultNormalised_; }
 
-    // Valor normalizado (0..1).
+    // Normalized value (0..1).
     [[nodiscard]] float getNormalised() const noexcept { return normalised_; }
     void setNormalised (float n) noexcept { normalised_ = clamp01 (n); }
 
-    // Valor real (en el rango [min, max]).
+    // Real value (in the range [min, max]).
     [[nodiscard]] float getValue() const noexcept
     {
         if (logarithmic_)

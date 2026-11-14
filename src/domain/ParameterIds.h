@@ -4,11 +4,11 @@ namespace aeonix::param
 {
 
 // ============================================================================
-//  Identificadores de los parametros del sintetizador.
+//  Synthesizer parameter identifiers.
 //
-//  Un solo punto de verdad para los ids, compartido por el nucleo, la GUI y
-//  los presets. Aqui esta el subconjunto que usa la Fase 1; la lista completa
-//  del MVP (2 osc, unison, LFOs, FX...) se anadira en fases posteriores.
+//  A single source of truth for the ids, shared by the core, the GUI and
+//  the presets. This is the subset used by Phase 1; the full MVP list
+//  (2 osc, unison, LFOs, FX...) will be added in later phases.
 // ============================================================================
 
 inline constexpr const char* masterVolume    = "master.volume";
@@ -20,7 +20,7 @@ inline constexpr const char* oscLevel        = "osc.level";
 inline constexpr const char* filterCutoff    = "filter.cutoff";
 inline constexpr const char* filterResonance = "filter.resonance";
 
-// Envolvente de filtro (independiente de la de amplitud).
+// Filter envelope (independent of the amplitude one).
 inline constexpr const char* filterEnvAmount = "filter.envAmount";
 inline constexpr const char* filterAttack    = "filter.attack";
 inline constexpr const char* filterDecay     = "filter.decay";

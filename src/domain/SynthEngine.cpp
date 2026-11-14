@@ -23,7 +23,7 @@ Waveform waveformFromIndex (int index)
     }
 }
 
-// Resonancia normalizada (0..1) -> factor Q (0.707 Butterworth .. 8.0).
+// Normalized resonance (0..1) -> Q factor (0.707 Butterworth .. 8.0).
 float resonanceToQ (float normalised)
 {
     return 0.707f + normalised * (8.0f - 0.707f);
@@ -33,7 +33,7 @@ float resonanceToQ (float normalised)
 
 void SynthEngine::prepare (double sampleRate, int blockSize, int polyphony)
 {
-    // blockSize queda reservado para los buffers de efectos (Fase 4).
+    // blockSize is left reserved for the effect buffers (Phase 4).
     (void) blockSize;
 
     sampleRate_ = sampleRate;
@@ -47,7 +47,7 @@ void SynthEngine::prepare (double sampleRate, int blockSize, int polyphony)
 
     voiceLimit_.store (std::min (requestedPolyphony_.load(), capacity));
 
-    // Resuelve los punteros a los parametros (una vez, fuera del hilo RT).
+    // Resolve the parameter pointers (once, outside the RT thread).
     pMasterVolume_ = patch_.find (param::masterVolume);
     pWaveform_     = patch_.find (param::oscWaveform);
     pOscLevel_     = patch_.find (param::oscLevel);
@@ -82,13 +82,13 @@ void SynthEngine::prepare (double sampleRate, int blockSize, int polyphony)
     applyParameters();
 }
 
-// --- Lado productor ---------------------------------------------------------
+// --- Producer side ----------------------------------------------------------
 
 void SynthEngine::noteOn (int midiNote, float velocity)
 {
     if (velocity <= 0.0f)
     {
-        // Algunos teclados mandan NoteOn con velocity=0 en vez de NoteOff.
+        // Some keyboards send NoteOn with velocity=0 instead of NoteOff.
         pushNoteEvent ({ NoteEvent::Type::NoteOff, midiNote, 0.0f });
         return;
     }
@@ -150,14 +150,14 @@ void SynthEngine::pushParamEvent (const ParamEvent& e)
     paramEvents_.tryPush (e);
 }
 
-// --- Lado consumidor (hilo de audio) ----------------------------------------
+// --- Consumer side (audio thread) -------------------------------------------
 
 void SynthEngine::render (float* left, float* right, int numSamples)
 {
     processPendingEvents();
 
-    // LFO: modulacion del cutoff a "control rate" (una vez por bloque).
-    // La profundidad efectiva suma la base del preset y la rueda de modulacion.
+    // LFO: cutoff modulation at "control rate" (once per block).
+    // The effective depth adds the preset base and the modulation wheel.
     const float lfoDepth = effectiveLfoDepth (lfoDepth_, modWheel_);
     lfo_.setDepth (lfoDepth);
     lfo_.advance (numSamples);
@@ -179,11 +179,11 @@ void SynthEngine::render (float* left, float* right, int numSamples)
         right[i] *= masterGain_;
     }
 
-    // Efectos sobre el bus master.
+    // Effects on the master bus.
     delay_.process (left, right, numSamples);
     reverb_.process (left, right, numSamples);
 
-    // Seguridad final: evita que acordes grandes o FX al maximo clipen.
+    // Final safety: prevents large chords or maxed FX from clipping.
     limiter_.process (left, right, numSamples);
 }
 
@@ -200,16 +200,16 @@ Voice* SynthEngine::findVoiceToSteal (int voiceLimit)
         if (! v.isActive())
             return &v;
 
-        // 1) Una voz ya en release apenas se percibe: es la mejor candidata.
+        // 1) A voice already in release is barely perceived: it is the best candidate.
         if (v.isReleasing()
             && (released == nullptr || v.getNoteId() < released->getNoteId()))
             released = &v;
 
-        // 2) Si no hay release, la de menor nivel de amplitud.
+        // 2) If there is no release, the one with the lowest amplitude level.
         if (quietest == nullptr || v.getAmpLevel() < quietest->getAmpLevel())
             quietest = &v;
 
-        // 3) Desempate final: la mas antigua.
+        // 3) Final tie-break: the oldest one.
         if (oldest == nullptr || v.getNoteId() < oldest->getNoteId())
             oldest = &v;
     }
@@ -248,11 +248,11 @@ int SynthEngine::getSlotNoteNumber (int slot) const
     return v.isActive() ? v.getNoteNumber() : -1;
 }
 
-// --- internos ---------------------------------------------------------------
+// --- internals --------------------------------------------------------------
 
 void SynthEngine::processPendingEvents()
 {
-    // 1) Parametros primero, para que las notas nuevas usen los valores nuevos.
+    // 1) Parameters first, so new notes use the new values.
     ParamEvent p;
     while (paramEvents_.tryPop (p))
         applyParamEvent (p);
@@ -263,7 +263,7 @@ void SynthEngine::processPendingEvents()
         paramsDirty_ = false;
     }
 
-    // 2) Notas.
+    // 2) Notes.
     NoteEvent n;
     while (noteEvents_.tryPop (n))
         applyNoteEvent (n);
@@ -307,7 +307,7 @@ void SynthEngine::applyNoteEvent (const NoteEvent& e)
                 voice->noteOn (e.noteNumber, e.velocity, noteId, detuneCents);
                 voice->setPitchBend (pitchBend_);
 
-                // Reparte el pan de las voces de unison de izquierda a derecha.
+                // Spreads the unison voice pan from left to right.
                 float pan = 0.0f;
                 if (numUnison > 1)
                     pan = unisonWidth_ * (-1.0f + 2.0f * static_cast<float> (i)
@@ -325,9 +325,9 @@ void SynthEngine::applyNoteEvent (const NoteEvent& e)
                 if (v.isActive() && v.getNoteNumber() == e.noteNumber)
                 {
                     if (sustain_)
-                        v.holdNote();   // con pedal: la nota queda sostenida
+                        v.holdNote();   // with pedal: the note stays held
                     else
-                        v.noteOff();    // sin pedal: entra en release
+                        v.noteOff();    // without pedal: enters release
                 }
             }
             break;

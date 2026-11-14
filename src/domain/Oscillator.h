@@ -5,7 +5,7 @@
 namespace aeonix
 {
 
-// Formas de onda soportadas por el oscilador (y el LFO).
+// Waveforms supported by the oscillator (and the LFO).
 enum class Waveform
 {
     Saw,
@@ -15,17 +15,17 @@ enum class Waveform
 };
 
 // ============================================================================
-//  Oscillator — oscilador con forma de onda, frecuencia y nivel.
+//  Oscillator - oscillator with waveform, frequency and level.
 //
-//  Rango de fase normalizado [0, 1). Se llama a nextSample() una vez por
-//  muestra; no hace asignaciones de memoria en caliente (RT-safe).
+//  Normalized phase range [0, 1). nextSample() is called once per
+//  sample; it does no hot-path memory allocations (RT-safe).
 //
-//  Sierra y cuadrada usan PolyBLEP (correccion de banda limitada de primer
-//  orden) para reducir el aliasing. Seno y triangulo se generan de forma
-//  directa: el triangulo tiene armonicos a 1/n^2 y su aliasing es inapreciable.
+//  Saw and square use PolyBLEP (first-order band-limited correction)
+//  to reduce aliasing. Sine and triangle are generated directly:
+//  the triangle has harmonics at 1/n^2 and its aliasing is negligible.
 //
-//  getValue() sigue devolviendo la onda "naive": lo usan el LFO y el dibujo de
-//  formas de onda, donde la correccion no aporta nada.
+//  getValue() still returns the "naive" wave: used by the LFO and by the
+//  waveform drawing, where the correction adds nothing.
 // ============================================================================
 class Oscillator
 {
@@ -50,21 +50,21 @@ public:
 
     void reset() noexcept { phase_ = 0.0; }
 
-    // Avanza la fase sin devolver valor (para uso a "control rate", p.ej. LFO).
+    // Advances the phase without returning a value (for "control rate" use, e.g. LFO).
     void advance (int samples)
     {
         phase_ += phaseIncrement_ * samples;
         if (phase_ >= 1.0)
-            phase_ -= std::floor (phase_);   // wrap a [0, 1)
+            phase_ -= std::floor (phase_);   // wrap to [0, 1)
     }
 
-    // Valor de la onda en la fase actual, sin avanzar.
+    // Value of the wave at the current phase, without advancing.
     [[nodiscard]] float getValue() const
     {
         return valueAtPhase (phase_) * level_;
     }
 
-    // Genera la siguiente muestra en [-level, +level].
+    // Generates the next sample in [-level, +level].
     float nextSample()
     {
         const float out = valueAtPhaseBandLimited (phase_) * level_;
@@ -73,9 +73,9 @@ public:
     }
 
 private:
-    // Correccion PolyBLEP de primer orden alrededor de un salto de fase.
-    // t: fase normalizada [0, 1). dt: incremento de fase por muestra.
-    // Devuelve 0 lejos del salto y una rama cuadratica en los bordes.
+    // First-order PolyBLEP correction around a phase jump.
+    // t: normalized phase [0, 1). dt: phase increment per sample.
+    // Returns 0 away from the jump and a quadratic branch at the edges.
     [[nodiscard]] static double polyBlep (double t, double dt) noexcept
     {
         if (dt <= 0.0)
@@ -107,7 +107,7 @@ private:
             {
                 double value = (p < 0.5) ? 1.0 : -1.0;
 
-                // Salto en fase 0 (subida) y en fase 0.5 (bajada).
+                // Jump at phase 0 (rising) and at phase 0.5 (falling).
                 value += polyBlep (p, phaseIncrement_);
 
                 double halfPhase = p - 0.5;

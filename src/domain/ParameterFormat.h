@@ -12,12 +12,12 @@ namespace aeonix
 {
 
 // ============================================================================
-//  ParameterFormat — convierte un valor normalizado (0..1) al valor real del
-//  parametro y lo formatea con unidades legibles (Hz, ms/s, cents, %).
+//  ParameterFormat - converts a normalized value (0..1) to the real
+//  parameter value and formats it with readable units (Hz, ms/s, cents, %).
 //
-//  Reutiliza makeDefaultPatch() como unica fuente de rangos y mapeo
-//  logaritmico, para no duplicar esa informacion en la GUI.
-//  C++ puro: se puede probar sin JUCE.
+//  Reuses makeDefaultPatch() as the single source of ranges and
+//  logarithmic mapping, so that information is not duplicated in the GUI.
+//  Pure C++: can be tested without JUCE.
 // ============================================================================
 
 namespace detail
@@ -29,7 +29,7 @@ inline const Patch& displayPatch()
     return patch;
 }
 
-// Formatea con "decimals" decimales y quita ceros finales ("20.00" -> "20").
+// Formats with "decimals" decimals and trims trailing zeros ("20.00" -> "20").
 inline std::string formatNumber (double value, int decimals)
 {
     char buffer[64] = {};
@@ -63,13 +63,13 @@ inline std::string formatParameterValue (const std::string& id, float normalised
     if (definition == nullptr)
         return {};
 
-    // Copia la definicion y aplica el valor normalizado recibido: getValue()
-    // usa el valor guardado en el Parameter, no el argumento.
+    // Copies the definition and applies the received normalized value: getValue()
+    // uses the value stored in the Parameter, not the argument.
     Parameter p = *definition;
     p.setNormalised (normalised);
     const float value = p.getValue();
 
-    // Formas de onda: indice -> nombre.
+    // Waveforms: index -> name.
     if (id == param::oscWaveform || id == param::lfoWaveform)
     {
         static const char* const names[] = { "Saw", "Square", "Sine", "Triangle" };
@@ -77,7 +77,7 @@ inline std::string formatParameterValue (const std::string& id, float normalised
         return names[index];
     }
 
-    // Frecuencias.
+    // Frequencies.
     if (id == param::filterCutoff || id == param::lfoRate)
     {
         if (value >= 1000.0f)
@@ -89,7 +89,7 @@ inline std::string formatParameterValue (const std::string& id, float normalised
         return detail::formatNumber (value, 1) + " Hz";
     }
 
-    // Tiempos: ms por debajo de 1 s, segundos por encima.
+    // Times: ms below 1 s, seconds above.
     if (detail::isTimeParameter (id))
     {
         if (value < 1.0f)
@@ -101,15 +101,15 @@ inline std::string formatParameterValue (const std::string& id, float normalised
         return detail::formatNumber (value, 2) + " s";
     }
 
-    // Desafinacion de unison (cents).
+    // Unison detune (cents).
     if (id == param::unisonDetune)
         return detail::formatNumber (value, 1) + " ct";
 
-    // Numero de voces de unison: entero sin unidad.
+    // Unison voice count: integer with no unit.
     if (id == param::unisonVoices)
         return detail::formatNumber (value, 0);
 
-    // Todo lo demas es un nivel normalizado -> porcentaje.
+    // Everything else is a normalized level -> percentage.
     return detail::formatNumber (static_cast<double> (normalised) * 100.0, 0) + "%";
 }
 

@@ -34,8 +34,8 @@ struct FactoryPreset
     std::array<FactoryValue, 25> values;
 };
 
-// Tabla de presets de fabrica. No ajustes valores a mano: se generan desde la
-// biblioteca de diseno y se validan con los tests de presets.
+// Factory preset table. Do not tweak values by hand: they are generated from the
+// design library and validated by the preset tests.
 constexpr std::array<FactoryPreset, 35> factoryPresets = {{
     { "Aurora Pad", {{
             { "master.volume", 0.78f },

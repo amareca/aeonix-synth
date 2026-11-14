@@ -42,15 +42,15 @@ void Voice::holdNote()
 
 void Voice::renderAdd (float* left, float* right, int numSamples)
 {
-    // El cutoff se recalcula cada 16 muestras (control rate interno): la
-    // envolvente se mueve con suficiente resolucion y sin recalcular el
-    // biquad en cada muestra.
+    // The cutoff is recomputed every 16 samples (internal control rate): the
+    // envelope moves with enough resolution and without recomputing the
+    // biquad on every sample.
     int cutoffCounter = 0;
 
     for (int i = 0; i < numSamples; ++i)
     {
         if (!ampEnv_.isActive())
-            break;   // voz terminada: no aporta mas audio
+            break;   // voice finished: no more audio
 
         const float env      = ampEnv_.nextSample();
         const float filterEnv = filterEnv_.nextSample();

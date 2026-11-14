@@ -7,10 +7,10 @@ namespace aeonix
 {
 
 // ============================================================================
-//  Reverb — reverberacion estilo Freeverb (8 combs + 4 allpass por canal).
+//  Reverb - Freeverb-style reverberation (8 combs + 4 allpass per channel).
 //
-//  Estereo, con control de "room size" y damping. process() es RT-safe
-//  (solo aritmetica sobre buffers preasignados en prepare()).
+//  Stereo, with "room size" and damping controls. process() is RT-safe
+//  (arithmetic only on buffers preallocated in prepare()).
 // ============================================================================
 class Reverb
 {
@@ -91,7 +91,7 @@ private:
         {
             const float out = buffer_[index_];
 
-            // Damping: filtro paso-bajo en la realimentacion.
+            // Damping: low-pass filter in the feedback.
             filterStore_ = out * (1.0f - damping_) + filterStore_ * damping_;
             buffer_[index_] = input + filterStore_ * feedback_;
 

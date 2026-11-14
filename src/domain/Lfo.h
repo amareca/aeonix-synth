@@ -6,11 +6,11 @@ namespace aeonix
 {
 
 // ============================================================================
-//  Lfo — Low Frequency Oscillator (oscilador lento que modula, no se oye).
+//  Lfo - Low Frequency Oscillator (slow oscillator that modulates, not heard).
 //
-//  Reutiliza Oscillator con una frecuencia muy baja y anade una "depth"
-//  (profundidad) que escala la salida. nextSample() devuelve un valor bipolar
-//  en [-depth, +depth].
+//  Reuses Oscillator at a very low frequency and adds a depth
+//  that scales the output. nextSample() returns a bipolar value
+//  in [-depth, +depth].
 // ============================================================================
 class Lfo
 {
@@ -31,10 +31,10 @@ public:
         return depth_ * osc_.nextSample();
     }
 
-    // Avanza la fase sin devolver (para modulacion a "control rate").
+    // Advances the phase without returning (for control-rate modulation).
     void advance (int samples) { osc_.advance (samples); }
 
-    // Valor de modulacion actual (bipolar, en [-depth, +depth]) sin avanzar.
+    // Current modulation value (bipolar, in [-depth, +depth]) without advancing.
     [[nodiscard]] float getValue() const { return depth_ * osc_.getValue(); }
 
 private:

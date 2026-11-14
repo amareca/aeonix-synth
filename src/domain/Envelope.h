@@ -4,18 +4,18 @@ namespace aeonix
 {
 
 // ============================================================================
-//  Envelope — envolvente ADSR (Attack, Decay, Sustain, Release).
+//  Envelope - ADSR envelope (Attack, Decay, Sustain, Release).
 //
-//  Maquina de estados:
+//  State machine:
 //      Idle -> Attack -> Decay -> Sustain -> Release -> Idle
 //
-//  noteOn() arranca el ataque desde el nivel actual. En una voz nueva el nivel
-//  es 0, asi que suena igual; al reciclar una voz (voice stealing) se evita el
-//  salto brusco a cero que producia un clic.
-//  noteOff() pasa a release (desde el valor actual).
+//  noteOn() starts the attack from the current level. On a fresh voice the
+//  level is 0, so it sounds the same; when recycling a voice (voice stealing)
+//  it avoids the abrupt jump to zero that used to produce a click.
+//  noteOff() moves to release (from the current value).
 //
-//  La forma es LINEAL (suficiente para esta fase). nextSample() devuelve el
-//  valor actual y avanza un paso. Sin asignaciones en caliente (RT-safe).
+//  The shape is LINEAR (enough for this stage). nextSample() returns the
+//  current value and advances one step. No hot-path allocations (RT-safe).
 // ============================================================================
 class Envelope
 {
@@ -39,8 +39,8 @@ public:
 
     void noteOn()
     {
-        // No se fuerza value_ = 0: al robar una voz en release conviene subir
-        // desde su nivel actual para no introducir un escalon (clic).
+        // value_ = 0 is not forced: when stealing a voice in release it is
+        // better to rise from its current level to avoid a step (click).
         stage_ = Stage::Attack;
     }
 
@@ -52,7 +52,7 @@ public:
         stage_ = Stage::Release;
     }
 
-    // Valor actual y avanza un paso. Rango [0, 1].
+    // Current value and advance one step. Range [0, 1].
     float nextSample()
     {
         switch (stage_)
@@ -113,7 +113,7 @@ public:
 private:
     void recomputeIncrements()
     {
-        // Segundos -> incremento por muestra. 0 segundos = cambio instantaneo.
+        // Seconds -> per-sample increment. 0 seconds = instant change.
         auto toInc = [this] (double seconds)
         {
             if (seconds <= 0.0 || sampleRate_ <= 0.0)

@@ -19,7 +19,7 @@ namespace aeonix
 {
 
 // ============================================================================
-//  NoteEvent — comando de nota que viaja del hilo de MIDI al hilo de audio.
+//  NoteEvent - note command that travels from the MIDI thread to the audio thread.
 // ============================================================================
 struct NoteEvent
 {
@@ -41,9 +41,9 @@ struct NoteEvent
 };
 
 // ============================================================================
-//  ParamEvent — cambio de parametro (id + valor normalizado). Viaja del hilo
-//  de UI al hilo de audio. El id va en un buffer de tamano fijo para no
-//  asignar memoria en el hilo de audio.
+//  ParamEvent - parameter change (id + normalized value). Travels from the UI
+//  thread to the audio thread. The id goes in a fixed-size buffer so as not to
+//  allocate memory on the audio thread.
 // ============================================================================
 struct ParamEvent
 {
@@ -52,50 +52,50 @@ struct ParamEvent
 };
 
 // ============================================================================
-//  SynthEngine — gestor de voces (polifonia) y renderizado por bloques.
+//  SynthEngine - voice manager (polyphony) and block rendering.
 //
-//  Productores (hilo de MIDI/UI):
-//      noteOn/noteOff/allNotesOff/setSustain/setParameter encolan eventos en
-//      colas lock-free y nunca tocan las voces. Un mutex serializa a los
-//      productores (el hilo de audio no lo usa).
+//  Producers (MIDI/UI thread):
+//      noteOn/noteOff/allNotesOff/setSustain/setParameter enqueue events into
+//      lock-free queues and never touch the voices. A mutex serializes the
+//      producers (the audio thread does not use it).
 //
-//  Consumidor (hilo de audio):
-//      render() vacia las colas (aplicando eventos y parametros) y suma las
-//      voces. Solo este hilo toca las voces.
+//  Consumer (audio thread):
+//      render() drains the queues (applying events and parameters) and sums the
+//      voices. Only this thread touches the voices.
 //
-//  RT-safe: render() solo hace aritmetica sobre memoria preasignada.
+//  RT-safe: render() only does arithmetic on preallocated memory.
 // ============================================================================
 class SynthEngine
 {
 public:
-    // Capacidad maxima de voces reservada por la app. El limite efectivo se
-    // puede bajar en caliente con setPolyphony() sin reasignar memoria.
+    // Maximum voice capacity reserved by the app. The effective limit can be
+    // lowered at runtime with setPolyphony() without reallocating memory.
     static constexpr int maxVoiceCapacity = 32;
 
     SynthEngine() = default;
 
     void prepare (double sampleRate, int blockSize, int polyphony);
 
-    // Limite de voces simultaneas (8/16/32 en la UI). Seguro desde el hilo de
-    // UI: solo actualiza atomics que lee el hilo de audio.
+    // Simultaneous voice limit (8/16/32 in the UI). Safe from the UI
+    // thread: only updates atomics that the audio thread reads.
     void setPolyphony (int voices);
 
-    // --- Lado productor (hilo de MIDI/UI). No bloquean. ---
+    // --- Producer side (MIDI/UI thread). They do not block. ---
     void noteOn (int midiNote, float velocity);
     void noteOff (int midiNote);
     void allNotesOff();
     void setSustain (bool on);
-    void setPitchBend (float value);   // -1..+1, rango fijo +-2 semitonos
-    void setModWheel (float value);    // 0..1, suma profundidad al LFO
+    void setPitchBend (float value);   // -1..+1, fixed +-2 semitone range
+    void setModWheel (float value);    // 0..1, adds depth to the LFO
     void setParameter (const std::string& id, float normalised);
 
-    // --- Lado consumidor (hilo de audio). ---
+    // --- Consumer side (audio thread). ---
     void render (float* left, float* right, int numSamples);
 
     [[nodiscard]] int getActiveVoiceCount() const;
     [[nodiscard]] int getPolyphony() const;
 
-    // Diagnostico/tests: nota que ocupa un slot, o -1 si esta inactivo.
+    // Diagnostics/tests: note occupying a slot, or -1 if inactive.
     [[nodiscard]] int getSlotNoteNumber (int slot) const;
 
 private:
@@ -107,14 +107,14 @@ private:
     void applyParameters();
     void applyVoiceParams (Voice& v);
 
-    // Elige la voz a robar: inactiva -> en release -> mas silenciosa -> mas antigua.
+    // Chooses the voice to steal: inactive -> in release -> quietest -> oldest.
     [[nodiscard]] Voice* findVoiceToSteal (int voiceLimit);
 
     double sampleRate_ = 44100.0;
     std::vector<Voice> voices_;
 
-    // requestedPolyphony_ lo fija la UI; voiceLimit_ es el valor efectivo que
-    // usa el hilo de audio (nunca supera la capacidad reservada).
+    // requestedPolyphony_ is set by the UI; voiceLimit_ is the effective value
+    // used by the audio thread (never exceeds the reserved capacity).
     std::atomic<int> requestedPolyphony_ { 16 };
     std::atomic<int> voiceLimit_ { 1 };
     std::atomic<int> voiceCapacity_ { 1 };
@@ -135,8 +135,8 @@ private:
     float pitchBend_         = 0.0f;
     float modWheel_          = 0.0f;
 
-    // Punteros a los parametros (estables; resueltos en prepare()). Evitan
-    // busquedas por string (y asignaciones) en el hilo de audio.
+    // Pointers to the parameters (stable; resolved in prepare()). They avoid
+    // string lookups (and allocations) on the audio thread.
     Parameter* pMasterVolume_ = nullptr;
     Parameter* pWaveform_     = nullptr;
     Parameter* pOscLevel_     = nullptr;
@@ -166,7 +166,7 @@ private:
     bool sustain_           = false;
     std::uint64_t nextNoteId_ = 1;
 
-    std::mutex producerMutex_;              // serializa a los productores
+    std::mutex producerMutex_;              // serializes the producers
     SpScQueue<NoteEvent, 256> noteEvents_;
     SpScQueue<ParamEvent, 256> paramEvents_;
 };

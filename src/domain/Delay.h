@@ -7,10 +7,10 @@ namespace aeonix
 {
 
 // ============================================================================
-//  Delay — linea de retardo estereo con realimentacion (feedback) y mix.
+//  Delay - stereo delay line with feedback and mix.
 //
-//  process() solo hace aritmetica sobre buffers preasignados en prepare()
-//  (RT-safe). El tiempo de retardo se fija con setTime().
+//  process() only does arithmetic on buffers preallocated in prepare()
+//  (RT-safe). Delay time is set with setTime().
 // ============================================================================
 class Delay
 {

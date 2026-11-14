@@ -8,11 +8,11 @@ namespace aeonix
 {
 
 // ============================================================================
-//  Filter — filtro paso-bajo resonante (biquad, tipo RBJ).
+//  Filter - resonant low-pass filter (biquad, RBJ style).
 //
-//  Atenua las frecuencias por encima de "cutoff"; la resonancia (Q) crea un
-//  pico en el corte. Coeficientes recalculados en setCutoff/setResonance (no
-//  en el bucle de audio), por lo que process() es RT-safe.
+//  Attenuates frequencies above "cutoff"; resonance (Q) creates a
+//  peak at the cutoff. Coefficients recomputed in setCutoff/setResonance (not
+//  in the audio loop), so process() is RT-safe.
 // ============================================================================
 class Filter
 {
@@ -31,7 +31,7 @@ public:
         updateCoefficients();
     }
 
-    // q = factor de calidad (mayor => mas resonancia). Se limita para estabilidad.
+    // q = quality factor (higher => more resonance). Clamped for stability.
     void setResonance (double q)
     {
         q_ = std::clamp (q, 0.1, 20.0);
