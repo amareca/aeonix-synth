@@ -44,13 +44,17 @@ El ejecutable de desarrollo queda en `build\Aeonix_artefacts\Release\AEONIX-dev.
 
 ## Flujo de trabajo
 
-1. Crea una rama para el cambio.
+1. Parte de `develop` y crea una rama para el cambio (`feature/*`, `fix/*`).
 2. Haz cambios pequeños y verificables.
 3. Ejecuta `.\dev.ps1 verify`.
 4. Si tocas la interfaz, usa `.\dev.ps1 ui -Quick` mientras iteras y la matriz
    completa `.\dev.ps1 ui` antes de dar el cambio por terminado; revisa las
    capturas.
-5. Abre un pull request. Los mensajes de commit van en inglés.
+5. Abre un pull request hacia `develop`. Los mensajes de commit van en inglés.
+
+`main` es la rama de producción: solo recibe merges por PR `develop -> main`
+cuando la versión está lista. El sitio de GitHub Pages se publica únicamente
+desde `main`, así que los cambios de `site/` no se ven hasta ese merge.
 
 ## Estilo de código
 
