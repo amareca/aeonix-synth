@@ -1969,7 +1969,7 @@ void PresetManagerOverlay::paintRow (int row, juce::Graphics& g,
     {
         const auto categoryText = categoryName (entry.metadata.category);
         const int pillW = juce::jmin (category.getWidth(),
-                                      juce::jmax (ui::px (36), badgeWidth (categoryText)));
+                                      juce::jmax (ui::px (40), badgeWidth (categoryText)));
         auto pill = category.removeFromLeft (pillW)
                             .withSizeKeepingCentre (pillW, ui::px (17));
 
