@@ -16,12 +16,12 @@ namespace aeonix
 {
 
 // ============================================================================
-//  PresetManagerOverlay — gestor de presets (overlay).
+//  PresetManagerOverlay - preset manager (overlay).
 //
-//  Cubre toda la ventana con un scrim y una tarjeta de 900x620. En esta primera
-//  version permite abrir, buscar, explorar la lista y cargar un preset. El
-//  lateral de categorias y las acciones de guardado llegan en los siguientes
-//  pasos.
+//  Covers the whole window with a scrim and a 900x620 card. In this first
+//  version it allows opening, searching, browsing the list and loading a
+//  preset. The category sidebar and the save actions arrive in the following
+//  steps.
 // ============================================================================
 class PresetManagerOverlay final : public juce::Component
 {
@@ -38,12 +38,12 @@ public:
     PresetManagerOverlay();
     ~PresetManagerOverlay() override;
 
-    // Abre el gestor con el catalogo actual y el preset activo.
+    // Opens the manager with the current catalog and the active preset.
     void show (const std::vector<PresetEntry>& entries,
                const juce::String& currentName,
                bool modified);
 
-    // Refresca la lista tras guardar, renombrar o borrar sin cerrar el gestor.
+    // Refreshes the list after saving, renaming or deleting without closing the manager.
     void refreshEntries (const std::vector<PresetEntry>& entries,
                          const juce::String& currentName,
                          bool modified);
@@ -52,20 +52,20 @@ public:
 
     [[nodiscard]] bool isOpen() const noexcept { return isVisible(); }
 
-    // Audicion: carga al seleccionar sin cerrar el gestor.
+    // Audition: loads on selection without closing the manager.
     void setAudition (bool enabled);
     [[nodiscard]] bool isAuditionEnabled() const;
 
-    // Orden de la lista. Persiste en config.json como presets.sort.
+    // List order. Persists in config.json as presets.sort.
     void setSortMode (SortMode mode, juce::NotificationType notification = juce::sendNotification);
     [[nodiscard]] SortMode getSortMode() const noexcept { return sortMode_; }
     [[nodiscard]] static juce::String sortKey (SortMode mode);
     [[nodiscard]] static SortMode sortModeFromKey (const juce::String& key);
 
-    // Refresca el preset actual sin tocar la seleccion ni el filtro.
+    // Refreshes the current preset without touching the selection or the filter.
     void setCurrentPreset (const juce::String& name, bool modified);
 
-    // Notifica una carga explicita; cierra solo si se pidio Cargar/Enter/doble clic.
+    // Notifies an explicit load; closes only if "Cargar"/Enter/double click was requested.
     void notifyPresetLoaded (const juce::String& name);
 
     void setTheme (ThemeId theme);
@@ -109,7 +109,7 @@ private:
         remove
     };
 
-    // Fila plana del lateral: etiqueta, contador y estado activo.
+    // Flat sidebar row: label, counter and active state.
     class SidebarRow final : public juce::Button
     {
     public:
@@ -130,7 +130,7 @@ private:
 
     class ListModel;
 
-    // Toggle de audicion con relleno y borde independientes.
+    // Audition toggle with independent fill and border.
     class AuditionButton final : public juce::TextButton
     {
     public:
@@ -143,8 +143,8 @@ private:
         ThemeId theme_ = ThemeId::holoAccents;
     };
 
-    // Boton de orden: etiqueta y chevron dibujado. "locked" lo atenua cuando
-    // el filtro fija el orden (Recientes) sin desactivar el tooltip.
+    // Sort button: label and drawn chevron. "locked" dims it when
+    // the filter fixes the order (Recientes) without disabling the tooltip.
     class SortButton final : public juce::TextButton
     {
     public:
@@ -161,8 +161,8 @@ private:
         bool open_ = false;
     };
 
-    // Scrollbar de la lista: solo cambia la tinta del thumb. El canal, el area
-    // de clic y el resto de scrollbars de la app se quedan como estan.
+    // List scrollbar: only the thumb ink changes. The track, the click
+    // area and the rest of the app scrollbars stay as they are.
     class ListScrollBarLookAndFeel final : public juce::LookAndFeel_V4
     {
     public:
@@ -180,7 +180,7 @@ private:
         ThemeId theme_ = ThemeId::holoAccents;
     };
 
-    // Capa modal de los formularios: atenua el panel y dibuja la tarjeta.
+    // Modal layer for the forms: dims the panel and draws the card.
     class FormShield final : public juce::Component
     {
     public:

@@ -22,8 +22,8 @@ OscillatorView::OscillatorView (OscillatorViewModel& viewModel)
     };
     addAndMakeVisible (waveform_);
 
-    // Sincroniza el combo cuando la forma de onda cambie (por ejemplo, al
-    // cargar un preset), igual que hacen los knobs con sus observables.
+    // Synchronises the combo when the waveform changes (for example, when
+    // loading a preset), just like the knobs do with their observables.
     waveformSubscription_ = viewModel.waveform.subscribe ([this] (const int& index)
     {
         waveform_.setSelectedIndex (index, juce::dontSendNotification);

@@ -12,7 +12,7 @@ namespace aeonix
 {
 
 // ============================================================================
-//  Vistas del bloque de efectos: delay y reverb.
+//  Views of the effects block: delay and reverb.
 // ============================================================================
 class DelayView final : public SectionPanel
 {

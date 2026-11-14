@@ -23,10 +23,10 @@ namespace aeonix
 {
 
 // ============================================================================
-//  SynthPanel — la vista principal del sintetizador.
+//  SynthPanel - the main view of the synthesizer.
 //
-//  MVVM: los sliders/combo hablan con sus ViewModels (nunca con el motor).
-//  Ademas contiene el navegador de presets (lista + guardar) y el teclado.
+//  MVVM: the sliders/combo talk to their ViewModels (never to the engine).
+//  It also contains the preset browser (list + save) and the keyboard.
 // ============================================================================
 class SynthPanel : public juce::Component,
                    private juce::MidiKeyboardState::Listener
@@ -40,53 +40,53 @@ public:
 
     void resized() override;
 
-    // Cambio de octava del teclado del ordenador (lo recibe MainComponent).
+    // Computer keyboard octave change (MainComponent receives it).
     std::function<void (int)> onOctaveChanged;
 
-    // Cambio de polifonía (8/16/32 voces), gestionado por MainComponent.
+    // Polyphony change (8/16/32 voices), handled by MainComponent.
     std::function<void (int)> onPolyphonyChanged;
 
-    // Se dispara al cargar un preset (para persistir el ultimo preset).
+    // Fired when a preset is loaded (to persist the last preset).
     std::function<void (const juce::String&)> onPresetLoaded;
 
-    // Audicion desde el gestor: carga sin marcar Recientes ni el ultimo preset.
+    // Audition from the manager: loads without marking "Recientes" or the last preset.
     std::function<void (const juce::String&)> onPresetPreviewed;
 
-    // Abre la carpeta de presets de usuario en el explorador.
+    // Opens the user preset folder in the file explorer.
     std::function<void()> onOpenPresetsFolder;
     std::function<void()> onRequestSaveCopy;
 
-    // Aviso breve al usuario (lo muestra MainComponent como Toast).
+    // Brief notice to the user (MainComponent shows it as a Toast).
     std::function<void (const juce::String&)> onPresetToast;
 
-    // Controles de performance en pantalla (pitch bend y mod wheel).
+    // On-screen performance controls (pitch bend and mod wheel).
     std::function<void (float)> onPitchBend;
     std::function<void (float)> onModWheel;
 
-    // Vuelve a centrar el pitch bend y bajar la rueda de modulacion.
+    // Re-centres the pitch bend and lowers the modulation wheel.
     void resetPerformanceControls();
 
-    // Refleja en las ruedas un movimiento venido del MIDI (sin reenviarlo).
+    // Mirrors a MIDI-driven movement on the wheels (without forwarding it).
     void setPitchBendDisplay (float value);
     void setModWheelDisplay (float value);
 
-    // Fija la octava sin disparar onOctaveChanged (al restaurar la config).
+    // Sets the octave without triggering onOctaveChanged (when restoring the config).
     void setOctave (int octave);
 
-    // Fija la polifonía sin disparar onPolyphonyChanged (al restaurar la config).
+    // Sets the polyphony without triggering onPolyphonyChanged (when restoring the config).
     void setPolyphony (int voices);
 
-    // Estado del indicador de cambios sin guardar.
+    // State of the unsaved-changes indicator.
     [[nodiscard]] bool isPresetModified() const;
 
-    // Selecciona y carga un preset por nombre (al restaurar la config).
+    // Selects and loads a preset by name (when restoring the config).
     void selectPresetByName (const juce::String& name, bool countAsRecent = true);
 
-    // Carga pedida por el gestor de presets; respeta la guardia de cambios.
-    // countAsRecent=false es una audicion: no marca Recientes.
+    // Load requested by the preset manager; respects the changes guard.
+    // countAsRecent=false is an audition: it does not mark "Recientes".
     void requestLoadPreset (const juce::String& name, bool countAsRecent = true);
 
-    // Catalogo actual, para el gestor de presets.
+    // Current catalog, for the preset manager.
     [[nodiscard]] const std::vector<PresetEntry>& presetEntries() const noexcept
     {
         return presetCatalog_.entries();
@@ -94,48 +94,48 @@ public:
 
     [[nodiscard]] juce::String currentPresetName() const { return presetBar_.getSelectedName(); }
 
-    // Favorito del preset (metadatos de la biblioteca).
+    // Preset favourite (library metadata).
     void setPresetFavorite (const juce::String& name, bool favorite);
 
-    // Acciones del gestor de presets.
+    // Preset manager actions.
     bool saveCurrentPreset();
     bool savePresetCopy (const juce::String& name, PresetCategory category);
     bool renamePreset (const juce::String& oldName, const juce::String& newName);
     bool deletePreset (const juce::String& name);
 
-    // Guarda el preset actual (Ctrl+S o Enter en el editor de nombre).
+    // Saves the current preset (Ctrl+S or Enter in the name editor).
     void savePreset();
 
-    // Indicador visual de cambios sin guardar en el preset.
+    // Visual indicator of unsaved changes in the preset.
     void setPresetModified (bool modified);
 
-    // Tema visual (Holo Accents / Glass / Minimal / Prototipo). El cambio se
-    // hace desde Ajustes › Apariencia.
+    // Visual theme (Holo Accents / Glass / Minimal / Prototipo). The change is
+    // made from Ajustes > Apariencia.
     void setTheme (ThemeId theme);
 
-    // Informe de depuracion del layout (F11): bounds, solapes y textos cortados.
+    // Layout debug report (F11): bounds, overlaps and clipped texts.
     [[nodiscard]] juce::String createLayoutReport() const;
 
-    // Feedback del teclado fisico (hilo de mensajes).
+    // Physical keyboard feedback (message thread).
     void highlightNoteOn (int note, float velocity);
     void highlightNoteOff (int note);
     void clearAllNotes();
 
 private:
-    // juce::MidiKeyboardState::Listener (clicks en el teclado virtual).
+    // juce::MidiKeyboardState::Listener (clicks on the virtual keyboard).
     void handleNoteOn  (juce::MidiKeyboardState*, int, int note, float velocity) override;
     void handleNoteOff (juce::MidiKeyboardState*, int, int note, float) override;
 
-    // --- casos de uso (inyectados) ---
+    // --- use cases (injected) ---
     std::function<void (const std::string&, float)> setParameter_;
     std::function<void (int, float)> noteOn_;
     std::function<void (int)> noteOff_;
 
-    // --- infraestructura ---
+    // --- infrastructure ---
     PresetRepository& presetRepository_;
 
-    // --- viewmodels (se declaran antes que las vistas para que las
-    //     suscripciones se destruyan primero) ---
+    // --- viewmodels (declared before the views so that the
+    //     subscriptions are destroyed first) ---
     SynthViewModels viewModels_;
     OscillatorViewModel& oscVm_ = viewModels_.osc;
     FilterViewModel&     filterVm_ = viewModels_.filter;
@@ -147,7 +147,7 @@ private:
     UnisonViewModel&     unisonVm_ = viewModels_.unison;
     PatchBinder          patchBinder_ { viewModels_ };
 
-    // --- vistas de seccion (cada una es su propio SectionPanel) ---
+    // --- section views (each one is its own SectionPanel) ---
     OscillatorView oscView_       { oscVm_ };
     FilterView     filterView_    { filterVm_, filterEnvVm_ };
     FilterEnvView  filterEnvView_ { filterEnvVm_ };
@@ -158,18 +158,18 @@ private:
     ReverbView     reverbView_    { fxVm_ };
     MasterView     masterView_    { synthVm_ };
 
-    // --- presets (vista + controlador) ---
+    // --- presets (view + controller) ---
     PresetBar presetBar_;
     PresetCatalog presetCatalog_ { presetRepository_ };
     std::unique_ptr<PresetController> presetController_;
 
-    // --- ruedas de performance y teclado (widgets) ---
+    // --- performance wheels and keyboard (widgets) ---
     PerformanceWheels performanceWheels_;
 
     // --- tooltips ---
     std::unique_ptr<juce::TooltipWindow> tooltipWindow_;
 
-    // --- teclado virtual ---
+    // --- virtual keyboard ---
     juce::MidiKeyboardState keyboardState_;
     KeyboardBed keyboardBed_ { keyboardState_ };
 

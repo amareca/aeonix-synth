@@ -29,7 +29,7 @@ PresetController::PresetController (PresetBar& bar,
 
 PresetController::~PresetController()
 {
-    // La barra puede sobrevivir al controlador: no dejar callbacks colgando.
+    // The bar may outlive the controller: do not leave dangling callbacks.
     bar_.onSelectIndex = nullptr;
     bar_.onPrev        = nullptr;
     bar_.onNext        = nullptr;
@@ -107,9 +107,9 @@ void PresetController::selectByName (const juce::String& name, bool countAsRecen
     {
         auto params = catalog_.load (wanted);
 
-        // Migracion: el preset guardado puede pertenecer a una biblioteca
-        // anterior. En ese caso se arranca con Default en vez de quedarse sin
-        // preset cargado.
+        // Migration: the stored preset may belong to a previous
+        // library. In that case start with Default instead of ending up with
+        // no preset loaded.
         if (params.empty() && wanted != "Default")
             return selectByName ("Default", countAsRecent);
 
@@ -180,7 +180,7 @@ void PresetController::requestLoadByIndex (int index, bool forceReload, bool cou
         return;
     }
 
-    // Una audicion nunca abre la guardia: si hay cambios, se queda en pausa.
+    // An audition never opens the guard: if there are changes, it stays paused.
     if (! countAsRecent && isDirty_ && isDirty_())
         return;
 
@@ -204,8 +204,8 @@ void PresetController::requestLoadByIndex (int index, bool forceReload, bool cou
                         {
                             if (factory)
                             {
-                                // Fabrica: no se sobrescribe; se abre el
-                                // formulario de copia y se cancela la carga.
+                                // Factory: never overwritten; the copy
+                                // form opens and the load is cancelled.
                                 if (onRequestSaveCopy)
                                     onRequestSaveCopy();
 

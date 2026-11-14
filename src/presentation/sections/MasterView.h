@@ -15,7 +15,7 @@ namespace aeonix
 {
 
 // ============================================================================
-//  MasterView — volumen general y octava del teclado del ordenador.
+//  MasterView - master volume and computer keyboard octave.
 // ============================================================================
 class MasterView final : public SectionPanel
 {
@@ -24,16 +24,16 @@ public:
 
     void resized() override;
 
-    // Cambio de octava (lo recibe SynthPanel para avisar a MainComponent).
+    // Octave change (SynthPanel receives it to notify MainComponent).
     std::function<void (int)> onOctaveChanged;
 
-    // Cambio de polifonía (8/16/32 voces).
+    // Polyphony change (8/16/32 voices).
     std::function<void (int)> onPolyphonyChanged;
 
-    // Fija la octava sin disparar onOctaveChanged.
+    // Sets the octave without triggering onOctaveChanged.
     void setOctave (int octave);
 
-    // Fija la polifonía sin disparar onPolyphonyChanged.
+    // Sets the polyphony without triggering onPolyphonyChanged.
     void setPolyphony (int voices);
 
 private:

@@ -67,7 +67,7 @@ namespace aeonix
 {
 
 // ============================================================================
-//  Fila del lateral
+//  Sidebar row
 // ============================================================================
 
 PresetManagerOverlay::SidebarRow::SidebarRow()
@@ -147,7 +147,7 @@ void PresetManagerOverlay::SidebarRow::paintButton (juce::Graphics& g,
 }
 
 // ============================================================================
-//  Formularios
+//  Forms
 // ============================================================================
 
 void PresetManagerOverlay::FormShield::setTheme (ThemeId theme)
@@ -176,7 +176,7 @@ void PresetManagerOverlay::FormShield::paint (juce::Graphics& g)
 }
 
 // ============================================================================
-//  Modelo de la lista
+//  List model
 // ============================================================================
 
 class PresetManagerOverlay::ListModel final : public juce::ListBoxModel
@@ -223,7 +223,7 @@ private:
 };
 
 // ============================================================================
-//  Toggle de audicion
+//  Audition toggle
 // ============================================================================
 
 void PresetManagerOverlay::AuditionButton::setTheme (ThemeId theme)
@@ -277,7 +277,7 @@ void PresetManagerOverlay::AuditionButton::paintButton (
 }
 
 // ============================================================================
-//  Boton de orden
+//  Sort button
 // ============================================================================
 
 void PresetManagerOverlay::SortButton::setTheme (ThemeId theme)
@@ -351,7 +351,7 @@ void PresetManagerOverlay::SortButton::paintButton (
     g.setFont (ui::font (11.0f));
     g.drawFittedText (getButtonText(), area, juce::Justification::centredLeft, 1);
 
-    // Chevron dibujado: no depende de la fuente ni del tamano de texto.
+    // Drawn chevron: it does not depend on the font or the text size.
     const auto cx = static_cast<float> (chevron.getCentreX());
     const auto cy = static_cast<float> (chevron.getCentreY());
     const auto halfW = static_cast<float> (ui::px (3));
@@ -365,7 +365,7 @@ void PresetManagerOverlay::SortButton::paintButton (
 }
 
 // ============================================================================
-//  Scrollbar de la lista
+//  List scrollbar
 // ============================================================================
 
 void PresetManagerOverlay::ListScrollBarLookAndFeel::setTheme (ThemeId theme)
@@ -414,7 +414,7 @@ void PresetManagerOverlay::ListScrollBarLookAndFeel::drawScrollbar (
 }
 
 // ============================================================================
-//  Construccion
+//  Construction
 // ============================================================================
 
 PresetManagerOverlay::~PresetManagerOverlay()
@@ -582,7 +582,7 @@ PresetManagerOverlay::PresetManagerOverlay()
     footerEsc_.setJustificationType (juce::Justification::centredLeft);
     addAndMakeVisible (footerEsc_);
 
-    // ---- formularios ----
+    // ---- forms ----
     addChildComponent (formShield_);
 
     formTitle_.setFont (ui::font (14.0f, juce::Font::bold));
@@ -633,7 +633,7 @@ PresetManagerOverlay::PresetManagerOverlay()
 }
 
 // ============================================================================
-//  Apertura y cierre
+//  Opening and closing
 // ============================================================================
 
 void PresetManagerOverlay::show (const std::vector<PresetEntry>& entries,
@@ -741,7 +741,7 @@ void PresetManagerOverlay::setTheme (ThemeId theme)
 }
 
 // ============================================================================
-//  Busqueda, seleccion y detalle
+//  Search, selection and detail
 // ============================================================================
 
 void PresetManagerOverlay::filter()
@@ -912,10 +912,10 @@ void PresetManagerOverlay::showSortMenu()
     menu.addItem (5, tr (TextId::presetManagerSortRecent), true,
                   sortMode_ == SortMode::lastUsed);
 
-    // Ancho: el que pida el texto mas largo, con el minimo del boton (120).
-    // El chrome imita el de JUCE: 2 x alto de fila + 8 de relleno propio del
-    // LookAndFeel + 2 x borde. La fuente se recorta igual que en JUCE cuando
-    // no cabe en la fila, para medir exactamente lo que pintara.
+    // Width: whatever the longest text asks for, with the button minimum (120).
+    // The chrome mimics JUCE's: 2 x row height + 8 of the LookAndFeel's own
+    // padding + 2 x border. The font is clipped as in JUCE when it
+    // does not fit in the row, to measure exactly what it will paint.
     auto font = getLookAndFeel().getPopupMenuFont();
     const auto rowHeight = ui::px (24);
     const auto maxFontHeight = static_cast<float> (rowHeight) / 1.3f;
@@ -1537,7 +1537,7 @@ void PresetManagerOverlay::rowClicked (int row, const juce::MouseEvent& e)
     if (row < 0 || row >= filteredCount())
         return;
 
-    // La estrella ocupa los primeros 24 px tras el margen izquierdo de la fila.
+    // The star occupies the first 24 px after the row's left margin.
     const int starLeft = ui::px (8);
     const int starRight = starLeft + ui::px (24);
 
@@ -1634,8 +1634,8 @@ void PresetManagerOverlay::loadSelected()
     if (findEntry (name) == nullptr || visibleRowOf (name) < 0)
         return;
 
-    // No cerrar hasta que la carga prospere: si la guardia se cancela, el
-    // gestor sigue abierto.
+    // Do not close until the load succeeds: if the guard is cancelled, the
+    // manager stays open.
     pendingClose_ = true;
 
     if (onLoad)
@@ -1678,7 +1678,7 @@ juce::String PresetManagerOverlay::rowName (int row) const
 }
 
 // ============================================================================
-//  Pintura
+//  Painting
 // ============================================================================
 
 void PresetManagerOverlay::paint (juce::Graphics& g)
@@ -1745,9 +1745,9 @@ void PresetManagerOverlay::paintOverChildren (juce::Graphics& g)
 
     if (searchEditor_.getText().isEmpty())
     {
-        // Misma caja que usa TextEditor para el texto: viewport (bounds menos
-        // borde) recortado por los indents. Asi el placeholder comparte x y
-        // linea base con el caret y con lo que se escribe.
+        // Same box TextEditor uses for the text: viewport (bounds minus
+        // border) clipped by the indents. This way the placeholder shares x and
+        // baseline with the caret and with what is typed.
         const auto border = searchEditor_.getBorder();
         auto area = searchEditor_.getBounds()
                         .withTrimmedLeft (border.getLeft() + searchEditor_.getLeftIndent())
@@ -1816,8 +1816,8 @@ void PresetManagerOverlay::paintListHeader (juce::Graphics& g)
     g.drawFittedText (tr (TextId::presetManagerColumnCategory).toUpperCase(),
                       category, juce::Justification::centredLeft, 1);
 
-    // Raya de la cabecera: mismo ancho que las filas y canal de scrollbar
-    // reservado, con 4 px de aire antes del primer preset.
+    // Header rule: same width as the rows with the scrollbar channel
+    // reserved, with 4 px of air before the first preset.
     g.setColour (colours.panelBorder.withAlpha (0.50f));
     g.fillRect (listHeaderBounds_.getX(),
                 listHeaderBounds_.getBottom() - 1,
@@ -1977,9 +1977,9 @@ void PresetManagerOverlay::paintRow (int row, juce::Graphics& g,
                     categoryColour (entry.metadata.category, colours), colours, true);
     }
 
-    // Origen solo como excepcion: los presets de usuario llevan un rombo de
-    // 6 px de lado. La forma se lee sin depender del color; la fabrica, que es
-    // el 90 % de la biblioteca, no lleva nada.
+    // Origin only as an exception: user presets carry a 6 px
+    // diamond. The shape reads without relying on colour; factory presets,
+    // which are 90 % of the library, carry nothing.
     if (! entry.factory)
     {
         const auto centre = mark.toFloat().getCentre();
@@ -2008,8 +2008,8 @@ void PresetManagerOverlay::resized()
 
     panelBounds_ = full.withSizeKeepingCentre (panelW, panelH);
 
-    // El pie absorbe el padding inferior: la linea queda donde estaba y los
-    // controles se centran entre ella y el borde del overlay.
+    // The footer absorbs the bottom padding: the line stays where it was and the
+    // controls centre between it and the overlay border.
     auto p = panelBounds_;
     p.removeFromTop (ui::px (20));
     p.removeFromLeft (ui::px (20));
@@ -2027,7 +2027,7 @@ void PresetManagerOverlay::resized()
     header.removeFromRight (ui::px (12));
     titleLabel_.setBounds (header);
 
-    // La meta crece con la tipografia: 20 / 21 / 23 con los tamanos actuales.
+    // The meta row grows with the typography: 20 / 21 / 23 with the current sizes.
     const int metaH = juce::jmax (ui::px (20),
                                   juce::roundToInt (ui::font (10.5f).getHeight()) + ui::px (4));
     auto meta = p.removeFromTop (metaH);
@@ -2116,7 +2116,7 @@ void PresetManagerOverlay::resized()
         if (! row.isVisible())
             continue;
 
-        // Red de seguridad: una fila sin alto seria un foco invisible.
+        // Safety net: a row with no height would be an invisible focus target.
         if (side.getHeight() < ui::px (23))
         {
             jassertfalse;

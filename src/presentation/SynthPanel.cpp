@@ -15,7 +15,7 @@ SynthPanel::SynthPanel (std::function<void (const std::string&, float)> setParam
       presetRepository_ (presetRepository),
       viewModels_ (setParameter_)
 {
-    // ---- paneles de seccion (deben estar detras de los controles) ----
+    // ---- section panels (must be behind the controls) ----
     addAndMakeVisible (oscView_);
     addAndMakeVisible (filterView_);
     addAndMakeVisible (filterEnvView_);
@@ -42,13 +42,13 @@ SynthPanel::SynthPanel (std::function<void (const std::string&, float)> setParam
     addAndMakeVisible (presetBar_);
     presetBar_.onOpenFolder = [this] { if (onOpenPresetsFolder) onOpenPresetsFolder(); };
 
-    // Ventana de tooltips (aparecen tras 700 ms sobre cada control).
+    // Tooltip window (they appear after 700 ms over each control).
     tooltipWindow_ = std::make_unique<juce::TooltipWindow> (this, 700);
 
-    // ---- selector de dispositivo MIDI ----
-    // El dispositivo MIDI se elige en Ajustes > MIDI (SettingsOverlay).
+    // ---- MIDI device selector ----
+    // The MIDI device is chosen in Ajustes > MIDI (SettingsOverlay).
 
-    // ---- ruedas de performance: pitch bend + mod wheel ----
+    // ---- performance wheels: pitch bend + mod wheel ----
     addAndMakeVisible (performanceWheels_);
     performanceWheels_.onPitchBend = [this] (float value)
     {
@@ -61,7 +61,7 @@ SynthPanel::SynthPanel (std::function<void (const std::string&, float)> setParam
             onModWheel (value);
     };
 
-    // ---- teclado virtual ----
+    // ---- virtual keyboard ----
     addAndMakeVisible (keyboardBed_);
 
     keyboardState_.addListener (this);
@@ -103,14 +103,14 @@ void SynthPanel::resized()
 {
     auto area = getLocalBounds().reduced (12);
 
-    // ---- barra superior: presets ----
+    // ---- top bar: presets ----
     auto presetArea = area.removeFromTop (PresetBar::preferredHeight());
     presetBar_.setBounds (presetArea.getX(), presetArea.getY(),
                           ui::px (PresetBar::preferredWidth), PresetBar::preferredHeight());
 
     area.removeFromTop (ui::px (10));
 
-    // ---- filas de secciones ----
+    // ---- section rows ----
     const int gap            = ui::px (12);
     const int sectionPadding = ui::px (10);
 
@@ -141,10 +141,10 @@ void SynthPanel::resized()
         }
     };
 
-    // Fila 1: generacion y forma (OSC, filtro, envolventes).
+    // Row 1: generation and shape (OSC, filter, envelopes).
     auto row1 = area.removeFromTop (ui::sectionRow1Height());
     layoutRow (row1, {
-        { &oscView_, 3 },        // combo de onda (2 celdas) + nivel
+        { &oscView_, 3 },        // waveform combo (2 cells) + level
         { &filterView_, 3 },
         { &filterEnvView_, 4 },
         { &ampEnvView_, 4 }
@@ -152,10 +152,10 @@ void SynthPanel::resized()
 
     area.removeFromTop (gap);
 
-    // Fila 2: modulacion y salida (LFO, unison, delay, reverb, master).
+    // Row 2: modulation and output (LFO, unison, delay, reverb, master).
     auto row2 = area.removeFromTop (ui::sectionRow2Height());
     layoutRow (row2, {
-        { &lfoView_, 4 },        // combo de onda (2 celdas) + rate + depth
+        { &lfoView_, 4 },        // waveform combo (2 cells) + rate + depth
         { &unisonView_, 3 },
         { &delayView_, 3 },
         { &reverbView_, 2 },
@@ -164,17 +164,17 @@ void SynthPanel::resized()
 
     area.removeFromTop (ui::px (16));
 
-    // ---- teclado + ruedas de performance a la izquierda ----
-    // Ocupan todo el alto restante. El KeyboardBed anade el fieltro arriba y
-    // el marco de 6 px alrededor del keybed.
+    // ---- keyboard + performance wheels on the left ----
+    // They take all the remaining height. KeyboardBed adds the felt on top and
+    // the 6 px frame around the keybed.
     auto performanceRow = area;
     performanceWheels_.setBounds (performanceRow.removeFromLeft (ui::px (PerformanceWheels::preferredWidth)));
     performanceRow.removeFromLeft (8);
 
     auto keybed = performanceRow;
-    keybed.removeFromTop (8);       // tira de fieltro
-    keybed.reduce (6, 0);           // marco lateral
-    keybed.removeFromBottom (6);    // marco inferior
+    keybed.removeFromTop (8);       // felt strip
+    keybed.reduce (6, 0);           // side frame
+    keybed.removeFromBottom (6);    // bottom frame
 
     const float keyWidth = juce::jlimit (16.0f, 40.0f,
                                          juce::jmax (120.0f, (float) keybed.getWidth()) / 29.5f);
@@ -282,7 +282,7 @@ void SynthPanel::setPresetModified (bool modified)
 }
 
 // ============================================================================
-//  Teclado virtual
+//  Virtual keyboard
 // ============================================================================
 
 void SynthPanel::highlightNoteOn (int note, float velocity)
@@ -323,7 +323,7 @@ void SynthPanel::handleNoteOff (juce::MidiKeyboardState*, int, int note, float)
 }
 
 // ============================================================================
-//  Informe de layout (F11) — texto legible con bounds, solapes y textos.
+//  Layout report (F11) - readable text with bounds, overlaps and texts.
 // ============================================================================
 
 juce::String SynthPanel::createLayoutReport() const
@@ -394,7 +394,7 @@ juce::String SynthPanel::createLayoutReport() const
 
             if (button->getProperties().contains ("aeonix.iconOnly"))
             {
-                // Boton solo-icono: el nombre es accesible, no texto visible.
+                // Icon-only button: the name is accessible, not visible text.
                 text.clear();
                 fits = true;
             }
@@ -449,8 +449,8 @@ juce::String SynthPanel::createLayoutReport() const
                 || dynamic_cast<SectionPanel*> (child) != nullptr)
                 continue;
 
-            // Los widgets compuestos se auditan como sus hojas internas para
-            // conservar el mismo informe que cuando eran controles sueltos.
+            // Composite widgets are audited as their internal leaves to
+            // keep the same report as when they were separate controls.
             if (auto* bar = dynamic_cast<PresetBar*> (child))
             {
                 for (int j = 0; j < bar->getNumChildComponents(); ++j)
@@ -485,9 +485,9 @@ juce::String SynthPanel::createLayoutReport() const
 
             if (auto* knob = dynamic_cast<KnobView*> (child))
             {
-                // Los ParameterKnob antiguos anadian slider y luego label;
-                // los knobs discretos (voices/octave) al reves. Conservamos
-                // ese orden en el informe.
+                // Old ParameterKnob added slider and then label;
+                // discrete knobs (voices/octave) the other way round. We keep
+                // that order in the report.
                 if (dynamic_cast<ParameterKnob*> (child) != nullptr)
                 {
                     auditLeaf (knob->getSlider(), knob->getPosition(), allowed, rects);

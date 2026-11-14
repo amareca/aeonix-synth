@@ -20,10 +20,10 @@ struct PresetEntry
 };
 
 // ============================================================================
-//  PresetCatalog — reglas de los presets (fabrica + usuario).
+//  PresetCatalog - preset rules (factory + user).
 //
-//  Centraliza la lista, la proteccion de los presets de fabrica y la
-//  carga/guardado/borrado/renombrado. No conoce la UI ni los dialogos.
+//  Centralises the list, the protection of factory presets and the
+//  load/save/delete/rename operations. It knows nothing about the UI or dialogs.
 // ============================================================================
 class PresetCatalog
 {
@@ -49,7 +49,7 @@ public:
     bool remove (const juce::String& name);
     bool rename (const juce::String& oldName, const juce::String& newName);
 
-    // Metadatos de la biblioteca (categoria, favorito y ultimo uso).
+    // Library metadata (category, favourite and last use).
     void setFavorite (const juce::String& name, bool favorite);
     void setCategory (const juce::String& name, PresetCategory category);
     void markUsed (const juce::String& name);
