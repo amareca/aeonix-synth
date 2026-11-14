@@ -14,17 +14,17 @@ namespace aeonix
 {
 
 // ============================================================================
-//  SettingsOverlay — panel de ajustes modal dibujado por la app.
+//  SettingsOverlay - app-drawn modal settings panel.
 //
-//  Se abre desde los iconos de la barra de titulo y se pinta sobre toda la
-//  interfaz (scrim + tarjeta centrada), sin depender de dialogos nativos.
+//  Opened from the title bar icons and painted over the whole interface
+//  (scrim + centred card), without relying on native dialogs.
 //
-//  Pestanas:
-//    - Audio:      AudioDeviceSelectorComponent embebido en un viewport.
-//    - MIDI:       dispositivo de entrada (se guarda en la configuracion).
-//    - Apariencia: tema visual.
+//  Tabs:
+//    - Audio:      AudioDeviceSelectorComponent embedded in a viewport.
+//    - MIDI:       input device (stored in the configuration).
+//    - Apariencia: visual theme.
 //
-//  Se cierra con el boton X, con Escape o haciendo clic fuera de la tarjeta.
+//  Closes with the X button, with Escape or by clicking outside the card.
 // ============================================================================
 class SettingsOverlay final : public juce::Component
 {
@@ -71,7 +71,7 @@ public:
             addAndMakeVisible (tabButtons_[i]);
         }
 
-        // ---- pestana MIDI ----
+        // ---- MIDI tab ----
         midiLabel_.setText (tr (TextId::settingsMidiDevice), juce::dontSendNotification);
         midiLabel_.setFont (ui::font (12.0f));
         midiLabel_.setJustificationType (juce::Justification::centredLeft);
@@ -98,7 +98,7 @@ public:
         midiHint_.setJustificationType (juce::Justification::centredLeft);
         addChildComponent (midiHint_);
 
-        // ---- pestana Apariencia ----
+        // ---- Apariencia tab ----
         appearanceLabel_.setText (tr (TextId::settingsThemeLabel), juce::dontSendNotification);
         appearanceLabel_.setFont (ui::font (12.0f));
         appearanceLabel_.setJustificationType (juce::Justification::centredLeft);
@@ -174,7 +174,7 @@ public:
         textSizeHint_.setJustificationType (juce::Justification::centredLeft);
         addChildComponent (textSizeHint_);
 
-        // ---- pie ----
+        // ---- footer ----
         versionLabel_.setText (tr (TextId::settingsVersion), juce::dontSendNotification);
         versionLabel_.setFont (ui::font (10.5f));
         versionLabel_.setJustificationType (juce::Justification::centredLeft);
@@ -197,7 +197,7 @@ public:
     std::function<void (TextSize)> onTextSizeChanged;
     std::function<void()> onClosed;
 
-    // ---- estado ----
+    // ---- state ----
     void show (Tab tab)
     {
         setTab (tab);

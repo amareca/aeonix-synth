@@ -6,11 +6,11 @@ namespace aeonix
 {
 
 // ============================================================================
-//  utf8 — convierte un literal UTF-8 a juce::String.
+//  utf8 - converts a UTF-8 literal to juce::String.
 //
-//  El constructor juce::String(const char*) asume ASCII: los bytes > 127 se
-//  interpretan como Latin-1 y los acentos salen como mojibake. Para los textos
-//  visibles usamos siempre este helper.
+//  The juce::String(const char*) constructor assumes ASCII: bytes > 127 are
+//  interpreted as Latin-1 and accents come out as mojibake. For visible texts
+//  we always use this helper.
 // ============================================================================
 inline juce::String utf8 (const char* text)
 {

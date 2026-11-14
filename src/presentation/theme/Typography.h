@@ -9,11 +9,11 @@ namespace aeonix::ui
 {
 
 // ============================================================================
-//  Tipografia centralizada.
+//  Centralised typography.
 //
-//  Nunca escribas tamanos de fuente a mano en las vistas: usa ui::font() y
-//  las alturas derivadas. Asi el ajuste Normal / Grande / Muy grande cambia
-//  toda la interfaz de forma coherente.
+//  Never hardcode font sizes in the views: use ui::font() and the derived
+//  heights. This way the Normal / Grande / Muy grande setting changes the
+//  whole interface coherently.
 // ============================================================================
 inline TextSize& textSizeState()
 {
@@ -24,9 +24,9 @@ inline TextSize& textSizeState()
 inline void setTextSize (TextSize size)       { textSizeState() = size; }
 inline TextSize getTextSize()                 { return textSizeState(); }
 
-// Base real de la tipografia. Los tamanos de las vistas siguen expresados
-// en la rejilla historica de 11 px; font() aplica 12/11 y luego el nivel
-// Normal / Grande / Muy grande.
+// Real typography base. View sizes are still expressed
+// on the historical 11 px grid; font() applies 12/11 and then the
+// Normal / Grande / Muy grande level.
 inline constexpr float baseFontScale = 12.0f / 11.0f;
 
 inline const char* typefaceName() noexcept { return "Segoe UI"; }
@@ -47,8 +47,8 @@ inline int px (int base)
     return juce::roundToInt (static_cast<float> (base) * layoutScale());
 }
 
-// Campos de una linea: texto, caret y placeholder comparten linea base.
-// Sin la justificacion vertical, JUCE pega el texto al borde superior.
+// Single-line fields: text, caret and placeholder share a baseline.
+// Without vertical justification, JUCE sticks the text to the top edge.
 inline void styleSingleLineEditor (juce::TextEditor& editor,
                                    float basePixels = 12.0f,
                                    int leftIndentBase = 8)

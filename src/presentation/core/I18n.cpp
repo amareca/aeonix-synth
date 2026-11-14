@@ -33,8 +33,8 @@ juce::String entryText (const TextEntry& entry, Language language)
     return utf8 (language == Language::spanish ? entry.es : entry.en);
 }
 
-// Cadenas que JUCE usa en AudioDeviceSelectorComponent. Las claves son ASCII
-// en ingles; los valores van en UTF-8 y LocalisedStrings los interpreta bien.
+// Strings that JUCE uses in AudioDeviceSelectorComponent. The keys are ASCII
+// English; the values are UTF-8 and LocalisedStrings interprets them fine.
 const char* const juceSpanishDictionary = R"TEXT(language: Spanish
 countries: es
 "none" = "ninguno"
@@ -99,8 +99,8 @@ Language getLanguage()
 
 void installJuceLocalisation (Language language)
 {
-    // setCurrentMappings toma la propiedad del puntero y libera la traduccion
-    // anterior. No guardes el objeto en otro propietario: seria doble liberacion.
+    // setCurrentMappings takes ownership of the pointer and frees the previous
+    // translation. Do not keep the object in another owner: that would double free.
     if (language == Language::spanish)
         juce::LocalisedStrings::setCurrentMappings (
             new juce::LocalisedStrings (juce::String (juce::CharPointer_UTF8 (juceSpanishDictionary)), false));

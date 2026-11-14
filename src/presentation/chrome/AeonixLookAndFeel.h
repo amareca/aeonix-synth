@@ -11,12 +11,12 @@ namespace aeonix
 {
 
 // ============================================================================
-//  AeonixLookAndFeel — estilo visual de la aplicacion.
+//  AeonixLookAndFeel - visual style of the application.
 //
-//  Cuatro temas: Holo Accents, Holo Glass, Holo Minimal y Prototipo.
-//  El color de acento por seccion se sigue leyendo de
-//  Slider::rotarySliderFillColourId en Prototipo; los temas Holo usan el
-//  degradado teal -> azul -> violeta -> ambar.
+//  Four themes: Holo Accents, Holo Glass, Holo Minimal and Prototipo.
+//  The accent colour per section is still read from
+//  Slider::rotarySliderFillColourId in Prototipo; the Holo themes use the
+//  teal -> blue -> violet -> amber gradient.
 // ============================================================================
 class AeonixLookAndFeel : public juce::LookAndFeel_V4
 {
@@ -111,10 +111,10 @@ public:
                 const int steps = juce::jlimit (8, 64,
                     juce::roundToInt ((angle - rotaryStartAngle) / 0.06f) + 1);
 
-                // Los angulos de Path::addCentredArc se miden en sentido
-                // horario desde las 12 en punto (0 = arriba), igual que
-                // Point::getPointOnCircumference. Hay que usar esa misma
-                // convencion o el relleno queda girado 90 grados.
+                // Path::addCentredArc angles are measured clockwise from
+                // 12 o'clock (0 = up), same as
+                // Point::getPointOnCircumference. That same convention must
+                // be used or the fill ends up rotated 90 degrees.
                 auto pointOnArc = [&] (float a)
                 {
                     return juce::Point<float> (centre.x + arcRadius * std::sin (a),
@@ -130,9 +130,9 @@ public:
                     const auto a0 = rotaryStartAngle + (angle - rotaryStartAngle) * t0;
                     const auto a1 = rotaryStartAngle + (angle - rotaryStartAngle) * t1;
 
-                    // Color segun la posicion dentro del recorrido COMPLETO:
-                    // asi el minimo es teal y el maximo ambar, y el puntero
-                    // siempre coincide con el color del final del relleno.
+                    // Colour based on the position within the FULL range:
+                    // so the minimum is teal and the maximum amber, and the
+                    // pointer always matches the fill end colour.
                     const auto globalT = (a0 - rotaryStartAngle) / fullRange;
                     const auto colour = holoColour (globalT);
 
@@ -183,8 +183,8 @@ public:
         juce::Path pointer;
         pointer.addRoundedRectangle (-1.5f, -innerRadius * 0.92f,
                                      3.0f, innerRadius * 0.55f, 1.0f);
-        // El rectangulo apunta hacia arriba (12 en punto) y "angle" tambien se
-        // mide desde arriba en sentido horario, asi que basta rotar por angle.
+        // The rectangle points up (12 o'clock) and "angle" is also measured
+        // from the top clockwise, so rotating by angle is enough.
         pointer.applyTransform (juce::AffineTransform::rotation (angle)
                                     .translated (centre.x, centre.y));
         g.setColour (pointerColour);
@@ -222,7 +222,7 @@ public:
         g.setColour (colours_.arcTrack.withAlpha (0.9f));
         g.fillRoundedRectangle (track, 3.0f);
 
-        // Marca central de Pitch (punto neutro).
+        // Centre mark for Pitch (neutral point).
         if (slider.getName() == "Pitch")
         {
             const auto midY = (trackTop + trackBottom) * 0.5f;
@@ -248,9 +248,9 @@ public:
     }
 
     // ------------------------------------------------------------------------
-    //  Menu emergente (PopupMenu y desplegables de ComboBox).
-    //  Un solo lenguaje: panel, borde de 1 px, radio 4, filas de 24 y la opcion
-    //  activa con tinte de acento y check dibujado.
+    //  Popup menu (PopupMenu and ComboBox dropdowns).
+    //  One single language: panel, 1 px border, radius 4, 24 px rows and the
+    //  active option with accent tint and a drawn check.
     // ------------------------------------------------------------------------
     int getPopupMenuBorderSize() override { return ui::px (4); }
 
@@ -258,9 +258,9 @@ public:
 
     void drawPopupMenuBackground (juce::Graphics& g, int width, int height) override
     {
-        // La ventana del menu es opaca, asi que se rellena entera y el borde
-        // redondeado se dibuja dentro. Sobre el panel del gestor las esquinas
-        // no se ven porque comparten color.
+        // The menu window is opaque, so it is filled entirely and the rounded
+        // border is drawn inside. Over the manager panel the corners are not
+        // visible because they share the same colour.
         g.fillAll (colours_.panel);
 
         const auto bounds = juce::Rectangle<float> (0.0f, 0.0f,
@@ -455,7 +455,7 @@ public:
         return ui::font (12.0f);
     }
 
-    // Valores de los knobs: mas compactos para que quepan en celdas estrechas.
+    // Knob values: more compact so they fit in narrow cells.
     juce::Label* createSliderTextBox (juce::Slider& slider) override
     {
         auto* label = juce::LookAndFeel_V4::createSliderTextBox (slider);

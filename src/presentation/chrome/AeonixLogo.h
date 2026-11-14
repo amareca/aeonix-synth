@@ -8,11 +8,11 @@ namespace aeonix
 {
 
 // ============================================================================
-//  Holo Delta — marca de AEONIX.
+//  Holo Delta - AEONIX brand mark.
 //
-//  Triángulo relleno con hueco interior y corte transversal, pintado con el
-//  degradado holográfico de la app (teal -> azul -> violeta -> ámbar).
-//  Se usa en la cabecera y para el icono de la ventana.
+//  Filled triangle with an inner hole and a cross cut, painted with the app's
+//  holographic gradient (teal -> blue -> violet -> amber).
+//  Used in the header and for the window icon.
 // ============================================================================
 
 namespace holo
@@ -68,7 +68,7 @@ inline void drawDelta (juce::Graphics& g, juce::Rectangle<float> area, bool draw
 
 } // namespace holo
 
-// Icono de app: tile redondeado oscuro + Holo Delta centrado.
+// App icon: dark rounded tile + centred Holo Delta.
 inline juce::Image createAeonixAppIcon (int size)
 {
     juce::Image image (juce::Image::ARGB, size, size, true);
@@ -105,7 +105,7 @@ inline juce::Image createAeonixAppIcon (int size)
 }
 
 // ============================================================================
-//  AeonixLogo — icono Holo Delta + wordmark "AEONIX" con degradado.
+//  AeonixLogo - Holo Delta icon + "AEONIX" wordmark with gradient.
 // ============================================================================
 class AeonixLogo : public juce::Component
 {

@@ -1,14 +1,14 @@
-// Catalogo de textos de la interfaz.
+// Interface string catalogue.
 //
-// Cada linea es una entrada AEONIX_TEXT(id, "espanol", "english"). El archivo se incluye
-// dos veces: una para generar el enum TextId y otra para construir la tabla.
-// Asi una traduccion olvidada no compila y el orden no puede desincronizarse.
+// Each line is an AEONIX_TEXT(id, "spanish", "english") entry. The file is
+// included twice: once to generate the TextId enum and once to build the table.
+// A missing translation therefore fails to compile and the order cannot drift.
 //
-// La columna espanola conserva el estilo actual de la app: solo se traducen
-// los tres terminos DAW de la barra de presets (Guardar / Borrar / Renombrar).
-// La columna inglesa traduce todo el texto que hoy esta en espanol.
+// The Spanish column keeps the app's current style: only the three DAW terms
+// in the preset bar are translated (Guardar / Borrar / Renombrar).
+// The English column translates every string that is currently in Spanish.
 
-// ---- general / barra de titulo ----
+// ---- general / title bar ----
 AEONIX_TEXT (titleBarTitle,               "Barra de título",                 "Title bar")
 AEONIX_TEXT (tooltipSettings,             "Ajustes (Ctrl+,)",                "Settings (Ctrl+,)")
 AEONIX_TEXT (tooltipMidiDevices,          "Dispositivos MIDI",               "MIDI devices")
@@ -17,7 +17,7 @@ AEONIX_TEXT (tooltipMaximise,             "Maximizar",                       "Ma
 AEONIX_TEXT (tooltipRestore,              "Restaurar",                       "Restore")
 AEONIX_TEXT (tooltipClose,                "Cerrar",                          "Close")
 
-// ---- botones de herramientas ----
+// ---- tool buttons ----
 AEONIX_TEXT (panicButton,                 "Panic",                           "Panic")
 AEONIX_TEXT (snapshotButton,              "Snapshot",                        "Snapshot")
 AEONIX_TEXT (layoutButton,                "Layout",                          "Layout")
@@ -27,7 +27,7 @@ AEONIX_TEXT (tooltipLayoutButton,         "Guarda el informe de layout (F11 o Ct
 AEONIX_TEXT (tooltipOpenSnapshots,        "Abre la carpeta de snapshots en el Explorador.", "Opens the snapshots folder in the file manager.")
 AEONIX_TEXT (tooltipPanic,                "Silencia todas las notas y resetea las ruedas.", "Silences all notes and resets the wheels.")
 
-// ---- barra de estado ----
+// ---- status bar ----
 AEONIX_TEXT (statusReady,                 "Listo. Toca el teclado MIDI o el teclado virtual.", "Ready. Play the MIDI or on-screen keyboard.")
 AEONIX_TEXT (statusTheme,                 "Tema: {0}",                       "Theme: {0}")
 AEONIX_TEXT (statusPitchBend,             "Pitch bend {0} st",               "Pitch bend {0} st")
@@ -54,7 +54,7 @@ AEONIX_TEXT (toastPresetsFolder,          "Carpeta de presets abierta",      "Pr
 AEONIX_TEXT (toastLanguageChanged,        "El idioma se aplicará al reiniciar.", "The language will apply after restart.")
 AEONIX_TEXT (toastTextSizeChanged,        "El tamaño del texto se aplicará al reiniciar.", "The text size will apply after restart.")
 
-// ---- ajustes ----
+// ---- settings ----
 AEONIX_TEXT (settingsTitle,               "Ajustes",                         "Settings")
 AEONIX_TEXT (settingsDescription,         "Audio, MIDI y apariencia.",       "Audio, MIDI and appearance.")
 AEONIX_TEXT (settingsTabAudio,            "Audio",                           "Audio")
@@ -80,7 +80,7 @@ AEONIX_TEXT (settingsTextSizeHint,        "El tamaño se aplicará al reiniciar.
 AEONIX_TEXT (settingsEsc,                 "Esc para cerrar",                 "Esc to close")
 AEONIX_TEXT (settingsVersion,             "AEONIX 0.1.0  |  Holo Delta",     "AEONIX 0.1.0  |  Holo Delta")
 
-// ---- navegador de presets ----
+// ---- preset browser ----
 AEONIX_TEXT (presetBarTitle,              "Navegador de presets",            "Preset browser")
 AEONIX_TEXT (presetBarDescription,        "Selecciona, guarda y gestiona presets.", "Select, save and manage presets.")
 AEONIX_TEXT (presetLabel,                 "Preset",                          "Preset")
@@ -105,7 +105,7 @@ AEONIX_TEXT (tooltipRename,               "Renombra el preset de usuario selecci
 AEONIX_TEXT (initButton,                  "Init",                            "Init")
 AEONIX_TEXT (tooltipInit,                 "Vuelve al patch por defecto.",    "Resets to the default patch.")
 
-// ---- dialogos y toasts de presets ----
+// ---- preset dialogs and toasts ----
 AEONIX_TEXT (dialogFactoryPresetTitle,    "Preset de fábrica",               "Factory preset")
 AEONIX_TEXT (dialogFactorySaveMessage,    "No se puede sobrescribir un preset de fábrica. Elige otro nombre.", "A factory preset cannot be overwritten. Choose another name.")
 AEONIX_TEXT (dialogOverwriteTitle,        "Sobrescribir preset",             "Overwrite preset")
@@ -131,7 +131,7 @@ AEONIX_TEXT (toastPresetSaved,            "Preset guardado: {0}",            "Pr
 AEONIX_TEXT (toastPresetDeleted,          "Preset borrado: {0}",             "Preset deleted: {0}")
 AEONIX_TEXT (toastPresetRenamed,          "Preset renombrado: {0}",          "Preset renamed: {0}")
 
-// ---- gestor de presets (overlay) ----
+// ---- preset manager (overlay) ----
 AEONIX_TEXT (presetManagerTitle,          "Presets",                         "Presets")
 AEONIX_TEXT (presetManagerDescription,    "Biblioteca de presets de fábrica y de usuario.", "Factory and user preset library.")
 AEONIX_TEXT (presetManagerLibrary,        "Biblioteca",                      "Library")
@@ -202,13 +202,13 @@ AEONIX_TEXT (presetManagerOpenFolderTooltip, "Abre la carpeta de presets de usua
 AEONIX_TEXT (presetManagerEsc,            "Esc para cerrar",                 "Esc to close")
 AEONIX_TEXT (tooltipOpenPresetManager,    "Abre el gestor de presets.",      "Opens the preset manager.")
 
-// ---- selector de tema ----
+// ---- theme selector ----
 AEONIX_TEXT (themeSelectorTitle,          "Selector de tema",                "Theme selector")
 AEONIX_TEXT (themeSelectorDescription,    "Cambia el tema visual de la interfaz.", "Changes the visual theme of the interface.")
 AEONIX_TEXT (themeLabel,                  "Tema",                            "Theme")
 AEONIX_TEXT (tooltipTheme,                "Tema visual de la interfaz.",     "Visual theme of the interface.")
 
-// ---- ruedas de performance ----
+// ---- performance wheels ----
 AEONIX_TEXT (wheelsTitle,                 "Ruedas de performance",           "Performance wheels")
 AEONIX_TEXT (wheelsDescription,           "Pitch bend y rueda de modulación.", "Pitch bend and modulation wheel.")
 AEONIX_TEXT (labelPitch,                  "Pitch",                           "Pitch")
@@ -216,11 +216,11 @@ AEONIX_TEXT (labelMod,                    "Mod",                             "Mo
 AEONIX_TEXT (tooltipPitchBend,            "Pitch bend (+-2 semitonos). Vuelve al centro al soltar.", "Pitch bend (+-2 semitones). Returns to centre on release.")
 AEONIX_TEXT (tooltipModWheel,             "Rueda de modulación: suma profundidad al LFO.", "Modulation wheel: adds depth to the LFO.")
 
-// ---- teclado ----
+// ---- keyboard ----
 AEONIX_TEXT (keyboardTitle,               "Teclado virtual",                 "On-screen keyboard")
 AEONIX_TEXT (keyboardDescription,         "Haz clic o arrastra sobre las teclas para tocar.", "Click or drag over the keys to play.")
 
-// ---- secciones ----
+// ---- sections ----
 AEONIX_TEXT (sectionOscillator,           "OSCILADOR",                       "OSCILLATOR")
 AEONIX_TEXT (sectionFilter,               "FILTRO",                          "FILTER")
 AEONIX_TEXT (sectionFilterEnv,            "ENV. FILTRO",                     "FILTER ENV")
@@ -238,7 +238,7 @@ AEONIX_TEXT (tooltipLfoWaveform,          "Forma de onda del LFO.",          "LF
 AEONIX_TEXT (labelOctave,                 "Octave",                          "Octave")
 AEONIX_TEXT (tooltipOctave,               "Desplazamiento de octava del teclado del ordenador.", "Octave shift for the computer keyboard.")
 
-// ---- parametros: etiquetas (identicas en ambos idiomas) ----
+// ---- parameters: labels (same in both languages) ----
 AEONIX_TEXT (paramVolume,                 "Volume",                          "Volume")
 AEONIX_TEXT (paramOscLevel,               "Osc Lvl",                         "Osc Lvl")
 AEONIX_TEXT (paramCutoff,                 "Cutoff",                          "Cutoff")
@@ -265,7 +265,7 @@ AEONIX_TEXT (paramReverbMix,              "Rev Mix",                         "Re
 AEONIX_TEXT (labelPolyphony,              "Polyphony",                       "Polyphony")
 AEONIX_TEXT (tooltipPolyphony,            "Número máximo de voces simultáneas.", "Maximum number of simultaneous voices.")
 
-// ---- parametros: tooltips ----
+// ---- parameters: tooltips ----
 AEONIX_TEXT (tipVolume,                   "Volumen general de la salida.",   "Overall output volume.")
 AEONIX_TEXT (tipOscLevel,                 "Nivel del oscilador.",            "Oscillator level.")
 AEONIX_TEXT (tipCutoff,                   "Frecuencia de corte del filtro paso-bajo.", "Low-pass filter cutoff frequency.")
@@ -290,13 +290,13 @@ AEONIX_TEXT (tipDelayMix,                 "Mezcla del delay.",               "De
 AEONIX_TEXT (tipReverbSize,               "Tamaño de la reverb.",            "Reverb size.")
 AEONIX_TEXT (tipReverbMix,                "Mezcla de la reverb.",            "Reverb mix.")
 
-// ---- nombres de tema (marca; solo Prototipo se traduce) ----
+// ---- theme names (brand; only Prototipo is translated) ----
 AEONIX_TEXT (themeHoloAccents,            "Holo Accents",                    "Holo Accents")
 AEONIX_TEXT (themeHoloGlass,              "Holo Glass",                      "Holo Glass")
 AEONIX_TEXT (themeHoloMinimal,            "Holo Minimal",                    "Holo Minimal")
 AEONIX_TEXT (themePrototype,              "Prototipo",                       "Prototype")
 
-// ---- tamano del texto ----
+// ---- text size ----
 AEONIX_TEXT (textSizeNormal,              "Normal",                          "Normal")
 AEONIX_TEXT (textSizeLarge,               "Grande",                          "Large")
 AEONIX_TEXT (textSizeExtraLarge,          "Muy grande",                      "Extra large")

@@ -8,11 +8,11 @@ namespace aeonix
 {
 
 // ============================================================================
-//  Toast — aviso flotante estilo Android.
+//  Toast - Android-style floating notice.
 //
-//  Píldora oscura centrada en la parte inferior, con fade-in, espera y
-//  fade-out. No intercepta clics (se puede seguir tocando el teclado) y se
-//  coloca por encima del resto de componentes.
+//  Dark pill centred at the bottom, with fade-in, hold and fade-out.
+//  It does not intercept clicks (the keyboard stays playable) and is placed
+//  above the rest of the components.
 // ============================================================================
 class Toast : public juce::Component, private juce::Timer
 {
@@ -46,7 +46,7 @@ public:
         setVisible (false);
     }
 
-    // Recoloca la píldora según el tamaño actual del padre.
+    // Repositions the pill for the parent's current size.
     void updateBounds()
     {
         if (auto* parent = getParentComponent())
@@ -76,7 +76,7 @@ public:
         g.setColour (juce::Colour (0xff4a5462).withMultipliedAlpha (alpha_));
         g.drawRoundedRectangle (bounds, 10.0f, 1.0f);
 
-        // Punto de acento verde.
+        // Green accent dot.
         g.setColour (juce::Colour (0xff7dd3a8).withMultipliedAlpha (alpha_));
         g.fillEllipse (ui::px (16), (getHeight() - ui::px (7)) * 0.5f, ui::px (7), ui::px (7));
 
@@ -112,7 +112,7 @@ private:
                 break;
 
             case State::hold:
-                holdCounter_ += 33;   // temporizador a ~30 Hz
+                holdCounter_ += 33;   // timer at ~30 Hz
                 if (holdCounter_ >= holdMs_)
                     state_ = State::fadeOut;
                 break;

@@ -8,11 +8,11 @@ namespace aeonix
 {
 
 // ============================================================================
-//  Language — idiomas soportados por la interfaz.
+//  Language - languages supported by the interface.
 //
-//  Se guarda en config.json con la clave "ui.language" ("es" / "en"). Si la
-//  clave no existe, la app detecta el idioma del sistema; el ingles es el
-//  idioma de reserva.
+//  Stored in config.json under the key "ui.language" ("es" / "en"). If the
+//  key does not exist, the app detects the system language; English is the
+//  fallback language.
 // ============================================================================
 enum class Language
 {
@@ -37,16 +37,16 @@ inline Language languageFromKey (const juce::String& key,
     return fallback;
 }
 
-// Nombre del idioma en su propia lengua (endonimo), como en cualquier selector
-// de idioma: "Español" / "English".
+// Language name in its own tongue (endonym), as in any language selector:
+// "Español" / "English".
 inline juce::String languageDisplayName (Language language)
 {
     return language == Language::spanish ? utf8 ("Español")
                                          : juce::String ("English");
 }
 
-// Detecta el idioma del sistema. Cualquier variante "es*" se trata como
-// espanol de Espana (unico espanol soportado por ahora); el resto, ingles.
+// Detects the system language. Any "es*" variant is treated as
+// Spanish from Spain (the only Spanish supported for now); the rest, English.
 inline Language detectSystemLanguage()
 {
     const auto code = juce::SystemStats::getUserLanguage();
