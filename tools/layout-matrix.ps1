@@ -1,20 +1,20 @@
-# Matriz de comprobacion visual: temas x tamanos de texto x tamanos x idiomas.
+# Visual check matrix: themes x text sizes x window sizes x languages.
 #
-# Uso:
+# Usage:
 #   .\tools\layout-matrix.ps1
 #   .\tools\layout-matrix.ps1 -Quick
 #   .\tools\layout-matrix.ps1 -TextSizes large
 #   .\tools\layout-matrix.ps1 -Sizes 1180x752
 #   .\tools\layout-matrix.ps1 -OutputDir .\docs\assets\snapshots -NoSnapshot
 #
-# -Quick es el perfil de iteracion: tema principal, espanol, texto Grande y la
-# ventana configurada (1180x752 de contenido). Escribe layout-quick.json y no
-# sustituye al layout.json de la matriz completa. Los parametros explicitos
-# tienen prioridad sobre el perfil.
+# -Quick is the iteration profile: main theme, Spanish, large text and the
+# configured window (1180x752 of content). It writes layout-quick.json and does
+# not replace the layout.json of the full matrix. Explicit parameters take
+# priority over the profile.
 #
-# La matriz arranca una sola vez por idioma y tamano de texto. Dentro de cada
-# arranque cambia de tema con F5-F8 y captura con F10 (PNG + informe) o F11.
-# Restaura la config del usuario al terminar, incluso si algo falla.
+# The matrix starts the app once per language and text size. Within each run it
+# switches themes with F5-F8 and captures with F10 (PNG + report) or F11. It
+# restores the user config when it finishes, even if something fails.
 
 [CmdletBinding()]
 param(
@@ -24,10 +24,10 @@ param(
 
     [string[]]$TextSizes = @("normal", "large", "xlarge"),
 
-    # Si se indica, se usa para todos los tamanos de texto.
+    # When given, it is used for every text size.
     [string[]]$Sizes = @(),
 
-    # Perfil de iteracion: holo.accents, es, large y 1180x752.
+    # Iteration profile: holo.accents, es, large and 1180x752.
     [switch]$Quick,
 
     [string]$OutputDir = "",
@@ -55,8 +55,8 @@ $Themes    = Expand-List -Values $Themes
 $TextSizes = Expand-List -Values $TextSizes
 $Sizes     = Expand-List -Values $Sizes
 
-# Perfil rapido para iterar la interfaz. Solo se aplica a los parametros que no
-# se hayan pasado de forma explicita.
+# Quick profile for iterating the interface. It only applies to parameters that
+# were not passed explicitly.
 if ($Quick)
 {
     $explicitTextSizes = $PSBoundParameters.ContainsKey("TextSizes")
@@ -67,9 +67,9 @@ if ($Quick)
 
     if (-not $PSBoundParameters.ContainsKey("Sizes"))
     {
-        # Sin -TextSizes se usa la ventana configurada del usuario. Si se piden
-        # otros tamanos de texto, se dejan las ventanas recomendadas de cada uno
-        # para no medir Muy grande por debajo de su minimo.
+        # Without -TextSizes the user's configured window is used. When other text
+        # sizes are requested, each one keeps its recommended window so Extra large
+        # is never measured below its minimum.
         $Sizes = if ($explicitTextSizes) { @() } else { @("1180x752") }
     }
 
@@ -85,7 +85,7 @@ function ConvertFrom-SizeString
 
     if ($Text -notmatch "^(\d+)x(\d+)$")
     {
-        throw ("Tamano no valido: {0}. Usa el formato 1180x752." -f $Text)
+        throw ("Invalid size: {0}. Use the 1180x752 format." -f $Text)
     }
 
     return [pscustomobject]@{
@@ -104,20 +104,20 @@ foreach ($textSize in $TextSizes)
 {
     if (-not $sizeTable.ContainsKey($textSize))
     {
-        throw ("Tamano de texto no valido: {0}. Usa normal, large o xlarge." -f $textSize)
+        throw ("Invalid text size: {0}. Use normal, large or xlarge." -f $textSize)
     }
 }
 
 if ($Languages.Count -eq 0 -or $Themes.Count -eq 0 -or $TextSizes.Count -eq 0)
 {
-    throw "La matriz necesita al menos un idioma, un tema y un tamano de texto."
+    throw "The matrix needs at least one language, one theme and one text size."
 }
 
 $exe = Get-AeonixExePath -Configuration Release
 
 if (-not (Test-Path -LiteralPath $exe))
 {
-    throw "No existe AEONIX-dev.exe. Compila antes con: .\dev.ps1 build"
+    throw "AEONIX-dev.exe not found. Build it first with: .\dev.ps1 build"
 }
 
 $results = New-Object System.Collections.Generic.List[object]
@@ -198,7 +198,7 @@ try
                                 }
                                 else
                                 {
-                                    # Respaldo si F10 no llega al componente principal.
+                                    # Fallback when F10 does not reach the main component.
                                     Invoke-AeonixSnapshotKey
                                     Invoke-AeonixLayoutKey
                                 }
@@ -241,12 +241,12 @@ try
 
                         if ($null -eq $summary)
                         {
-                            throw ("No se pudo capturar {0}." -f $stem)
+                            throw ("Could not capture {0}." -f $stem)
                         }
 
                         if ($captureBoth -and $null -eq $picture)
                         {
-                            throw ("No se genero el PNG de {0}." -f $stem)
+                            throw ("No PNG was generated for {0}." -f $stem)
                         }
 
                         if ($OutputDir -and $null -ne $picture)
@@ -269,15 +269,15 @@ try
                         }
 
                         $results.Add([pscustomobject]@{
-                            Idioma    = $language
-                            Tema      = $theme
-                            Texto     = $textSize
-                            Tamano    = $sizeText
-                            Controles = $summary.Controls
-                            Solapes   = $summary.Overlaps
-                            Fuera     = $summary.Outside
-                            Cortados  = $summary.Clipped
-                            Estado    = if ($summary.Ok) { "OK" } else { "FALLO" }
+                            Language  = $language
+                            Theme     = $theme
+                            Text      = $textSize
+                            Size      = $sizeText
+                            Controls  = $summary.Controls
+                            Overlaps  = $summary.Overlaps
+                            Outside   = $summary.Outside
+                            Clipped   = $summary.Clipped
+                            Status    = if ($summary.Ok) { "OK" } else { "FAIL" }
                         })
 
                         Write-Host ("{0}/{1}/{2} {3}: {4}" -f $language, $theme, $textSize, $sizeText, $summary.Line)
@@ -345,16 +345,16 @@ if ($Quick)
 
 Write-JsonFile -Path $reportPath -Object $report
 
-Write-Host ("  Informe: {0}" -f $reportPath) -ForegroundColor DarkGray
+Write-Host ("  Report: {0}" -f $reportPath) -ForegroundColor DarkGray
 
 if ($failures -gt 0)
 {
-    throw ("Layout con {0} combinacion(es) con problemas." -f $failures)
+    throw ("Layout with {0} combination(s) with problems." -f $failures)
 }
 
-Write-Host ("Layout OK en {0} combinaciones en {1:N1} s." -f $results.Count, $stopwatch.Elapsed.TotalSeconds) -ForegroundColor Green
+Write-Host ("Layout OK in {0} combinations in {1:N1} s." -f $results.Count, $stopwatch.Elapsed.TotalSeconds) -ForegroundColor Green
 
 if ($Quick)
 {
-    Write-Host ("  Rapido ({0} combinacion(es)): la matriz completa sigue pendiente antes de cerrar el cambio." -f $results.Count) -ForegroundColor Yellow
+    Write-Host ("  Quick ({0} combination(s)): the full matrix is still pending before closing the change." -f $results.Count) -ForegroundColor Yellow
 }

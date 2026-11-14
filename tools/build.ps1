@@ -1,6 +1,6 @@
-# Compila AEONIX con el preset de CMake correspondiente.
+# Builds AEONIX with the matching CMake preset.
 #
-# Uso:
+# Usage:
 #   .\tools\build.ps1
 #   .\tools\build.ps1 -Configuration Debug
 #   .\tools\build.ps1 -Target aeonix_tests
@@ -56,7 +56,7 @@ try
 {
     if ($Configure -or -not (Test-Path -LiteralPath $cache))
     {
-        Invoke-Checked -Exe $cmake -Arguments @("--preset", $configurePreset) -Step ("Configurando CMake ({0})" -f $Flavour)
+        Invoke-Checked -Exe $cmake -Arguments @("--preset", $configurePreset) -Step ("Configuring CMake ({0})" -f $Flavour)
     }
 
     $arguments = @("--build", "--preset", $buildPreset)
@@ -66,8 +66,8 @@ try
         $arguments += @("--target", $Target)
     }
 
-    Invoke-Checked -Exe $cmake -Arguments $arguments -Step ("Compilando {0} {1}" -f $Flavour, $Configuration)
-    Write-Ok ("Build {0} {1} completado." -f $Flavour, $Configuration)
+    Invoke-Checked -Exe $cmake -Arguments $arguments -Step ("Building {0} {1}" -f $Flavour, $Configuration)
+    Write-Ok ("Build {0} {1} done." -f $Flavour, $Configuration)
 }
 finally
 {

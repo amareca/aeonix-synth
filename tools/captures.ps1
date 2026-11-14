@@ -1,14 +1,14 @@
-# Resumen y limpieza de las capturas F11/F12.
+# Summary and cleanup for the F11/F12 captures.
 #
-# Uso:
+# Usage:
 #   .\tools\captures.ps1
 #   .\tools\captures.ps1 -Open
 #   .\tools\captures.ps1 -Legacy
 #   .\tools\captures.ps1 -Clean
 #   .\tools\captures.ps1 -Clean -Force
 #
-# -Legacy mueve los ficheros antiguos de la raiz a _legacy\YYYY-MM-DD\.
-# -Clean borra todo el contenido de la carpeta de capturas.
+# -Legacy moves the old files from the root into _legacy\YYYY-MM-DD\.
+# -Clean deletes the whole capture folder.
 
 [CmdletBinding()]
 param(
@@ -43,7 +43,7 @@ $allowedPrefix = $allowedRoot.TrimEnd("\") + "\"
 
 if (-not $Root.StartsWith($allowedPrefix, [System.StringComparison]::OrdinalIgnoreCase))
 {
-    throw ("Por seguridad, la carpeta debe estar dentro de {0}." -f $allowedRoot)
+    throw ("For safety, the folder must be inside {0}." -f $allowedRoot)
 }
 
 function Get-CaptureSummary
@@ -66,7 +66,7 @@ function Get-CaptureSummary
 
             $rows.Add([pscustomobject]@{
                 Feature = $folder.Name
-                Archivos = $files.Count
+                Files = $files.Count
                 MB = [math]::Round($bytes / 1MB, 2)
             })
         }
@@ -80,7 +80,7 @@ function Get-CaptureSummary
         {
             $rows.Add([pscustomobject]@{
                 Feature = "(raiz)"
-                Archivos = $rootFiles.Count
+                Files = $rootFiles.Count
                 MB = [math]::Round($rootBytes / 1MB, 2)
             })
         }
@@ -149,7 +149,7 @@ function Clear-Captures
 
     if (-not (Test-Path -LiteralPath $Directory))
     {
-        Write-Host "No hay capturas que borrar." -ForegroundColor Yellow
+        Write-Host "There are no captures to delete." -ForegroundColor Yellow
         return
     }
 
@@ -159,7 +159,7 @@ function Clear-Captures
 
         if ($answer -ne "SI")
         {
-            Write-Host "Cancelado." -ForegroundColor Yellow
+            Write-Host "Cancelled." -ForegroundColor Yellow
             return
         }
     }
@@ -167,15 +167,15 @@ function Clear-Captures
     Get-ChildItem -LiteralPath $Directory -Force -ErrorAction SilentlyContinue |
         Remove-Item -Recurse -Force
 
-    Write-Host ("Capturas borradas: {0}" -f $Directory) -ForegroundColor Green
+    Write-Host ("Captures deleted: {0}" -f $Directory) -ForegroundColor Green
 }
 
-Write-Step "Capturas de AEONIX"
+Write-Step "AEONIX captures"
 
 if ($Legacy)
 {
     $moved = Move-LegacyCaptures -Directory $Root
-    Write-Host ("  Movidos a _legacy: {0} archivos" -f $moved) -ForegroundColor Green
+    Write-Host ("  Moved to _legacy: {0} files" -f $moved) -ForegroundColor Green
 }
 
 if ($Clean)
@@ -191,11 +191,11 @@ if ($summary.Rows.Count -gt 0)
 }
 else
 {
-    Write-Host "  No hay capturas." -ForegroundColor Yellow
+    Write-Host "  No captures found." -ForegroundColor Yellow
 }
 
-Write-Host ("  Total: {0} archivos, {1:N2} MB" -f $summary.TotalFiles, $summary.TotalMB)
-Write-Host ("  Carpeta: {0}" -f $Root) -ForegroundColor DarkGray
+Write-Host ("  Total: {0} files, {1:N2} MB" -f $summary.TotalFiles, $summary.TotalMB)
+Write-Host ("  Folder: {0}" -f $Root) -ForegroundColor DarkGray
 
 $reportPath = Join-Path (Get-ReportsDir) "captures.json"
 
@@ -207,7 +207,7 @@ Write-JsonFile -Path $reportPath -Object ([ordered]@{
     totalMB = $summary.TotalMB
 })
 
-Write-Host ("  Informe: {0}" -f $reportPath) -ForegroundColor DarkGray
+Write-Host ("  Report: {0}" -f $reportPath) -ForegroundColor DarkGray
 
 if ($Open)
 {

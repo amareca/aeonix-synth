@@ -1,14 +1,14 @@
-# Automatizacion de la interfaz de AEONIX para pruebas manuales repetibles.
+# AEONIX interface automation for repeatable manual tests.
 #
-# Estrategia hibrida:
-#   - Botones y ventana: UI Automation (por nombre de accesibilidad).
-#   - Campos de texto: los dos Edit del navegador de presets, ordenados por
-#     posicion (el superior es el buscador). JUCE no expone su nombre por UIA.
-#   - Teclas y clics: Win32 como respaldo.
+# Hybrid strategy:
+#   - Buttons and window: UI Automation (by accessibility name).
+#   - Text fields: the two Edit controls of the preset browser, ordered by
+#     position (the top one is the search box). JUCE does not expose its name
+#     through UIA. Keys and clicks: Win32 as a fallback.
 #
-# Todas las funciones trabajan sobre la ultima sesion iniciada con Start-Aeonix.
-# Los scripts que usan este modulo deben hacer Backup-AeonixConfig antes y
-# Restore-AeonixConfig en un bloque finally.
+# Every function works on the last session started with Start-Aeonix. Scripts
+# that use this module must call Backup-AeonixConfig first and Restore-AeonixConfig
+# in a finally block.
 
 Import-Module (Join-Path $PSScriptRoot "Common.psm1") -Force
 
@@ -55,7 +55,7 @@ function Get-AeonixSession
 {
     if ($null -eq $script:Session)
     {
-        throw "No hay sesion de AEONIX. Llama antes a Start-Aeonix."
+        throw "No AEONIX session. Call Start-Aeonix first."
     }
 
     return $script:Session
@@ -108,14 +108,14 @@ function Start-Aeonix
 
     if (-not (Test-Path -LiteralPath $ExePath))
     {
-        throw ("No existe {0}. Compila antes con: .\dev.ps1 build" -f $ExePath)
+        throw ("{0} not found. Build it first with: .\dev.ps1 build" -f $ExePath)
     }
 
     if ((Get-AeonixProcess).Count -gt 0)
     {
         if (-not $StopExisting)
         {
-            throw "AEONIX esta en ejecucion; cierra la app o pasa -StopExisting."
+            throw "AEONIX is running; close the app or pass -StopExisting."
         }
 
         Stop-AeonixProcess
@@ -186,7 +186,7 @@ function Get-AeonixWindowRect
 
     if (-not [AeonixUiNative]::GetWindowRect($session.Handle, [ref]$rect))
     {
-        throw "No se pudo leer la posicion de la ventana de AEONIX."
+        throw "Could not read the AEONIX window position."
     }
 
     return [pscustomobject]@{
@@ -250,9 +250,9 @@ function Connect-AeonixWindow
 
     if ([AeonixUiNative]::GetForegroundWindow() -ne $handle)
     {
-        # Windows puede bloquear SetForegroundWindow si el proceso no tiene el
-        # foco. El truco TOPMOST/NOTOPMOST suele desbloquearlo sin robar el foco
-        # de forma permanente.
+        # Windows may block SetForegroundWindow when the process does not own the
+        # focus. The TOPMOST/NOTOPMOST trick usually unblocks it without stealing
+        # the focus for good.
         [void][AeonixUiNative]::SetWindowPos($handle, [IntPtr](-1), 0, 0, 0, 0, 0x0001 -bor 0x0002 -bor 0x0010)
         [void][AeonixUiNative]::SetWindowPos($handle, [IntPtr](-2), 0, 0, 0, 0, 0x0001 -bor 0x0002 -bor 0x0010)
         [void][AeonixUiNative]::SetForegroundWindow($handle)
@@ -342,7 +342,7 @@ function Select-AeonixComboItem
 
     if ($null -eq $combo)
     {
-        throw ("No se encontro el combo '{0}'." -f $Name)
+        throw ("Combo '{0}' not found." -f $Name)
     }
 
     Connect-AeonixWindow
@@ -401,7 +401,7 @@ function Invoke-AeonixButton
 
     if ($null -eq $element)
     {
-        throw ("No se encontro el boton '{0}' por accesibilidad." -f $Name)
+        throw ("Button '{0}' not found through accessibility." -f $Name)
     }
 
     try
@@ -425,7 +425,7 @@ function Get-AeonixEditElements
 
     $edits = @($root.FindAll([System.Windows.Automation.TreeScope]::Descendants, $condition))
 
-    # Los editores se ordenan por posicion: el buscador del gestor queda arriba.
+    # Editors are ordered by position: the manager search box ends up on top.
     return @($edits | Sort-Object { $_.Current.BoundingRectangle.Top }, { $_.Current.BoundingRectangle.Left })
 }
 
@@ -445,7 +445,7 @@ function Get-AeonixSearchEdit
 
     if ($edits.Count -lt 1)
     {
-        throw "No se encontro el buscador de presets."
+        throw "The preset search box was not found."
     }
 
     return $edits[0]
@@ -475,11 +475,11 @@ function Set-AeonixSearchText
 
     $search = Get-AeonixSearchEdit
 
-    # Un clic garantiza el foco real (UIA SetFocus no siempre funciona en JUCE).
+    # A click guarantees the real focus (UIA SetFocus does not always work in JUCE).
     Invoke-AeonixElementClick -Element $search
     Start-Sleep -Milliseconds 120
 
-    # Los backspaces vacian el campo; END garantiza el final antes de borrar.
+    # Backspaces empty the field; END moves to the end before deleting.
     [System.Windows.Forms.SendKeys]::SendWait("{END}")
     [System.Windows.Forms.SendKeys]::SendWait("{BACKSPACE 60}")
 
@@ -646,7 +646,7 @@ function ConvertFrom-AeonixLayoutSummary
         }
     }
 
-    throw ("Formato de informe de layout no reconocido: {0}" -f $Line)
+    throw ("Unrecognised layout report format: {0}" -f $Line)
 }
 
 function Set-AeonixFocus
@@ -657,8 +657,8 @@ function Set-AeonixFocus
 
     $rect = Get-AeonixWindowRect
 
-    # Zona neutra de la barra superior (etiqueta de estado): quita el foco de
-    # cualquier control para que F5-F12 lleguen al componente principal.
+    # Neutral spot in the title bar (status label): removes the focus from any
+    # control so F5-F12 reach the main component.
     $x = $rect.Left + [int]($rect.Width / 2)
     $y = $rect.Top + 60
 
@@ -705,7 +705,7 @@ function Invoke-AeonixLayoutReport
 
     if ($null -eq $layout)
     {
-        throw "AEONIX no genero el informe de layout (F11)."
+        throw "AEONIX did not generate the layout report (F11)."
     }
 
     if ($Snapshot)

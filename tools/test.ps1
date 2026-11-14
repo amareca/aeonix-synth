@@ -1,6 +1,6 @@
-# Ejecuta los tests del nucleo.
+# Runs the core tests.
 #
-# Uso:
+# Usage:
 #   .\tools\test.ps1
 #   .\tools\test.ps1 -Tag engine
 #   .\tools\test.ps1 -Tag preset -Repeat 5
@@ -9,7 +9,7 @@
 #   .\tools\test.ps1 -Failed
 #   .\tools\test.ps1 -Build
 #
-# Cada ejecucion escribe build\reports\tests.xml y tests.json.
+# Every run writes build\reports\tests.xml and tests.json.
 
 [CmdletBinding()]
 param(
@@ -220,7 +220,7 @@ if ($Changed -and $Tag)
 
 if ($Failed -and ($Tag -or $Changed))
 {
-    throw "Usa -Failed solo, sin -Tag ni -Changed."
+    throw "Use -Failed on its own, without -Tag or -Changed."
 }
 
 if ($Build)
@@ -239,7 +239,7 @@ if ($Failed)
 
     if ($failedNames.Count -eq 0)
     {
-        Write-Host "No hay tests fallidos en el ultimo informe; nada que repetir." -ForegroundColor Green
+        Write-Host "No failed tests in the last report; nothing to repeat." -ForegroundColor Green
         return
     }
 
@@ -254,7 +254,7 @@ elseif ($Changed)
     $selected = New-Object System.Collections.Generic.List[string]
     $empty = 0
 
-    Write-Step ("Cambios detectados: {0} archivo(s)" -f $changedFiles.Count)
+    Write-Step ("Changes detected: {0} file(s)" -f $changedFiles.Count)
 
     foreach ($file in $changedFiles)
     {
@@ -263,7 +263,7 @@ elseif ($Changed)
         if ($tagsForFile.Count -eq 0)
         {
             ++$empty
-            Write-Host ("  {0} -> (sin tests relevantes)" -f $file) -ForegroundColor DarkGray
+            Write-Host ("  {0} -> (no relevant tests)" -f $file) -ForegroundColor DarkGray
             continue
         }
 
@@ -271,7 +271,7 @@ elseif ($Changed)
         {
             $selected.Clear()
             $selected.Add("__all__")
-            Write-Host ("  {0} -> suite completa" -f $file) -ForegroundColor Yellow
+            Write-Host ("  {0} -> full suite" -f $file) -ForegroundColor Yellow
             break
         }
 
@@ -288,7 +288,7 @@ elseif ($Changed)
     if ($selected.Count -eq 0)
     {
         $mode = "Changed"
-        $note = "Sin tests relevantes para los archivos modificados."
+        $note = "No relevant tests for the modified files."
 
         if (Test-Path -LiteralPath $junit)
         {
@@ -304,7 +304,7 @@ elseif ($Changed)
     if ($selected.Contains("__all__"))
     {
         $mode = "Changed"
-        $filter = "(suite completa)"
+        $filter = "(full suite)"
     }
     else
     {
@@ -323,15 +323,15 @@ elseif ($Tag)
 if ($DryRun)
 {
     Write-Host ""
-    Write-Host ("Modo:   {0}" -f $mode)
-    Write-Host ("Filtro: {0}" -f $(if ($filter) { $filter } else { "(suite completa)" }))
-    Write-Host ("Informe: {0}" -f $reportJson)
+    Write-Host ("Mode:   {0}" -f $mode)
+    Write-Host ("Filter: {0}" -f $(if ($filter) { $filter } else { "(full suite)" }))
+    Write-Host ("Report: {0}" -f $reportJson)
     return
 }
 
 if ($spec -and -not (Test-Path -LiteralPath $tests))
 {
-    throw ("No existe {0}. Compila antes con: .\dev.ps1 build -Configuration {1}" -f $tests, $Configuration)
+    throw ("{0} not found. Build it first with: .\dev.ps1 build -Configuration {1}" -f $tests, $Configuration)
 }
 
 if (Test-Path -LiteralPath $junit)
@@ -378,11 +378,11 @@ else
 
 $report = Get-TestReport -Mode $mode -Filter $filter -ExitCode $exitCode -Note $note
 Write-JsonFile -Path $reportJson -Object $report
-Write-Host ("  Informe: {0}" -f $reportJson) -ForegroundColor DarkGray
+Write-Host ("  Report: {0}" -f $reportJson) -ForegroundColor DarkGray
 
 if ($exitCode -ne 0)
 {
-    throw ("Los tests fallaron con codigo {0}." -f $exitCode)
+    throw ("Tests failed with code {0}." -f $exitCode)
 }
 
-Write-Ok "Tests completados."
+Write-Ok "Tests finished."
