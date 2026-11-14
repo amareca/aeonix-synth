@@ -29,6 +29,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - **Folder shortcut in the sidebar**: the preset folder is now a 26×26 folder
   icon next to `+ New preset`, matching the main preset bar.
 - **Focused keyboard access** for `+ New preset` and the folder icon.
+- **Preset sorting**: a 120×22 sort button in the manager header opens a menu
+  with `Name A–Z`, `Name Z–A`, `Category`, `Origin` and `Last used`. The choice
+  is stored in `config.json` (`presets.sort`) and `Origin` is the default.
+- **Pluck and Brass categories** (`pluck`, `metales`): the library now shows
+  five plucks and five brass presets in their own rows.
 
 ### Changed
 
@@ -42,7 +47,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `Abrir carpeta` / `Open folder` was removed from the footer; the sidebar icon
   is the only entry point.
 - Factory categories are derived from the family suffix
-  (`Pad`, `Pluck`, `Lead`, `Bass`, `Brass`, `Piano`, `Strings`).
+  (`Pad`, `Pluck`, `Lead`, `Bass`, `Brass`, `Piano`, `Strings`). The factory
+  category is always taken from the built-in table, so older `library.json`
+  files do not need to be migrated.
+- Empty categories are no longer drawn: `FX` and `Other` only appear when a
+  preset uses them. The sidebar shows eight rows with the current library.
+- The list no longer has an `Origin` column. The name gained 36 px and only
+  user presets carry a 6 px diamond at the end of the row; the accessible name
+  of every row still reports factory or user.
 - If the saved `preset.last` no longer exists, AEONIX falls back to `Default`
   instead of starting without a loaded preset.
 
@@ -60,7 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Verification
 
-- `verify`: 83 tests / 7619 assertions.
+- `verify`: 84 tests.
 - `presets`: Copper Lead and Warm Strings smoke cases.
 - `ui`: 48/48 combinations, 64 main controls, 0 overlaps, 0 out-of-bounds,
   0 clipped labels.
