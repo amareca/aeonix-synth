@@ -12,10 +12,10 @@ namespace aeonix
 {
 
 // ============================================================================
-//  PresetRepository — guarda y carga presets en archivos JSON (infraestructura).
+//  PresetRepository - saves and loads presets in JSON files (infrastructure).
 //
-//  Los presets de fabrica viven en el dominio (makeFactoryPresets); aqui solo
-//  se gestionan los presets de USUARIO (un archivo .json por preset).
+//  Factory presets live in the domain (makeFactoryPresets); here only the
+//  USER presets are managed (one .json file per preset).
 // ============================================================================
 class PresetRepository
 {
@@ -26,7 +26,7 @@ public:
         directory_.createDirectory();
     }
 
-    // Nombres de los presets de usuario (sin extension), ordenados.
+    // Names of the user presets (without extension), sorted.
     [[nodiscard]] juce::StringArray listPresets() const
     {
         juce::StringArray names;
@@ -37,19 +37,19 @@ public:
         return names;
     }
 
-    // Comprueba si existe un preset de usuario con ese nombre.
+    // Checks whether a user preset with that name exists.
     [[nodiscard]] bool exists (const juce::String& name) const
     {
         return fileFor (name).existsAsFile();
     }
 
-    // Borra un preset de usuario. Devuelve true si se borro.
+    // Deletes a user preset. Returns true if it was deleted.
     bool remove (const juce::String& name) const
     {
         return fileFor (name).deleteFile();
     }
 
-    // Renombra un preset de usuario. Devuelve true si se movio.
+    // Renames a user preset. Returns true if it was moved.
     bool rename (const juce::String& oldName, const juce::String& newName) const
     {
         const juce::File source = fileFor (oldName);
@@ -61,7 +61,7 @@ public:
         return source.moveFileTo (target);
     }
 
-    // Carga un preset de usuario. Devuelve el mapa vacio si no existe.
+    // Loads a user preset. Returns an empty map if it does not exist.
     [[nodiscard]] std::map<std::string, float> load (const juce::String& name) const
     {
         std::map<std::string, float> params;
@@ -84,7 +84,7 @@ public:
         return params;
     }
 
-    // Guarda un preset de usuario.
+    // Saves a user preset.
     void save (const juce::String& name, const std::map<std::string, float>& params) const
     {
         juce::DynamicObject::Ptr obj = new juce::DynamicObject();
@@ -100,7 +100,7 @@ public:
         file.replaceWithText (juce::JSON::toString (obj.get()));
     }
 
-    // Ruta de los presets de usuario (para abrirla desde la GUI).
+    // Path of the user presets (to open it from the GUI).
     [[nodiscard]] const juce::File& getDirectory() const noexcept { return directory_; }
 
 private:

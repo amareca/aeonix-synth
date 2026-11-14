@@ -31,8 +31,8 @@ void readGroup (const juce::var& group,
 
         if (auto* values = entry.value.getDynamicObject())
         {
-            // En fabrica el genero sale siempre de la tabla estatica: asi un
-            // cambio de categoria no depende de migrar el sidecar.
+            // For factory entries the genre always comes from the static table:
+            // that way a category change does not depend on migrating the sidecar.
             meta.category = factory
                               ? factoryCategoryFor (name)
                               : (values->hasProperty ("category")
@@ -245,7 +245,7 @@ PresetCategory factoryCategoryFor (const juce::String& name)
 {
     if (name == "Default") return PresetCategory::initiation;
 
-    // La biblioteca v1 usa el sufijo de familia en el nombre visible.
+    // The v1 library uses the family suffix in the visible name.
     if (name.endsWith (" Pad"))     return PresetCategory::pad;
     if (name.endsWith (" Pluck"))   return PresetCategory::pluck;
     if (name.endsWith (" Lead"))    return PresetCategory::lead;
