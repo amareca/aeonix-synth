@@ -51,6 +51,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - The body grew from 476 to 484 px, so normal and large text show a full extra
   row.
 - Category chips in the list use a 40 px minimum and centred text.
+- The starter category is now `Básicos` / `Basics` instead of
+  `Iniciación` / `Initiation`, and `Teclas` became `Teclados`. `Lead`, `Pad`,
+  `Pluck` and `FX` stay as trade terms, and the stored category keys did not
+  change, so `library.json` needs no migration.
 - The previous 14 prototype presets were replaced by the 36-preset factory
   library.
 - The preset manager footer is now 32 px high, with a top rule, a 120 px
