@@ -43,7 +43,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Changed
 
 - **English first**: code comments, dev tool output and the public documents are
-  now written in English; the internal `docs/` tree stays in Spanish.
+  now written in English; the internal `docs/` tree stays in Spanish. The string
+  catalogue lists the English column first, and the Spanish column stays as the
+  second argument for the product strings.
 - The preset manager header now holds the title, search, sort and close in one
   44 px row; the counter keeps a small band of its own.
 - The footer is 52 px and absorbs the bottom padding: `Esc` and the audition

@@ -18,7 +18,7 @@ struct TextEntry
 
 constexpr TextEntry entries[] =
 {
-#define AEONIX_TEXT(id, es, en) { es, en },
+#define AEONIX_TEXT(id, en, es) { es, en },
 #include "presentation/core/StringCatalog.inc"
 #undef AEONIX_TEXT
 };

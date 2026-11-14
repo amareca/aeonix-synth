@@ -22,7 +22,7 @@ namespace aeonix
 // ============================================================================
 enum class TextId : int
 {
-#define AEONIX_TEXT(id, es, en) id,
+#define AEONIX_TEXT(id, en, es) id,
 #include "presentation/core/StringCatalog.inc"
 #undef AEONIX_TEXT
 
