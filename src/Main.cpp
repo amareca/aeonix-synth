@@ -9,14 +9,14 @@
 #include "presentation/theme/Typography.h"
 
 // ==============================================================================
-//  AEONIX — punto de entrada de la aplicacion standalone (JUCE).
+//  AEONIX - entry point of the standalone application (JUCE).
 //
-//  JUCEApplication es la clase que arranca el bucle de mensajes, la ventana
-//  y el ciclo de vida de la app. Aqui solo creamos la ventana principal.
+//  JUCEApplication is the class that starts the message loop, the window
+//  and the app lifecycle. Here we only create the main window.
 //
-//  La ventana usa un chrome propio (sin barra nativa) para que la apariencia
-//  sea la misma en Windows, macOS y Linux. La barra la dibuja
-//  aeonix::TitleBar dentro de MainComponent.
+//  The window uses a custom chrome (no native bar) so the appearance is
+//  the same on Windows, macOS and Linux. The bar is drawn by
+//  aeonix::TitleBar inside MainComponent.
 // ==============================================================================
 
 class AeonixApplication final : public juce::JUCEApplication
@@ -30,18 +30,18 @@ public:
     }
     const juce::String getApplicationVersion() override { return "0.1.0"; }
 
-    // Una sola instancia por flavour: PRO y DEV pueden convivir porque usan
-    // nombres de instancia y carpetas de datos distintas.
+    // One instance per flavour: PRO and DEV can coexist because they use
+    // different instance names and data folders.
     bool moreThanOneInstanceAllowed() override { return false; }
 
-    // Se llama al arrancar la app: aqui creamos la ventana principal.
+    // Called when the app starts: here we create the main window.
     void initialise (const juce::String& commandLine) override
     {
         juce::ignoreUnused (commandLine);
 
-        // Idioma: clave explicita o deteccion del sistema (ingles de reserva).
-        // Debe fijarse antes de construir la interfaz: los textos se asignan
-        // en los constructores de los componentes.
+        // Language: explicit key or system detection (English as fallback).
+        // Must be set before building the UI: the texts are assigned
+        // in the component constructors.
         auto& config = aeonix::ConfigManager::getInstance();
         const auto savedLanguage = config.getString ("ui.language");
 
@@ -50,8 +50,8 @@ public:
                                  : aeonix::detectSystemLanguage());
         aeonix::installJuceLocalisation (aeonix::getLanguage());
 
-        // Tamano de texto: eleccion guardada o deteccion por altura de pantalla.
-        // Debe fijarse antes de construir la interfaz.
+        // Text size: saved choice or detection by screen height.
+        // Must be set before building the UI.
         const auto savedTextSize = config.getString ("ui.textSize");
 
         if (savedTextSize.isNotEmpty())
@@ -71,10 +71,10 @@ public:
         mainWindow = std::make_unique<MainWindow> (getApplicationName());
     }
 
-    // Se llama al cerrar la app.
+    // Called when the app closes.
     void shutdown() override
     {
-        mainWindow = nullptr;   // destruye la ventana y su contenido
+        mainWindow = nullptr;   // destroys the window and its content
     }
 
     void systemRequestedQuit() override
@@ -85,7 +85,7 @@ public:
     void anotherInstanceStarted (const juce::String&) override {}
 
 private:
-    // Ventana de nivel superior con chrome propio.
+    // Top-level window with custom chrome.
     class MainWindow final : public juce::DocumentWindow
     {
     public:
@@ -94,7 +94,7 @@ private:
                                     juce::Colour (0xff1b1f27),
                                     juce::DocumentWindow::allButtons)
         {
-            // Sin barra nativa: la dibuja TitleBar dentro de MainComponent.
+            // No native bar: it is drawn by TitleBar inside MainComponent.
             setUsingNativeTitleBar (false);
             setTitleBarHeight (0);
             setTitleBarButtonsRequired (0, false);
@@ -118,7 +118,7 @@ private:
 
                 setMaximised (false);
 
-                // Coloca la ventana restaurada bajo el cursor, como hace el SO.
+                // Places the restored window under the cursor, as the OS does.
                 const auto bounds = getBounds();
                 setBounds (screenPos.x - juce::roundToInt (proportion * static_cast<float> (bounds.getWidth())),
                            screenPos.y - 14,
@@ -127,7 +127,7 @@ private:
 
             setContentOwned (content, true);
 
-            setResizable (true, false);   // bordes: nativos en Win/mac, JUCE en Linux
+            setResizable (true, false);   // edges: native on Win/mac, JUCE on Linux
 
             const auto textSize = aeonix::ui::getTextSize();
             setResizeLimits (aeonix::minWindowWidthForSize (textSize),
@@ -136,9 +136,9 @@ private:
 
             auto& config = aeonix::ConfigManager::getInstance();
 
-            // Migracion de altura: las configs anteriores no reservaban la
-            // barra propia, asi que sumamos su alto una sola vez. El peer sin
-            // marco anade 1 px de borde por lado: +2 de ancho y +2 de alto.
+            // Height migration: older configs did not reserve the custom
+            // bar, so we add its height only once. The peer without a
+            // frame adds 1 px of border per side: +2 width and +2 height.
             const bool hasCustomChrome = config.getInt ("window.chrome", 0) != 0;
 
             int width  = config.getInt ("window.w", aeonix::defaultWindowWidthForSize (textSize));
@@ -167,15 +167,15 @@ private:
             if (config.getInt ("window.maximised", 0) != 0)
                 setMaximised (true);
 
-            // Icono de la ventana / barra de tareas (Holo Delta).
+            // Window / taskbar icon (Holo Delta).
             if (auto* peer = getPeer())
                 peer->setIcon (aeonix::createAeonixAppIcon (128));
         }
 
         ~MainWindow() override
         {
-            // Guarda tambien si el cierre llega por una ruta del sistema
-            // (apagado, cierre de sesion, etc.) y no por el boton propio.
+            // Also saves if the close comes through a system path
+            // (shutdown, log off, etc.) and not through the custom button.
             saveWindowState();
         }
 
@@ -219,8 +219,8 @@ private:
         {
             auto& config = aeonix::ConfigManager::getInstance();
 
-            // Si esta maximizada guardamos el tamano de restauracion, no el
-            // de la pantalla, para que la proxima sesion abra igual.
+            // If maximized we save the restore size, not the
+            // screen one, so the next session opens the same.
             const auto bounds = maximised_ ? restoreBounds_ : getBounds();
 
             config.setInt ("window.x", bounds.getX());
@@ -242,5 +242,5 @@ private:
     std::unique_ptr<MainWindow> mainWindow;
 };
 
-// Macro que genera el main() de la aplicacion (oculta el main() de Windows).
+// Macro that generates the application's main() (hides the Windows main()).
 START_JUCE_APPLICATION (AeonixApplication)

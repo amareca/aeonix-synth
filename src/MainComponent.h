@@ -23,15 +23,15 @@
 #include "infrastructure/PresetRepository.h"
 
 // ==============================================================================
-//  MainComponent — ventana principal (contenedor).
+//  MainComponent - main window (container).
 //
-//  - Hilo de audio:    synthEngine.render().
-//  - Hilo de MIDI:     traduce mensajes a noteOn/off/sustain (encolado lock-free)
-//                      y encola texto de estado + feedback de teclas.
-//  - Hilo de mensajes: pinta la GUI (AsyncUpdater), NUNCA desde otro hilo.
+//  - Audio thread:     synthEngine.render().
+//  - MIDI thread:      translates messages to noteOn/off/sustain (lock-free queued)
+//                      and queues status text + key feedback.
+//  - Message thread:   paints the GUI (AsyncUpdater), NEVER from another thread.
 //
-//  Contiene un SynthPanel (los controles + teclado virtual) que sigue el
-//  patron MVVM: las Views hablan con ViewModels, no con el motor.
+//  Contains a SynthPanel (the controls + virtual keyboard) that follows the
+//  MVVM pattern: the Views talk to ViewModels, not to the engine.
 // ==============================================================================
 class MainComponent : public juce::AudioAppComponent,
                       private juce::MidiInputCallback,
@@ -47,28 +47,28 @@ public:
     void paintOverChildren (juce::Graphics& g) override;
     void resized() override;
 
-    // Ventana propia: MainWindow conecta estos callbacks con el DocumentWindow.
+    // Custom window: MainWindow connects these callbacks with the DocumentWindow.
     std::function<void()> onWindowMinimise;
     std::function<void()> onWindowToggleMaximise;
     std::function<void()> onWindowClose;
     std::function<void (float, juce::Point<int>)> onWindowRestoreForDrag;
 
-    // Sincroniza el icono maximizar/restaurar de la barra.
+    // Syncs the bar's maximize/restore icon.
     void setWindowMaximised (bool maximised);
 
-    // ---- juce::AudioAppComponent (hilo de audio) ----
+    // ---- juce::AudioAppComponent (audio thread) ----
     void prepareToPlay (int samplesPerBlockExpected, double sampleRate) override;
     void getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill) override;
     void releaseResources() override;
 
-    // ---- juce::MidiInputCallback (hilo de fondo de MIDI) ----
+    // ---- juce::MidiInputCallback (MIDI background thread) ----
     void handleIncomingMidiMessage (juce::MidiInput* source,
                                     const juce::MidiMessage& message) override;
 
-    // ---- juce::AsyncUpdater (hilo de mensajes) ----
+    // ---- juce::AsyncUpdater (message thread) ----
     void handleAsyncUpdate() override;
 
-    // ---- juce::KeyListener (teclado del ordenador como piano) ----
+    // ---- juce::KeyListener (computer keyboard as a piano) ----
     bool keyPressed (const juce::KeyPress& key, juce::Component* origin) override;
     bool keyStateChanged (bool isKeyDown, juce::Component* origin) override;
 
@@ -81,17 +81,17 @@ private:
     void setupMidiDevices();
     void openMidiInput (int deviceIndex);
 
-    // Tema visual.
+    // Visual theme.
     void applyTheme (aeonix::ThemeId theme);
 
-    // Herramientas de desarrollo: F12 = snapshot PNG, F11 = informe de layout.
+    // Development tools: F12 = PNG snapshot, F11 = layout report.
 #if AEONIX_HAS_DEV_TOOLS
     void saveSnapshot();
     void saveLayoutReport();
     void openSnapshotsFolder();
 
-    // Raiz de capturas y carpeta de la feature activa. La feature sale de
-    // AEONIX_CAPTURE_TAG o del contexto visible (gestor, ajustes o main).
+    // Capture root and folder of the active feature. The feature comes from
+    // AEONIX_CAPTURE_TAG or from the visible context (manager, settings or main).
     [[nodiscard]] static juce::File developmentOutputDirectory();
     [[nodiscard]] juce::String captureTag() const;
     [[nodiscard]] juce::String captureFileStem() const;
@@ -103,7 +103,7 @@ private:
 #endif
     void openPresetsFolder();
 
-    // Evento de feedback para el teclado virtual (hilo MIDI -> hilo mensajes).
+    // Feedback event for the virtual keyboard (MIDI thread -> message thread).
     struct KeyFeedback
     {
         bool noteOn = false;
@@ -111,18 +111,18 @@ private:
         float velocity = 0.0f;
     };
 
-    // ---- estilo (debe vivir mas que los hijos) ----
+    // ---- styling (must outlive the children) ----
     aeonix::AeonixLookAndFeel lookAndFeel_;
     aeonix::ThemeId theme_ = aeonix::ThemeId::holoAccents;
 
-    // ---- audio + sintesis ----
+    // ---- audio + synthesis ----
     aeonix::ConfigManager& config_;
     aeonix::PresetRepository presetRepository;
     aeonix::SynthEngine synthEngine;
     bool presetLoaded_ = false;
     aeonix::SynthPanel synthPanel;
 
-    // ---- interfaz ----
+    // ---- interface ----
     aeonix::TitleBar titleBar_;
     aeonix::SettingsOverlay settingsOverlay_;
     std::unique_ptr<aeonix::PresetManagerOverlay> presetManagerOverlay_;
@@ -135,13 +135,13 @@ private:
 #endif
     juce::Label      statusLabel;
 
-    // Aviso flotante (se anade como hijo invisible y se muestra al guardar).
+    // Floating notice (added as an invisible child and shown on save).
     aeonix::Toast toast_;
 
     // ---- MIDI ----
     std::unique_ptr<juce::MidiInput> midiInput;
 
-    // ---- estado pendiente (hilo MIDI -> hilo mensajes) ----
+    // ---- pending state (MIDI thread -> message thread) ----
     std::mutex midiMutex_;
     juce::String pendingStatus_;
     std::vector<KeyFeedback> pendingKeyFeedback_;
@@ -150,13 +150,13 @@ private:
     bool  hasPendingPitchBend_ = false;
     bool  hasPendingModWheel_  = false;
 
-    // Teclas del ordenador actualmente pulsadas (keyCode -> nota MIDI).
+    // Computer keys currently held (keyCode -> MIDI note).
     std::map<int, int> heldKeys_;
 
-    // Desplazamiento de octava del teclado del ordenador (en octavas).
+    // Octave offset of the computer keyboard (in octaves).
     int typingOctave_ = 0;
 
-    // Polifonía efectiva (8/16/32), persistida en config.json.
+    // Effective polyphony (8/16/32), persisted in config.json.
     int polyphony_ = 16;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)

@@ -4,11 +4,11 @@
 
 namespace
 {
-// Mapeo del teclado del ordenador a notas MIDI (layout QWERTY-piano, como FL Studio).
-// Fila Z..M = octava base (C4..B4); fila Q..U = +1 octava; fila I..P = +2 octavas.
+// Mapping of the computer keyboard to MIDI notes (QWERTY-piano layout, like FL Studio).
+// Row Z..M = base octave (C4..B4); row Q..U = +1 octave; row I..P = +2 octaves.
 int noteForKeyCode (int keyCode, int octaveShift)
 {
-    constexpr int base = 60;   // C4 = do central (fila inferior Z) con octaveShift = 0
+    constexpr int base = 60;   // C4 = middle C (bottom row Z) with octaveShift = 0
 
     int relative = -1;
     switch (keyCode)
@@ -76,12 +76,12 @@ MainComponent::MainComponent()
 
     setSize (1180, 752);
 
-    // Teclado del ordenador como piano (layout FL Studio).
+    // Computer keyboard as a piano (FL Studio layout).
     addKeyListener (this);
     setWantsKeyboardFocus (true);
     grabKeyboardFocus();
 
-    // ---------------------------------------------------------------- interfaz
+    // ---------------------------------------------------------------- interface
     addAndMakeVisible (titleBar_);
     addAndMakeVisible (panicButton);
 #if AEONIX_HAS_DEV_TOOLS
@@ -91,7 +91,7 @@ MainComponent::MainComponent()
 #endif
     addAndMakeVisible (statusLabel);
     addAndMakeVisible (synthPanel);
-    addChildComponent (settingsOverlay_);   // oculto hasta abrir Ajustes
+    addChildComponent (settingsOverlay_);   // hidden until Settings is opened
 
     presetManagerOverlay_ = std::make_unique<aeonix::PresetManagerOverlay>();
     presetManagerOverlay_->onLoad = [this] (const juce::String& name)
@@ -167,7 +167,7 @@ MainComponent::MainComponent()
     };
     addChildComponent (*presetManagerOverlay_);
 
-    addChildComponent (toast_);             // invisible hasta que se muestre un aviso
+    addChildComponent (toast_);             // invisible until a notice is shown
 
     titleBar_.onSettings = [this] { showSettings (aeonix::SettingsOverlay::Tab::audio); };
     titleBar_.onMidi     = [this] { showSettings (aeonix::SettingsOverlay::Tab::midi); };
@@ -283,37 +283,37 @@ MainComponent::MainComponent()
     };
 
     // ---------------------------------------------------------------- audio
-    // Polifonía: 8/16/32 voces. Se redondea el valor guardado y se aplica
-    // antes de arrancar el dispositivo para que prepare() reserve la capacidad.
+    // Polyphony: 8/16/32 voices. The saved value is rounded and applied
+    // before starting the device so prepare() reserves the capacity.
     {
         const int saved = config_.getInt ("polyphony", 16);
         polyphony_ = saved <= 8 ? 8 : (saved <= 16 ? 16 : 32);
         synthPanel.setPolyphony (polyphony_);
     }
 
-    // Restaura el dispositivo de audio guardado (si lo hay).
+    // Restores the saved audio device (if any).
     std::unique_ptr<juce::XmlElement> audioState;
     const juce::String audioXml = config_.getString ("audio.state");
     if (audioXml.isNotEmpty())
         audioState = juce::XmlDocument::parse (audioXml);
 
-    setAudioChannels (0, 2, audioState.get());   // 0 entradas, 2 salidas (estereo)
+    setAudioChannels (0, 2, audioState.get());   // 0 inputs, 2 outputs (stereo)
     statusLabel.setText (aeonix::tr (aeonix::TextId::statusReady),
                          juce::dontSendNotification);
 
-    // ---------------------------------------------------------------- estado
+    // ---------------------------------------------------------------- state
     typingOctave_ = juce::jlimit (-2, 2, config_.getInt ("keyboard.octave", 0));
     synthPanel.setOctave (typingOctave_);
 
     // ---------------------------------------------------------------- MIDI
     setupMidiDevices();
 
-    // Ultimo preset usado (o Default si ya no existe). No cuenta como reciente.
+    // Last used preset (or Default if it no longer exists). Does not count as recent.
     synthPanel.selectPresetByName (config_.getString ("preset.last", "Default"), false);
     presetLoaded_ = true;
     synthPanel.setPresetModified (false);
 
-    // Tema visual guardado (Holo Accents por defecto).
+    // Saved visual theme (Holo Accents by default).
     applyTheme (aeonix::themeFromKey (config_.getString ("theme", "holo.accents")));
 }
 
@@ -324,13 +324,13 @@ MainComponent::~MainComponent()
     if (midiInput != nullptr)
         midiInput->stop();
 
-    // Recuerda el estado del dispositivo de audio para la proxima sesion.
+    // Remembers the audio device state for the next session.
     if (auto state = deviceManager.createStateXml())
         config_.setString ("audio.state", state->toString());
 
     config_.save();
 
-    shutdownAudio();   // obligatorio en AudioAppComponent
+    shutdownAudio();   // mandatory in AudioAppComponent
 }
 
 // ==============================================================================
@@ -431,8 +431,8 @@ void MainComponent::paint (juce::Graphics& g)
 
 void MainComponent::paintOverChildren (juce::Graphics& g)
 {
-    // La ventana no tiene marco nativo: dibujamos un borde de 1 px por encima
-    // de todo el contenido para separarla del escritorio.
+    // The window has no native frame: we draw a 1 px border above
+    // all the content to separate it from the desktop.
     g.setColour (aeonix::themeColours (theme_).panelBorder.withAlpha (0.55f));
     g.drawRect (getLocalBounds(), 1);
 }
@@ -472,13 +472,13 @@ void MainComponent::resized()
 }
 
 // ==============================================================================
-//  Audio (hilo de tiempo real)
+//  Audio (real-time thread)
 // ==============================================================================
 
 void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRate)
 {
-    // Reserva la capacidad máxima (32) y aplica el límite configurado; así el
-    // usuario puede cambiar 8/16/32 sin reiniciar el audio.
+    // Reserves the maximum capacity (32) and applies the configured limit; that way the
+    // user can switch 8/16/32 without restarting the audio.
     synthEngine.prepare (sampleRate, samplesPerBlockExpected,
                          aeonix::SynthEngine::maxVoiceCapacity);
     synthEngine.setPolyphony (polyphony_);
@@ -496,11 +496,11 @@ void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& buffe
 
 void MainComponent::releaseResources()
 {
-    // El SynthEngine no reserva recursos de audio; nada que liberar.
+    // SynthEngine does not reserve audio resources; nothing to release.
 }
 
 // ==============================================================================
-//  MIDI (hilo de fondo) — aqui NO se pinta la GUI.
+//  MIDI (background thread) - the GUI is NOT painted here.
 // ==============================================================================
 
 void MainComponent::handleIncomingMidiMessage (juce::MidiInput* source,
@@ -564,7 +564,7 @@ void MainComponent::handleIncomingMidiMessage (juce::MidiInput* source,
     }
     else if (message.isPitchWheel())
     {
-        // 0..16383 con centro en 8192 -> -1..+1 (rango fijo +-2 semitonos).
+        // 0..16383 with centre at 8192 -> -1..+1 (fixed range +-2 semitones).
         const float bend = (message.getPitchWheelValue() - 8192) / 8192.0f;
         synthEngine.setPitchBend (bend);
 
@@ -592,7 +592,7 @@ void MainComponent::handleIncomingMidiMessage (juce::MidiInput* source,
 }
 
 // ==============================================================================
-//  GUI (hilo de mensajes, via AsyncUpdater)
+//  GUI (message thread, via AsyncUpdater)
 // ==============================================================================
 
 void MainComponent::handleAsyncUpdate()
@@ -636,7 +636,7 @@ void MainComponent::handleAsyncUpdate()
 }
 
 // ==============================================================================
-//  Teclado del ordenador (KeyListener)
+//  Computer keyboard (KeyListener)
 // ==============================================================================
 
 bool MainComponent::keyPressed (const juce::KeyPress& key, juce::Component*)
@@ -644,16 +644,16 @@ bool MainComponent::keyPressed (const juce::KeyPress& key, juce::Component*)
     const int keyCode = key.getKeyCode();
     const auto mods = key.getModifiers();
 
-    // En Windows/JUCE, Ctrl+S llega como caracter de control 0x13 (19), no
-    // como 'S'. Normalizamos Ctrl/Cmd+letra a su letra antes de comparar.
+    // On Windows/JUCE, Ctrl+S arrives as control character 0x13 (19), not
+    // as 'S'. We normalize Ctrl/Cmd+letter to its letter before comparing.
     int shortcutKey = keyCode;
     if (mods.isCommandDown() && keyCode >= 1 && keyCode <= 26)
         shortcutKey = 'A' + keyCode - 1;
 
-    // Herramientas de desarrollo (no afectan al teclado musical).
-    // F11/F12 pueden requerir Fn en algunos portatiles; Ctrl+Shift es la
-    // alternativa universal. Funcionan tambien con Ajustes abierto para poder
-    // capturar esa feature. F5-F8 cambian de tema y F10 guarda PNG + informe.
+    // Development tools (they do not affect the musical keyboard).
+    // F11/F12 may require Fn on some laptops; Ctrl+Shift is the
+    // universal alternative. They also work with Settings open so as to
+    // capture that feature. F5-F8 switch themes and F10 saves PNG + report.
 #if AEONIX_HAS_DEV_TOOLS
     const bool cmdShift = mods.isCommandDown() && mods.isShiftDown();
     const bool isSnapshotShortcut = keyCode == juce::KeyPress::F12Key
@@ -691,7 +691,7 @@ bool MainComponent::keyPressed (const juce::KeyPress& key, juce::Component*)
     }
 #endif
 
-    // Con los ajustes abiertos, el teclado no debe tocar el sintetizador.
+    // With settings open, the keyboard must not touch the synthesizer.
     if (settingsOverlay_.isOpen())
     {
         if (keyCode == juce::KeyPress::escapeKey)
@@ -700,7 +700,7 @@ bool MainComponent::keyPressed (const juce::KeyPress& key, juce::Component*)
         return true;
     }
 
-    // Atajo global de ajustes (Ctrl+, en Windows/Linux; Cmd+, en macOS).
+    // Global settings shortcut (Ctrl+, on Windows/Linux; Cmd+, on macOS).
     if (keyCode == ',' && mods.isCommandDown())
     {
         showSettings (aeonix::SettingsOverlay::Tab::audio);
@@ -719,10 +719,10 @@ bool MainComponent::keyPressed (const juce::KeyPress& key, juce::Component*)
     const int note = noteForKeyCode (keyCode, typingOctave_);
 
     if (note < 0)
-        return false;   // no es una tecla mapeada
+        return false;   // not a mapped key
 
     if (heldKeys_.count (keyCode))
-        return true;    // auto-repeticion: ignorar
+        return true;    // auto-repeat: ignore
 
     heldKeys_[keyCode] = note;
 
@@ -736,7 +736,7 @@ bool MainComponent::keyStateChanged (bool isKeyDown, juce::Component*)
     if (isKeyDown)
         return false;
 
-    // Alguna tecla se solto: libera las teclas mapeadas que ya no esten pulsadas.
+    // Some key was released: free the mapped keys that are no longer held.
     for (auto it = heldKeys_.begin(); it != heldKeys_.end(); )
     {
         if (!juce::KeyPress::isKeyCurrentlyDown (it->first))
@@ -755,7 +755,7 @@ bool MainComponent::keyStateChanged (bool isKeyDown, juce::Component*)
 }
 
 // ==============================================================================
-//  Acciones de la interfaz (hilo de mensajes)
+//  UI actions (message thread)
 // ==============================================================================
 
 void MainComponent::panic()
@@ -767,7 +767,7 @@ void MainComponent::panic()
 }
 
 // ==============================================================================
-//  Herramientas de desarrollo
+//  Development tools
 // ==============================================================================
 
 #if AEONIX_HAS_DEV_TOOLS
@@ -879,10 +879,10 @@ void MainComponent::archiveCapture (const juce::File& file) const
 
 void MainComponent::saveSnapshot()
 {
-    // Ocultamos el Toast para que no aparezca en el PNG.
+    // We hide the Toast so it does not appear in the PNG.
     toast_.hideToast();
 
-    // Se captura antes de tocar la barra de estado para que el PNG salga limpio.
+    // It is captured before touching the status bar so the PNG comes out clean.
     const auto image = createComponentSnapshot (getLocalBounds(), true, 1.0f);
 
     if (image.isNull())
@@ -960,7 +960,7 @@ void MainComponent::openPresetsFolder()
 {
     auto dir = presetRepository.getDirectory();
     dir.createDirectory();
-    dir.startAsProcess();   // abre la carpeta de presets directamente
+    dir.startAsProcess();   // opens the presets folder directly
 
     statusLabel.setText (aeonix::tr (aeonix::TextId::statusPresetsFolder), juce::dontSendNotification);
     toast_.showMessage (aeonix::tr (aeonix::TextId::toastPresetsFolder));
@@ -989,7 +989,7 @@ void MainComponent::refreshPresetManager()
 
 void MainComponent::showSettings (aeonix::SettingsOverlay::Tab tab)
 {
-    // Refresca la lista por si se ha conectado/desconectado un dispositivo.
+    // Refreshes the list in case a device has been connected/disconnected.
     refreshMidiDevices (false);
 
     settingsOverlay_.setTheme (theme_);
@@ -1005,7 +1005,7 @@ void MainComponent::setWindowMaximised (bool maximised)
 }
 
 // ==============================================================================
-//  MIDI: enumeracion y apertura
+//  MIDI: enumeration and opening
 // ==============================================================================
 
 void MainComponent::setupMidiDevices()
@@ -1021,7 +1021,7 @@ void MainComponent::refreshMidiDevices (bool reopenDevice)
     for (const auto& device : inputs)
         names.add (device.name);
 
-    // Prioridad: dispositivo recordado -> Oxygen -> primero disponible.
+    // Priority: remembered device -> Oxygen -> first available.
     const juce::String savedId = config_.getString ("midi.deviceId");
 
     int selected = -1;
