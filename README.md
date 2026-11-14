@@ -109,7 +109,8 @@ powershell -ExecutionPolicy Bypass -File .\dev.ps1 verify
 ## Status
 
 AEONIX 0.1.0 is an early release for Windows 10/11 (64-bit). It is a standalone
-application; VST3 support is planned but not available yet.
+application; VST3 support is planned but not available yet. Release history and
+the changes prepared for 0.2.0 are tracked in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Support
 
