@@ -18,10 +18,9 @@ namespace aeonix
 // ============================================================================
 //  PresetManagerOverlay - preset manager (overlay).
 //
-//  Covers the whole window with a scrim and a 900x620 card. In this first
-//  version it allows opening, searching, browsing the list and loading a
-//  preset. The category sidebar and the save actions arrive in the following
-//  steps.
+//  Covers the whole window with a scrim and a 900x620 card: a sidebar with
+//  filters and categories, a searchable list, the detail panel, the sort menu,
+//  audition on selection and the save, rename and delete forms.
 // ============================================================================
 class PresetManagerOverlay final : public juce::Component
 {
