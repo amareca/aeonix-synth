@@ -614,6 +614,33 @@ function Save-AeonixScreenshot
     try
     {
         $graphics.CopyFromScreen($rect.Left, $rect.Top, 0, 0, $bitmap.Size)
+
+        # A borderless JUCE window still gets a 1 px DWM frame and rounded
+        # corners, so the desktop behind them lands in the bitmap. Clamp the
+        # outer ring to the pixels just inside: the size stays the same and no
+        # wallpaper survives.
+        $edge = 3
+        $maxX = $bitmap.Width - 1 - $edge
+        $maxY = $bitmap.Height - 1 - $edge
+
+        for ($y = 0; $y -lt $bitmap.Height; ++$y)
+        {
+            $edgeRow = ($y -lt $edge) -or ($y -gt $maxY)
+            $sampleY = [Math]::Min([Math]::Max($y, $edge), $maxY)
+
+            for ($x = 0; $x -lt $bitmap.Width; ++$x)
+            {
+                if (-not $edgeRow -and ($x -ge $edge) -and ($x -le $maxX))
+                {
+                    $x = $maxX
+                    continue
+                }
+
+                $sampleX = [Math]::Min([Math]::Max($x, $edge), $maxX)
+                $bitmap.SetPixel($x, $y, $bitmap.GetPixel($sampleX, $sampleY))
+            }
+        }
+
         $directory = Split-Path -Parent $Path
 
         if ($directory -and -not (Test-Path -LiteralPath $directory))

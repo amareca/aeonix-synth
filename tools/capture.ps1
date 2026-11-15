@@ -12,10 +12,14 @@ param(
     [ValidateSet("normal", "large", "xlarge")]
     [string]$TextSize = "normal",
 
+    [string]$Preset = "Default",
+
     [ValidateSet("Dev", "Pro")]
     [string]$Flavour = "Dev",
 
     [string]$Search = "",
+
+    [string]$Tab = "",
 
     [switch]$EmptyLibrary,
 
@@ -74,16 +78,16 @@ if ($EmptyLibrary)
         $stashDir = Join-Path ([System.IO.Path]::GetTempPath()) ("aeonix-capture-" + [guid]::NewGuid().ToString("N"))
         New-Item -ItemType Directory -Path $stashDir -Force | Out-Null
 
-        foreach ($preset in $userPresets)
+        foreach ($presetFile in $userPresets)
         {
-            Move-Item -LiteralPath $preset.FullName -Destination (Join-Path $stashDir $preset.Name) -Force
+            Move-Item -LiteralPath $presetFile.FullName -Destination (Join-Path $stashDir $presetFile.Name) -Force
         }
     }
 }
 
 try
 {
-    $config = New-AeonixBaseConfig -Theme $Theme -Language $Language -Preset "Default" -TextSize $TextSize
+    $config = New-AeonixBaseConfig -Theme $Theme -Language $Language -Preset $Preset -TextSize $TextSize
     Start-Aeonix -ConfigJson ($config | ConvertTo-Json -Compress) -Flavour $Flavour -Width $Width -Height $Height | Out-Null
     Start-Sleep -Milliseconds 800
 
@@ -123,8 +127,28 @@ try
 
         "settings"
         {
-            Invoke-AeonixKeys -Keys "^,"
-            Start-Sleep -Milliseconds 500
+            $settingsButton = Find-AeonixElementByNames -Names @("Settings (Ctrl+,)", "Ajustes (Ctrl+,)")
+
+            if ($null -eq $settingsButton)
+            {
+                throw "The settings button was not found."
+            }
+
+            Invoke-AeonixElementClick -Element $settingsButton
+            Start-Sleep -Milliseconds 600
+
+            if ($Tab)
+            {
+                $tabElement = Find-AeonixElementByNames -Names @($Tab)
+
+                if ($null -eq $tabElement)
+                {
+                    throw ("Settings tab '{0}' was not found." -f $Tab)
+                }
+
+                Invoke-AeonixElementClick -Element $tabElement
+                Start-Sleep -Milliseconds 400
+            }
         }
 
         "main"
@@ -153,9 +177,9 @@ finally
 
     if ($stashDir -and (Test-Path -LiteralPath $stashDir))
     {
-        foreach ($preset in (Get-ChildItem -LiteralPath $stashDir -Filter *.json -File))
+        foreach ($presetFile in (Get-ChildItem -LiteralPath $stashDir -Filter *.json -File))
         {
-            Move-Item -LiteralPath $preset.FullName -Destination (Join-Path $presetsDir $preset.Name) -Force
+            Move-Item -LiteralPath $presetFile.FullName -Destination (Join-Path $presetsDir $presetFile.Name) -Force
         }
 
         Remove-Item -LiteralPath $stashDir -Force -Recurse
