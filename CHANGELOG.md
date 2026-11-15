@@ -51,6 +51,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the sidebar folder button is 30×30 to match the `+ New preset` button beside it.
 - The footer is 52 px and absorbs the bottom padding: `Esc` and the audition
   toggle are centred between its top rule and the overlay border.
+- The preset detail column now follows the panel rhythm: 20 px of vertical
+  padding and 12/12/14/16 between blocks. The dead space above the action
+  buttons drops from 173 to 116 px on factory presets and from 141 to 84 on user
+  presets.
 - The preset count is gone from the header: the sidebar already shows the library
   totals, so the 20 px band stays as breathing room between the search row and
   the rule.

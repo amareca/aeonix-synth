@@ -2117,16 +2117,18 @@ void PresetManagerOverlay::resized()
         placeRow (row);
     }
 
-    auto detail = detailBounds_.reduced (ui::px (12), ui::px (8));
-    detailName_.setBounds (detail.removeFromTop (ui::px (24)));
+    // The detail column follows the panel rhythm (20 px padding and 12/12/14/16
+    // stacking gaps), not the denser list scale, so its blocks read as a column.
+    auto detail = detailBounds_.reduced (ui::px (12), ui::px (20));
+    detailName_.setBounds (detail.removeFromTop (ui::px (26)));
     refreshDetailName();
-    detail.removeFromTop (ui::px (3));
+    detail.removeFromTop (ui::px (12));
     detailBadgesBounds_ = detail.removeFromTop (ui::px (20));
-    detail.removeFromTop (ui::px (6));
+    detail.removeFromTop (ui::px (12));
     favoriteButton_.setBounds (detail.removeFromTop (ui::px (26)));
-    detail.removeFromTop (ui::px (8));
+    detail.removeFromTop (ui::px (14));
     detailCardBounds_ = detail.removeFromTop (ui::px (54));
-    detail.removeFromTop (ui::px (6));
+    detail.removeFromTop (ui::px (16));
 
     auto status = detail.removeFromTop (ui::px (18));
     detailStatusDotBounds_ = status.removeFromLeft (ui::px (10));
