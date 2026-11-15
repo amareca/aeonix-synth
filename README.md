@@ -31,8 +31,9 @@ design, with the whole signal path visible on a single screen.
 
 - Subtractive synthesis with an oscillator, filter, envelopes and LFO.
 - Unison with stereo spread, delay and reverb.
-- Preset manager with factory and user presets, search, filters, favourites and
-  recents.
+- **36 factory presets** in seven families, plus a preset manager with search,
+  category filters, favourites, recents and sorting.
+- Audition on selection, so you can hear a preset without closing the manager.
 - MIDI input, on-screen keyboard, pitch and modulation wheels.
 - Four visual themes: Holo Accents, Holo Glass, Holo Minimal and Prototype.
 - Accessibility: Normal / Large / Extra large text, automatic detection by screen
@@ -109,8 +110,8 @@ powershell -ExecutionPolicy Bypass -File .\dev.ps1 verify
 ## Status
 
 AEONIX 0.2.0 is an early release for Windows 10/11 (64-bit). It is a standalone
-application; VST3 support is planned but not available yet. Release history and
-the changes prepared for 0.2.0 are tracked in [`CHANGELOG.md`](CHANGELOG.md).
+application; VST3 support is planned but not available yet. Release history is
+tracked in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Support
 
@@ -141,7 +142,8 @@ corresponding source code.
 
 AEONIX es un instrumento de escritorio para Windows 10 y 11 de 64 bits, escrito en
 C++20 con JUCE 8, pensado para pads cinematográficos, plucks atmosféricos y diseño
-sonoro experimental.
+sonoro experimental. Incluye **36 presets de fábrica** en siete familias, gestor
+con búsqueda, categorías, favoritos y audición sin cerrarlo.
 
 - **Web en español:** <https://amareca.github.io/aeonix-synth/es/>
 - **Descarga:** [GitHub Releases](https://github.com/amareca/aeonix-synth/releases/latest)

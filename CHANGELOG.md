@@ -21,10 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - **Preset audition**: a persistent `Load on select` toggle in the preset
   manager. Selecting a preset loads it without closing the manager. The
   preference is stored in `config.json` (`presets.audition`) and starts off.
-- **Folder shortcut in the sidebar**: the preset folder is now a 26×26 folder
+- **Folder shortcut in the sidebar**: the preset folder is now a 30×30 folder
   icon next to `+ New preset`, matching the main preset bar.
 - **Focused keyboard access** for `+ New preset` and the folder icon.
-- **Preset sorting**: a 120×22 sort button in the manager header opens a menu
+- **Preset sorting**: a 120×26 sort button in the manager header opens a menu
   with `Name A–Z`, `Name Z–A`, `Category`, `Origin` and `Last used`. The choice
   is stored in `config.json` (`presets.sort`) and `Origin` is the default.
 - **Themed popup menus**: the sort menu and every dropdown now share the app
@@ -60,9 +60,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   change, so `library.json` needs no migration.
 - The previous 14 prototype presets were replaced by the 36-preset factory
   library.
-- The preset manager footer is now 32 px high, with a top rule, a 120 px
-  `Esc to close` label and a 190×24 audition toggle aligned with the preset
-  list.
 - The end of the preset list fades over 12 px, with a 6 px cushion, so rows no
   longer collide with the footer. The fade does not cover the scrollbar.
 - `Abrir carpeta` / `Open folder` was removed from the footer; the sidebar icon
@@ -98,14 +95,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `ui`: 48/48 combinations, 64 main controls, 0 overlaps, 0 out-of-bounds,
   0 clipped labels.
 - PRO Release build: `AEONIX.exe`.
-- `docs-check`: 27 notes, 191 wiki links and 24 images.
+- `docs-check`: 10 notes, 83 wiki links and 2 images.
 
 ### Notes
 
 - No DSP, audio engine or main-surface control changes.
 - AEONIX remains a standalone Windows application; VST3 is planned but not
   available.
-- Release notes, ZIP names, tag and SHA-256 checksums are pending.
+- The ZIP is built and its SHA-256 published; the tag and the GitHub release are pending.
 
 ## [0.1.0] - 2026-11-11
 
