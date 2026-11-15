@@ -195,7 +195,6 @@ private:
     void filter();
     void sortVisible();
     void setFilter (Filter filter, PresetCategory category = PresetCategory::other);
-    void updateMeta();
     void updateSortButton();
     void showSortMenu();
     void updateSidebar();
@@ -239,7 +238,6 @@ private:
     ListScrollBarLookAndFeel listScrollLookAndFeel_;
     juce::ListBox listBox_ { "Presets", nullptr };
     std::unique_ptr<ListModel> model_;
-    juce::Label countLabel_;
     SortButton sortButton_;
     juce::Label libraryLabel_;
     juce::Label categoriesLabel_;

@@ -452,10 +452,6 @@ PresetManagerOverlay::PresetManagerOverlay()
     closeButton_.onClick = [this] { hide(); };
     addAndMakeVisible (closeButton_);
 
-    countLabel_.setFont (ui::font (11.0f));
-    countLabel_.setJustificationType (juce::Justification::centredLeft);
-    addAndMakeVisible (countLabel_);
-
     sortButton_.setName ("PresetSort");
     sortButton_.setTooltip (tr (TextId::presetManagerSortTooltip));
     sortButton_.onClick = [this] { showSortMenu(); };
@@ -785,7 +781,7 @@ void PresetManagerOverlay::filter()
     listBox_.selectRow (visibleRowOf (selectedName_), juce::dontSendNotification);
     updating_ = false;
 
-    updateMeta();
+    updateSortButton();
     updateDetail();
     repaint();
 }
@@ -855,17 +851,6 @@ void PresetManagerOverlay::sortVisible()
                               });
             break;
     }
-}
-
-void PresetManagerOverlay::updateMeta()
-{
-    countLabel_.setText (filteredCount() == 1
-                             ? tr (TextId::presetManagerCountOne)
-                             : trf (TextId::presetManagerCount,
-                                    { juce::String (filteredCount()) }),
-                         juce::dontSendNotification);
-
-    updateSortButton();
 }
 
 void PresetManagerOverlay::updateSortButton()
@@ -2031,11 +2016,9 @@ void PresetManagerOverlay::resized()
     header.removeFromRight (ui::px (12));
     titleLabel_.setBounds (header);
 
-    // The meta row grows with the typography: 20 / 21 / 23 with the current sizes.
-    const int metaH = juce::jmax (ui::px (20),
-                                  juce::roundToInt (ui::font (10.5f).getHeight()) + ui::px (4));
-    auto meta = p.removeFromTop (metaH);
-    countLabel_.setBounds (meta.removeFromLeft (ui::px (220)));
+    // Breathing room between the header and the rule below it. The count that
+    // used to live here repeated the numbers already shown in the sidebar.
+    p.removeFromTop (ui::px (20));
 
     auto footer = p.removeFromBottom (ui::px (52));
 
@@ -2285,7 +2268,6 @@ void PresetManagerOverlay::applyThemeToChildren()
     const auto colours = themeColours (theme_);
 
     titleLabel_.setColour (juce::Label::textColourId, colours.text);
-    countLabel_.setColour (juce::Label::textColourId, colours.muted);
     sortButton_.setTheme (theme_);
     libraryLabel_.setColour (juce::Label::textColourId, colours.muted);
     categoriesLabel_.setColour (juce::Label::textColourId, colours.muted);

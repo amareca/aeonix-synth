@@ -47,13 +47,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   catalogue lists the English column first, and the Spanish column stays as the
   second argument for the product strings.
 - The preset manager header now holds the title, search, sort and close in one
-  44 px row; the counter keeps a small band of its own. The three controls share
-  a 26 px height so their boxes line up, and the sidebar folder button is 30×30
-  to match the `+ New preset` button beside it.
+  44 px row. The three controls share a 26 px height so their boxes line up, and
+  the sidebar folder button is 30×30 to match the `+ New preset` button beside it.
 - The footer is 52 px and absorbs the bottom padding: `Esc` and the audition
   toggle are centred between its top rule and the overlay border.
-- The body grew from 476 to 484 px, so normal and large text show a full extra
-  row.
+- The preset count is gone from the header: the sidebar already shows the library
+  totals, so the 20 px band stays as breathing room between the search row and
+  the rule.
 - Category chips in the list use a 40 px minimum and centred text.
 - The starter category is now `Básicos` / `Basics` instead of
   `Iniciación` / `Initiation`, and `Teclas` became `Teclados`. `Lead`, `Pad`,

@@ -139,8 +139,6 @@ AEONIX_TEXT (presetManagerNew,            "+ New preset",                    "+ 
 AEONIX_TEXT (presetManagerFormNewTitle,   "New preset",                      "Nuevo preset")
 AEONIX_TEXT (presetManagerListAccessible, "Preset list",                     "Lista de presets")
 AEONIX_TEXT (presetManagerSearch,         "Search the library",              "Buscar en la biblioteca")
-AEONIX_TEXT (presetManagerCount,          "{0} presets",                     "{0} presets")
-AEONIX_TEXT (presetManagerCountOne,       "1 preset",                        "1 preset")
 AEONIX_TEXT (presetManagerSortRecent,     "Last used",                       "Último uso")
 AEONIX_TEXT (presetManagerSortButton,     "Sort",                            "Ordenar")
 AEONIX_TEXT (presetManagerSortTooltip,    "Sort the list",                   "Ordenar la lista")
