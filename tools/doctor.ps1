@@ -1,4 +1,4 @@
-# Comprueba que el entorno de desarrollo esta listo.
+# Checks that the development environment is ready.
 #
 # Uso:
 #   .\tools\doctor.ps1
@@ -19,13 +19,13 @@ function Add-Check
     )
 
     $checks.Add([pscustomobject]@{
-        Comprobacion = $Name
-        Estado       = $Status
-        Detalle      = $Detail
+        Check  = $Name
+        Status = $Status
+        Detail = $Detail
     })
 }
 
-Write-Step "Entorno de desarrollo de AEONIX"
+Write-Step "AEONIX development environment"
 
 Add-Check "Windows" "OK" ([System.Environment]::OSVersion.VersionString)
 Add-Check "PowerShell" "OK" ($PSVersionTable.PSVersion.ToString())
@@ -41,7 +41,7 @@ if ($cmake)
 }
 else
 {
-    Add-Check "CMake" "FALLO" "No encontrado; instala VS Build Tools o CMake."
+    Add-Check "CMake" "FAIL" "Not found; install VS Build Tools or CMake."
 }
 
 $ctest = Find-Executable -Name "ctest" -Candidates @(
@@ -53,7 +53,7 @@ if ($ctest)
 }
 else
 {
-    Add-Check "CTest" "FALLO" "No encontrado junto a CMake."
+    Add-Check "CTest" "FAIL" "Not found next to CMake."
 }
 
 if (Test-Path -LiteralPath $vsRoot)
@@ -62,18 +62,18 @@ if (Test-Path -LiteralPath $vsRoot)
 }
 else
 {
-    Add-Check "Visual Studio Build Tools" "FALLO" "No se encontro la ruta habitual de VS 2022."
+    Add-Check "Visual Studio Build Tools" "FAIL" "The usual VS 2022 path was not found."
 }
 
 $juce = Join-Path $repo "external\JUCE\CMakeLists.txt"
 
 if (Test-Path -LiteralPath $juce)
 {
-    Add-Check "JUCE (submodulo)" "OK" "external\JUCE"
+    Add-Check "JUCE (submodule)" "OK" "external\JUCE"
 }
 else
 {
-    Add-Check "JUCE (submodulo)" "FALLO" "Ejecuta: git submodule update --init --recursive"
+    Add-Check "JUCE (submodule)" "FAIL" "Run: git submodule update --init --recursive"
 }
 
 foreach ($flavour in @("Dev", "Pro"))
@@ -83,11 +83,11 @@ foreach ($flavour in @("Dev", "Pro"))
 
     if (Test-Path -LiteralPath $cache)
     {
-        Add-Check ("Build {0} configurado" -f $flavour) "OK" ((Split-Path -Leaf $buildDir) + "\")
+        Add-Check ("Build {0} configured" -f $flavour) "OK" ((Split-Path -Leaf $buildDir) + "\")
     }
     else
     {
-        Add-Check ("Build {0} configurado" -f $flavour) "AVISO" "Sin cache; el primer build ejecutara CMake."
+        Add-Check ("Build {0} configured" -f $flavour) "WARN" "No cache yet; the first build runs CMake."
     }
 
     $exe = Get-AeonixExePath -Flavour $flavour -Configuration Release
@@ -99,7 +99,7 @@ foreach ($flavour in @("Dev", "Pro"))
     }
     else
     {
-        Add-Check ((Split-Path -Leaf $exe)) "AVISO" "No compilado todavia."
+        Add-Check ((Split-Path -Leaf $exe)) "WARN" "Not built yet."
     }
 
     $config = Get-AeonixConfigPath -Flavour $flavour
@@ -110,7 +110,7 @@ foreach ($flavour in @("Dev", "Pro"))
     }
     else
     {
-        Add-Check ("Config {0}" -f $flavour) "AVISO" "Se creara al abrir la app."
+        Add-Check ("Config {0}" -f $flavour) "WARN" "Created when the app opens."
     }
 
     $presets = Get-AeonixPresetsDir -Flavour $flavour
@@ -118,11 +118,11 @@ foreach ($flavour in @("Dev", "Pro"))
     if (Test-Path -LiteralPath $presets)
     {
         $count = (Get-ChildItem -LiteralPath $presets -Filter *.json -File -ErrorAction SilentlyContinue).Count
-        Add-Check ("Presets {0}" -f $flavour) "OK" ("{0} archivos en {1}" -f $count, $presets)
+        Add-Check ("Presets {0}" -f $flavour) "OK" ("{0} files in {1}" -f $count, $presets)
     }
     else
     {
-        Add-Check ("Presets {0}" -f $flavour) "AVISO" "La carpeta se creara al guardar el primer preset."
+        Add-Check ("Presets {0}" -f $flavour) "WARN" "The folder is created when the first preset is saved."
     }
 }
 
@@ -130,22 +130,22 @@ $tests = Get-AeonixTestsPath -Configuration Release -Flavour "Dev"
 
 if (Test-Path -LiteralPath $tests)
 {
-    Add-Check "aeonix_tests.exe (DEV)" "OK" "Listo para ejecutar."
+    Add-Check "aeonix_tests.exe (DEV)" "OK" "Ready to run."
 }
 else
 {
-    Add-Check "aeonix_tests.exe (DEV)" "AVISO" "No compilado todavia."
+    Add-Check "aeonix_tests.exe (DEV)" "WARN" "Not built yet."
 }
 
 $running = (Get-AeonixProcess).Count
 
 if ($running -gt 0)
 {
-    Add-Check "AEONIX en ejecucion" "AVISO" ("{0} proceso(s); cierra la app antes de compilar." -f $running)
+    Add-Check "AEONIX running" "WARN" ("{0} process(es); close the app before building." -f $running)
 }
 else
 {
-    Add-Check "AEONIX en ejecucion" "OK" "Ninguno."
+    Add-Check "AEONIX running" "OK" "None."
 }
 
 $clangFormat = Find-Executable -Name "clang-format" -Candidates @(
@@ -154,22 +154,22 @@ $clangTidy = Find-Executable -Name "clang-tidy" -Candidates @(
     (Join-Path $vsRoot "VC\Tools\Llvm\x64\bin\clang-tidy.exe"))
 
 if ($clangFormat) { Add-Check "clang-format" "OK" $clangFormat }
-else { Add-Check "clang-format" "AVISO" "No disponible (se usara en el bloque de formato)." }
+else { Add-Check "clang-format" "WARN" "Not available (used by the formatting block)." }
 
 if ($clangTidy) { Add-Check "clang-tidy" "OK" $clangTidy }
-else { Add-Check "clang-tidy" "AVISO" "No disponible (se usara en el bloque de calidad)." }
+else { Add-Check "clang-tidy" "WARN" "Not available (used by the quality block)." }
 
 $drive = Get-PSDrive -Name C -ErrorAction SilentlyContinue
 
 if ($drive)
 {
-    Add-Check "Espacio libre (C:)" "OK" ("{0:N1} GB" -f ($drive.Free / 1GB))
+    Add-Check "Free space (C:)" "OK" ("{0:N1} GB" -f ($drive.Free / 1GB))
 }
 
 Write-Host ""
 $checks | Format-Table -AutoSize
 
-$failures = @($checks | Where-Object { $_.Estado -eq "FALLO" }).Count
+$failures = @($checks | Where-Object { $_.Estado -eq "FAIL" }).Count
 $reportPath = Join-Path (Get-ReportsDir) "doctor.json"
 
 Write-JsonFile -Path $reportPath -Object ([ordered]@{
@@ -179,11 +179,11 @@ Write-JsonFile -Path $reportPath -Object ([ordered]@{
     checks      = $checks.ToArray()
 })
 
-Write-Host ("  Informe: {0}" -f $reportPath) -ForegroundColor DarkGray
+Write-Host ("  Report: {0}" -f $reportPath) -ForegroundColor DarkGray
 
 if ($failures -gt 0)
 {
-    throw ("Doctor encontro {0} problema(s) bloqueante(s)." -f $failures)
+    throw ("Doctor found {0} blocking problem(s)." -f $failures)
 }
 
-Write-Host "Entorno listo." -ForegroundColor Green
+Write-Host "Environment ready." -ForegroundColor Green

@@ -17,7 +17,7 @@ TEST_CASE ("Low-pass filter passes DC (gain ~1)", "[filter]")
 
     float out = 0.0f;
     for (int i = 0; i < 2000; ++i)
-        out = filter.process (1.0f);   // senal constante (DC)
+        out = filter.process (1.0f);   // constant signal (DC)
 
     REQUIRE (out == Catch::Approx (1.0f).margin (1e-3f));
 }
@@ -35,7 +35,7 @@ TEST_CASE ("Low-pass filter attenuates the Nyquist frequency", "[filter]")
         const float input = (i % 2 == 0) ? 1.0f : -1.0f;   // 22.05 kHz
         const float out = filter.process (input);
 
-        if (i > 1000)   // ignora el transitorio inicial
+        if (i > 1000)   // ignore the initial transient
             peak = std::max (peak, std::fabs (out));
     }
 

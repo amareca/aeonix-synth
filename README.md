@@ -13,7 +13,7 @@ English · [Español](#español)
 
 ![AEONIX interface: preset bar, synthesis sections, virtual keyboard and effect controls](site/assets/captures/hero.png)
 
-*Main surface with extra-large text. AEONIX 0.1.0, PRO build.*
+*Main surface with extra-large text. AEONIX 0.2.0, PRO build.*
 
 AEONIX is a desktop instrument for Windows 10 and 11 (64-bit), built with C++20 and
 JUCE 8. It is designed for cinematic pads, atmospheric plucks and experimental sound
@@ -31,8 +31,9 @@ design, with the whole signal path visible on a single screen.
 
 - Subtractive synthesis with an oscillator, filter, envelopes and LFO.
 - Unison with stereo spread, delay and reverb.
-- Preset manager with factory and user presets, search, filters, favourites and
-  recents.
+- **36 factory presets** in seven families, plus a preset manager with search,
+  category filters, favourites, recents and sorting.
+- Audition on selection, so you can hear a preset without closing the manager.
 - MIDI input, on-screen keyboard, pitch and modulation wheels.
 - Four visual themes: Holo Accents, Holo Glass, Holo Minimal and Prototype.
 - Accessibility: Normal / Large / Extra large text, automatic detection by screen
@@ -49,9 +50,9 @@ design, with the whole signal path visible on a single screen.
 
 ## Download (Windows)
 
-Only Windows 10/11, 64-bit, is supported in 0.1.0.
+Only Windows 10/11, 64-bit, is supported in 0.2.0.
 
-1. Download `AEONIX-0.1.0-win64.zip` from
+1. Download `AEONIX-0.2.0-win64.zip` from
    [Releases](https://github.com/amareca/aeonix-synth/releases).
 2. Unzip it and run `AEONIX.exe`.
 
@@ -108,8 +109,9 @@ powershell -ExecutionPolicy Bypass -File .\dev.ps1 verify
 
 ## Status
 
-AEONIX 0.1.0 is an early release for Windows 10/11 (64-bit). It is a standalone
-application; VST3 support is planned but not available yet.
+AEONIX 0.2.0 is an early release for Windows 10/11 (64-bit). It is a standalone
+application; VST3 support is planned but not available yet. Release history is
+tracked in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Support
 
@@ -140,11 +142,12 @@ corresponding source code.
 
 AEONIX es un instrumento de escritorio para Windows 10 y 11 de 64 bits, escrito en
 C++20 con JUCE 8, pensado para pads cinematográficos, plucks atmosféricos y diseño
-sonoro experimental.
+sonoro experimental. Incluye **36 presets de fábrica** en siete familias, gestor
+con búsqueda, categorías, favoritos y audición sin cerrarlo.
 
 - **Web en español:** <https://amareca.github.io/aeonix-synth/es/>
 - **Descarga:** [GitHub Releases](https://github.com/amareca/aeonix-synth/releases/latest)
-  (`AEONIX-0.1.0-win64.zip`, Windows 10/11 de 64 bits, sin runtime adicional).
+  (`AEONIX-0.2.0-win64.zip`, Windows 10/11 de 64 bits, sin runtime adicional).
 - **Código:** <https://github.com/amareca/aeonix-synth>
 
 ### Compilar (Windows)

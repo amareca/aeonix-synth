@@ -8,19 +8,19 @@ namespace aeonix
 {
 
 // ============================================================================
-//  Preset — un preset del sintetizador: un nombre + el valor normalizado (0..1)
-//  de cada parametro. Pura C++ (sin JUCE, sin I/O).
+//  Preset - a synthesizer preset: a name + the normalized value (0..1)
+//  of each parameter. Pure C++ (no JUCE, no I/O).
 // ============================================================================
 struct Preset
 {
     std::string name;
-    std::map<std::string, float> parameters;   // id -> valor normalizado 0..1
+    std::map<std::string, float> parameters;   // id -> normalized value 0..1
 };
 
-// Parametros del patch por defecto (id -> normalizado).
+// Parameters of the default patch (id -> normalized).
 std::map<std::string, float> makeDefaultParameters();
 
-// Presets de fabrica: Default, Pluck y Pad.
+// Factory presets: Default + v1 library (7 families, 35 presets).
 std::vector<Preset> makeFactoryPresets();
 
 } // namespace aeonix

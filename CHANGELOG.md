@@ -1,0 +1,122 @@
+# Changelog
+
+All notable changes to AEONIX are documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/).
+
+## [0.2.0] - 2026-11-15
+
+### Added
+
+- **Factory library v1**: 36 presets across seven families, five per family
+  plus `Default`:
+  - Pads: Aurora, Nocturne, Air, Drift, Frost.
+  - Plucks: Glass, Wood, Bell, Muted, Wide.
+  - Leads: Copper, Hollow, Velvet, Twin, Edge.
+  - Bass: Sub Terra, Round, Acid Line, Growl, Pulse.
+  - Brass: Soft, Bright, Big, Muted, Stab (synthetic brass).
+  - Piano: Felt, Bell, Soft, Bright, Lo-fi (e-piano, not acoustic).
+  - Strings: Warm, Wide, Soft, Bright, Cinematic.
+- **Preset audition**: a persistent `Load on select` toggle in the preset
+  manager. Selecting a preset loads it without closing the manager. The
+  preference is stored in `config.json` (`presets.audition`) and starts off.
+- **Folder shortcut in the sidebar**: the preset folder is now a 30×30 folder
+  icon next to `+ New preset`, matching the main preset bar.
+- **Focused keyboard access** for `+ New preset` and the folder icon.
+- **Preset sorting**: a 120×26 sort button in the manager header opens a menu
+  with `Name A–Z`, `Name Z–A`, `Category`, `Origin` and `Last used`. The choice
+  is stored in `config.json` (`presets.sort`) and `Origin` is the default.
+- **Themed popup menus**: the sort menu and every dropdown now share the app
+  palette, with a 1 px border, accent tint and a drawn check on the active
+  option. The sort menu is 24 px per row and grows to fit its longest label.
+- **Pluck and Brass categories** (`pluck`, `metales`): the library now shows
+  five plucks and five brass presets in their own rows.
+- **Themed list scrollbar**: a 3 px rounded thumb on the existing 9 px channel,
+  with a transparent track and 55/80/95 % states. It hides when the list fits.
+
+### Changed
+
+- **English first**: code comments, dev tool output and the public documents are
+  now written in English; the internal `docs/` tree stays in Spanish. The string
+  catalogue lists the English column first, and the Spanish column stays as the
+  second argument for the product strings.
+- The preset manager header now holds the title, search, sort and close in one
+  44 px row. The three controls share a 26 px height so their boxes line up, and
+  the sidebar folder button is 30×30 to match the `+ New preset` button beside it.
+- The footer is 52 px and absorbs the bottom padding: `Esc` and the audition
+  toggle are centred between its top rule and the overlay border.
+- The preset detail column now follows the panel rhythm: 20 px of vertical
+  padding and 12/12/14/16 between blocks. The dead space above the action
+  buttons drops from 173 to 116 px on factory presets and from 141 to 84 on user
+  presets.
+- The preset count is gone from the header: the sidebar already shows the library
+  totals, so the 20 px band stays as breathing room between the search row and
+  the rule.
+- Category chips in the list use a 40 px minimum and centred text.
+- The starter category is now `Básicos` / `Basics` instead of
+  `Iniciación` / `Initiation`, and `Teclas` became `Teclados`. `Lead`, `Pad`,
+  `Pluck` and `FX` stay as trade terms, and the stored category keys did not
+  change, so `library.json` needs no migration.
+- The previous 14 prototype presets were replaced by the 36-preset factory
+  library.
+- The end of the preset list fades over 12 px, with a 6 px cushion, so rows no
+  longer collide with the footer. The fade does not cover the scrollbar.
+- `Abrir carpeta` / `Open folder` was removed from the footer; the sidebar icon
+  is the only entry point.
+- Factory categories are derived from the family suffix
+  (`Pad`, `Pluck`, `Lead`, `Bass`, `Brass`, `Piano`, `Strings`). The factory
+  category is always taken from the built-in table, so older `library.json`
+  files do not need to be migrated.
+- Empty categories are no longer drawn: `FX` and `Other` only appear when a
+  preset uses them. The sidebar shows eight rows with the current library.
+- The list no longer has an `Origin` column. The name gained 36 px and only
+  user presets carry a 6 px diamond at the end of the row; the accessible name
+  of every row still reports factory or user.
+- If the saved `preset.last` no longer exists, AEONIX falls back to `Default`
+  instead of starting without a loaded preset.
+
+### Fixed
+
+- Cancelling the unsaved-changes guard from `Load` no longer closes the preset
+  manager.
+- Auditioning a preset no longer adds it to Recent or writes `preset.last` on
+  every selection; the last auditioned preset is saved once when the manager
+  closes.
+- Opening `Save copy…` from the guard no longer resets the manager's search and
+  filter.
+- The preset manager's keyboard cycle now reaches `+ New preset` and the folder
+  icon, with a visible focus ring.
+
+### Verification
+
+- `verify`: 84 tests.
+- `presets`: Copper Lead and Warm Strings smoke cases.
+- `ui`: 48/48 combinations, 64 main controls, 0 overlaps, 0 out-of-bounds,
+  0 clipped labels.
+- PRO Release build: `AEONIX.exe`.
+- `docs-check`: 10 notes, 83 wiki links and 2 images.
+
+### Notes
+
+- No DSP, audio engine or main-surface control changes.
+- AEONIX remains a standalone Windows application; VST3 is planned but not
+  available.
+- The ZIP is built and its SHA-256 published; the tag and the GitHub release are pending.
+
+## [0.1.0] - 2026-11-11
+
+First public release.
+
+- Standalone subtractive synthesizer for Windows 10/11, 64-bit, built with
+  C++20 and JUCE 8.
+- One oscillator, resonant low-pass filter, amp and filter ADSR, LFO to cutoff,
+  unison, stereo delay, reverb, pitch bend and mod wheel.
+- 14 factory presets, user presets in JSON, 4 themes, Spanish and English, and
+  three text sizes.
+- Static runtime: no Visual C++ Redistributable required.
+- AGPL-3.0.
+- Unsigned executable with SHA-256 checksums and a SmartScreen warning.
+
+[0.2.0]: https://github.com/amareca/aeonix-synth/releases/tag/v0.2.0
+[0.1.0]: https://github.com/amareca/aeonix-synth/releases/tag/v0.1.0

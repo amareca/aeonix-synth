@@ -16,7 +16,9 @@ juce::Colour categoryColour (aeonix::PresetCategory category,
         case aeonix::PresetCategory::lead:       return juce::Colour (0xfff6a54a);
         case aeonix::PresetCategory::pad:        return juce::Colour (0xffa78bfa);
         case aeonix::PresetCategory::strings:    return juce::Colour (0xff7dd3a8);
+        case aeonix::PresetCategory::brass:      return juce::Colour (0xffd97a9e);
         case aeonix::PresetCategory::keys:       return juce::Colour (0xffe6c15a);
+        case aeonix::PresetCategory::pluck:      return juce::Colour (0xffa8d95f);
         case aeonix::PresetCategory::fx:         return juce::Colour (0xffe8836b);
         case aeonix::PresetCategory::other:      return colours.muted;
     }
@@ -65,7 +67,7 @@ namespace aeonix
 {
 
 // ============================================================================
-//  Fila del lateral
+//  Sidebar row
 // ============================================================================
 
 PresetManagerOverlay::SidebarRow::SidebarRow()
@@ -145,7 +147,7 @@ void PresetManagerOverlay::SidebarRow::paintButton (juce::Graphics& g,
 }
 
 // ============================================================================
-//  Formularios
+//  Forms
 // ============================================================================
 
 void PresetManagerOverlay::FormShield::setTheme (ThemeId theme)
@@ -174,7 +176,7 @@ void PresetManagerOverlay::FormShield::paint (juce::Graphics& g)
 }
 
 // ============================================================================
-//  Modelo de la lista
+//  List model
 // ============================================================================
 
 class PresetManagerOverlay::ListModel final : public juce::ListBoxModel
@@ -221,10 +223,204 @@ private:
 };
 
 // ============================================================================
-//  Construccion
+//  Audition toggle
 // ============================================================================
 
-PresetManagerOverlay::~PresetManagerOverlay() = default;
+void PresetManagerOverlay::AuditionButton::setTheme (ThemeId theme)
+{
+    if (theme_ != theme)
+    {
+        theme_ = theme;
+        repaint();
+    }
+}
+
+void PresetManagerOverlay::AuditionButton::paintButton (
+    juce::Graphics& g,
+    bool shouldDrawButtonAsHighlighted,
+    bool shouldDrawButtonAsDown)
+{
+    const auto colours = themeColours (theme_);
+    const auto bounds = getLocalBounds().toFloat().reduced (0.5f);
+    const bool on = getToggleState();
+    const bool enabled = isEnabled();
+
+    auto fill = on ? colours.accent.withAlpha (0.14f) : colours.panel;
+    auto border = on ? colours.accent.withAlpha (0.55f)
+                     : colours.muted.withAlpha (0.55f);
+    auto text = on ? colours.accent : colours.muted;
+
+    if (! enabled)
+    {
+        fill = fill.withMultipliedAlpha (0.45f);
+        border = border.withMultipliedAlpha (0.45f);
+        text = text.withMultipliedAlpha (0.45f);
+    }
+    else if (shouldDrawButtonAsDown)
+    {
+        fill = fill.brighter (0.08f);
+    }
+    else if (shouldDrawButtonAsHighlighted)
+    {
+        fill = fill.brighter (0.04f);
+    }
+
+    g.setColour (fill);
+    g.fillRoundedRectangle (bounds, 4.0f);
+    g.setColour (border);
+    g.drawRoundedRectangle (bounds, 4.0f, 1.0f);
+    g.setColour (text);
+    g.setFont (ui::font (11.0f));
+    g.drawFittedText (getButtonText(),
+                      getLocalBounds().reduced (ui::px (8), 0),
+                      juce::Justification::centred, 1);
+}
+
+// ============================================================================
+//  Sort button
+// ============================================================================
+
+void PresetManagerOverlay::SortButton::setTheme (ThemeId theme)
+{
+    if (theme_ != theme)
+    {
+        theme_ = theme;
+        repaint();
+    }
+}
+
+void PresetManagerOverlay::SortButton::setLocked (bool locked)
+{
+    if (locked_ != locked)
+    {
+        locked_ = locked;
+        repaint();
+    }
+}
+
+void PresetManagerOverlay::SortButton::setOpen (bool open)
+{
+    if (open_ != open)
+    {
+        open_ = open;
+        repaint();
+    }
+}
+
+void PresetManagerOverlay::SortButton::paintButton (
+    juce::Graphics& g,
+    bool shouldDrawButtonAsHighlighted,
+    bool shouldDrawButtonAsDown)
+{
+    const auto colours = themeColours (theme_);
+    const auto bounds = getLocalBounds().toFloat().reduced (0.5f);
+
+    auto border = colours.panelBorder;
+    auto text = colours.muted;
+
+    if (locked_)
+    {
+        border = colours.panelBorder.withAlpha (0.55f);
+        text = colours.muted.withAlpha (0.45f);
+    }
+    else if (open_)
+    {
+        border = colours.accent.withAlpha (0.55f);
+        text = colours.accent;
+    }
+    else if (shouldDrawButtonAsDown)
+    {
+        border = colours.accent.withAlpha (0.55f);
+        text = colours.accent;
+    }
+    else if (shouldDrawButtonAsHighlighted)
+    {
+        border = colours.muted.withAlpha (0.50f);
+        text = colours.text;
+    }
+
+    g.setColour (open_ ? colours.accent.withAlpha (0.14f) : colours.panel);
+    g.fillRoundedRectangle (bounds, 4.0f);
+    g.setColour (border);
+    g.drawRoundedRectangle (bounds, 4.0f, 1.0f);
+
+    auto area = getLocalBounds().reduced (ui::px (8), 0);
+    auto chevron = area.removeFromRight (ui::px (8));
+
+    g.setColour (text);
+    g.setFont (ui::font (11.0f));
+    g.drawFittedText (getButtonText(), area, juce::Justification::centredLeft, 1);
+
+    // Drawn chevron: it does not depend on the font or the text size.
+    const auto cx = static_cast<float> (chevron.getCentreX());
+    const auto cy = static_cast<float> (chevron.getCentreY());
+    const auto halfW = static_cast<float> (ui::px (3));
+    const auto halfH = static_cast<float> (ui::px (2));
+
+    juce::Path path;
+    path.startNewSubPath (cx - halfW, cy - halfH);
+    path.lineTo (cx, cy + halfH);
+    path.lineTo (cx + halfW, cy - halfH);
+    g.strokePath (path, juce::PathStrokeType (1.2f));
+}
+
+// ============================================================================
+//  List scrollbar
+// ============================================================================
+
+void PresetManagerOverlay::ListScrollBarLookAndFeel::setTheme (ThemeId theme)
+{
+    theme_ = theme;
+}
+
+void PresetManagerOverlay::ListScrollBarLookAndFeel::drawScrollbar (
+    juce::Graphics& g,
+    juce::ScrollBar& bar,
+    int x, int y, int width, int height,
+    bool isScrollbarVertical,
+    int thumbStartPosition,
+    int thumbSize,
+    bool isMouseOver,
+    bool isMouseDown)
+{
+    if (! isScrollbarVertical)
+    {
+        juce::LookAndFeel_V4::drawScrollbar (g, bar, x, y, width, height,
+                                             isScrollbarVertical, thumbStartPosition,
+                                             thumbSize, isMouseOver, isMouseDown);
+        return;
+    }
+
+    const auto colours = themeColours (theme_);
+    const auto thickness = juce::jmin (ui::px (3), width);
+
+    if (thickness <= 0 || thumbSize <= 0)
+        return;
+
+    const auto thumb = juce::Rectangle<int> (x + (width - thickness) / 2,
+                                             thumbStartPosition,
+                                             thickness,
+                                             thumbSize);
+
+    auto alpha = 0.55f;
+
+    if (isMouseDown)
+        alpha = 0.95f;
+    else if (isMouseOver)
+        alpha = 0.80f;
+
+    g.setColour (colours.muted.withAlpha (alpha));
+    g.fillRoundedRectangle (thumb.toFloat(), static_cast<float> (thickness) * 0.5f);
+}
+
+// ============================================================================
+//  Construction
+// ============================================================================
+
+PresetManagerOverlay::~PresetManagerOverlay()
+{
+    listBox_.getVerticalScrollBar().setLookAndFeel (nullptr);
+}
 
 PresetManagerOverlay::PresetManagerOverlay()
 {
@@ -256,13 +452,10 @@ PresetManagerOverlay::PresetManagerOverlay()
     closeButton_.onClick = [this] { hide(); };
     addAndMakeVisible (closeButton_);
 
-    countLabel_.setFont (ui::font (11.0f));
-    countLabel_.setJustificationType (juce::Justification::centredLeft);
-    addAndMakeVisible (countLabel_);
-
-    sortLabel_.setFont (ui::font (11.0f));
-    sortLabel_.setJustificationType (juce::Justification::centredRight);
-    addAndMakeVisible (sortLabel_);
+    sortButton_.setName ("PresetSort");
+    sortButton_.setTooltip (tr (TextId::presetManagerSortTooltip));
+    sortButton_.onClick = [this] { showSortMenu(); };
+    addAndMakeVisible (sortButton_);
 
     newButton_.setButtonText (tr (TextId::presetManagerNew));
     newButton_.setTitle (tr (TextId::presetManagerNew));
@@ -307,6 +500,11 @@ PresetManagerOverlay::PresetManagerOverlay()
     listBox_.setColour (juce::ListBox::outlineColourId, juce::Colours::transparentBlack);
     listBox_.setName ("PresetManagerList");
     listBox_.setTitle (tr (TextId::presetManagerListAccessible));
+
+    if (auto* viewport = listBox_.getViewport())
+        viewport->setScrollBarThickness (ui::px (9));
+
+    listBox_.getVerticalScrollBar().setLookAndFeel (&listScrollLookAndFeel_);
     addAndMakeVisible (listBox_);
 
     detailName_.setFont (ui::font (15.0f, juce::Font::bold));
@@ -331,9 +529,23 @@ PresetManagerOverlay::PresetManagerOverlay()
     loadButton_.setEnabled (false);
     addAndMakeVisible (loadButton_);
 
-    openFolderButton_.setButtonText (tr (TextId::presetManagerOpenFolder));
-    openFolderButton_.setTooltip (tr (TextId::presetManagerOpenFolderTooltip));
+    auditionButton_.setButtonText (tr (TextId::presetManagerAudition));
+    auditionButton_.setTooltip (tr (TextId::presetManagerAuditionTooltip));
+    auditionButton_.setTitle (tr (TextId::presetManagerAudition));
+    auditionButton_.setName ("PresetAudition");
+    auditionButton_.setClickingTogglesState (true);
+    auditionButton_.onClick = [this]
+    {
+        updateAuditionButton();
+
+        if (onAuditionChanged)
+            onAuditionChanged (auditionButton_.getToggleState());
+    };
+    addAndMakeVisible (auditionButton_);
+
     openFolderButton_.setName ("OpenPresetsFolder");
+    openFolderButton_.setTitle (tr (TextId::presetManagerOpenFolder));
+    openFolderButton_.setWantsKeyboardFocus (true);
     openFolderButton_.onClick = [this] { if (onOpenFolder) onOpenFolder(); };
     addAndMakeVisible (openFolderButton_);
 
@@ -366,7 +578,7 @@ PresetManagerOverlay::PresetManagerOverlay()
     footerEsc_.setJustificationType (juce::Justification::centredLeft);
     addAndMakeVisible (footerEsc_);
 
-    // ---- formularios ----
+    // ---- forms ----
     addChildComponent (formShield_);
 
     formTitle_.setFont (ui::font (14.0f, juce::Font::bold));
@@ -417,7 +629,7 @@ PresetManagerOverlay::PresetManagerOverlay()
 }
 
 // ============================================================================
-//  Apertura y cierre
+//  Opening and closing
 // ============================================================================
 
 void PresetManagerOverlay::show (const std::vector<PresetEntry>& entries,
@@ -431,6 +643,7 @@ void PresetManagerOverlay::show (const std::vector<PresetEntry>& entries,
     currentName_ = currentName;
     selectedName_ = currentName;
     modified_ = modified;
+    pendingClose_ = false;
     filter_ = Filter::all;
     category_ = PresetCategory::other;
 
@@ -457,6 +670,7 @@ void PresetManagerOverlay::refreshEntries (const std::vector<PresetEntry>& entri
     entries_ = entries;
     currentName_ = currentName;
     modified_ = modified;
+    pendingClose_ = false;
 
     if (findEntry (currentName_) != nullptr)
         selectedName_ = currentName_;
@@ -472,10 +686,45 @@ void PresetManagerOverlay::hide()
     if (! isVisible())
         return;
 
+    pendingClose_ = false;
     setVisible (false);
 
     if (onClosed)
         onClosed();
+}
+
+void PresetManagerOverlay::setAudition (bool enabled)
+{
+    auditionButton_.setToggleState (enabled, juce::dontSendNotification);
+    updateAuditionButton();
+}
+
+bool PresetManagerOverlay::isAuditionEnabled() const
+{
+    return auditionButton_.getToggleState();
+}
+
+void PresetManagerOverlay::setCurrentPreset (const juce::String& name, bool modified)
+{
+    currentName_ = name;
+    modified_ = modified;
+
+    if (isVisible())
+    {
+        updateDetail();
+        repaint();
+    }
+}
+
+void PresetManagerOverlay::notifyPresetLoaded (const juce::String& name)
+{
+    setCurrentPreset (name, false);
+
+    if (pendingClose_)
+    {
+        pendingClose_ = false;
+        hide();
+    }
 }
 
 void PresetManagerOverlay::setTheme (ThemeId theme)
@@ -488,7 +737,7 @@ void PresetManagerOverlay::setTheme (ThemeId theme)
 }
 
 // ============================================================================
-//  Busqueda, seleccion y detalle
+//  Search, selection and detail
 // ============================================================================
 
 void PresetManagerOverlay::filter()
@@ -522,28 +771,254 @@ void PresetManagerOverlay::filter()
         if (static_cast<int> (visible_.size()) > recentLimit)
             visible_.resize (static_cast<size_t> (recentLimit));
     }
+    else
+    {
+        sortVisible();
+    }
 
     updating_ = true;
     listBox_.updateContent();
     listBox_.selectRow (visibleRowOf (selectedName_), juce::dontSendNotification);
     updating_ = false;
 
-    updateMeta();
+    updateSortButton();
     updateDetail();
     repaint();
 }
 
-void PresetManagerOverlay::updateMeta()
+void PresetManagerOverlay::sortVisible()
 {
-    countLabel_.setText (filteredCount() == 1
-                             ? tr (TextId::presetManagerCountOne)
-                             : trf (TextId::presetManagerCount,
-                                    { juce::String (filteredCount()) }),
-                         juce::dontSendNotification);
+    const auto entry = [this] (int index) -> const PresetEntry&
+    {
+        return entries_[static_cast<size_t> (index)];
+    };
 
-    sortLabel_.setText (filter_ == Filter::recent ? tr (TextId::presetManagerSortRecent)
-                                                  : tr (TextId::presetManagerSort),
-                        juce::dontSendNotification);
+    const auto byName = [&entry] (int left, int right)
+    {
+        const auto cmp = entry (left).name.compareIgnoreCase (entry (right).name);
+        return cmp != 0 ? cmp < 0 : left < right;
+    };
+
+    switch (sortMode_)
+    {
+        case SortMode::nameAsc:
+            std::stable_sort (visible_.begin(), visible_.end(), byName);
+            break;
+
+        case SortMode::nameDesc:
+            std::stable_sort (visible_.begin(), visible_.end(),
+                              [&byName] (int left, int right)
+                              {
+                                  if (byName (left, right))
+                                      return false;
+
+                                  if (byName (right, left))
+                                      return true;
+
+                                  return false;
+                              });
+            break;
+
+        case SortMode::category:
+            std::stable_sort (visible_.begin(), visible_.end(),
+                              [&] (int left, int right)
+                              {
+                                  const auto a = static_cast<int> (entry (left).metadata.category);
+                                  const auto b = static_cast<int> (entry (right).metadata.category);
+                                  return a != b ? a < b : byName (left, right);
+                              });
+            break;
+
+        case SortMode::lastUsed:
+            std::stable_sort (visible_.begin(), visible_.end(),
+                              [&] (int left, int right)
+                              {
+                                  const auto a = entry (left).metadata.lastUsed;
+                                  const auto b = entry (right).metadata.lastUsed;
+                                  return a != b ? a > b : byName (left, right);
+                              });
+            break;
+
+        case SortMode::origin:
+        default:
+            std::stable_sort (visible_.begin(), visible_.end(),
+                              [&] (int left, int right)
+                              {
+                                  if (entry (left).factory != entry (right).factory)
+                                      return entry (left).factory;
+
+                                  return byName (left, right);
+                              });
+            break;
+    }
+}
+
+void PresetManagerOverlay::updateSortButton()
+{
+    const bool locked = filter_ == Filter::recent;
+
+    juce::String label;
+
+    switch (sortMode_)
+    {
+        case SortMode::nameAsc:  label = tr (TextId::presetManagerSortNameAsc); break;
+        case SortMode::nameDesc: label = tr (TextId::presetManagerSortNameDesc); break;
+        case SortMode::category: label = tr (TextId::presetManagerSortCategory); break;
+        case SortMode::lastUsed: label = tr (TextId::presetManagerSortRecent); break;
+        case SortMode::origin:
+        default:                 label = tr (TextId::presetManagerSortOrigin); break;
+    }
+
+    if (locked)
+        label = tr (TextId::presetManagerSortRecent);
+
+    sortButton_.setButtonText (label);
+    sortButton_.setLocked (locked);
+    sortButton_.setTooltip (locked ? tr (TextId::presetManagerSortLockedTooltip)
+                                   : tr (TextId::presetManagerSortTooltip));
+    sortButton_.setTitle (locked ? tr (TextId::presetManagerSortLockedTooltip)
+                                 : tr (TextId::presetManagerSortButton));
+}
+
+void PresetManagerOverlay::showSortMenu()
+{
+    if (filter_ == Filter::recent)
+        return;
+
+    juce::PopupMenu menu;
+    menu.addItem (1, tr (TextId::presetManagerSortNameAsc), true,
+                  sortMode_ == SortMode::nameAsc);
+    menu.addItem (2, tr (TextId::presetManagerSortNameDesc), true,
+                  sortMode_ == SortMode::nameDesc);
+    menu.addItem (3, tr (TextId::presetManagerSortCategory), true,
+                  sortMode_ == SortMode::category);
+    menu.addItem (4, tr (TextId::presetManagerSortOrigin), true,
+                  sortMode_ == SortMode::origin);
+    menu.addItem (5, tr (TextId::presetManagerSortRecent), true,
+                  sortMode_ == SortMode::lastUsed);
+
+    // Width: whatever the longest text asks for, with the button minimum (120).
+    // The chrome mimics JUCE's: 2 x row height + 8 of the LookAndFeel's own
+    // padding + 2 x border. The font is clipped as in JUCE when it
+    // does not fit in the row, to measure exactly what it will paint.
+    auto font = getLookAndFeel().getPopupMenuFont();
+    const auto rowHeight = ui::px (24);
+    const auto maxFontHeight = static_cast<float> (rowHeight) / 1.3f;
+
+    if (font.getHeight() > maxFontHeight)
+        font.setHeight (maxFontHeight);
+
+    int widest = 0;
+
+    for (const auto id : { TextId::presetManagerSortNameAsc,
+                           TextId::presetManagerSortNameDesc,
+                           TextId::presetManagerSortCategory,
+                           TextId::presetManagerSortOrigin,
+                           TextId::presetManagerSortRecent })
+        widest = juce::jmax (widest,
+                             juce::GlyphArrangement::getStringWidthInt (font, tr (id)));
+
+    const auto chrome = 2 * rowHeight + ui::px (8) + 2 * ui::px (4);
+    const auto menuWidth = juce::jmax (ui::px (120), widest + chrome);
+
+    auto target = sortButton_.getScreenBounds();
+    target.setX (target.getRight() - menuWidth);
+    target.setWidth (menuWidth);
+
+    sortButton_.setOpen (true);
+    menu.setLookAndFeel (&getLookAndFeel());
+
+    menu.showMenuAsync (juce::PopupMenu::Options()
+                            .withTargetScreenArea (target)
+                            .withMinimumWidth (menuWidth)
+                            .withStandardItemHeight (ui::px (24)),
+                        [this] (int result)
+                        {
+                            sortButton_.setOpen (false);
+
+                            switch (result)
+                            {
+                                case 1: setSortMode (SortMode::nameAsc); break;
+                                case 2: setSortMode (SortMode::nameDesc); break;
+                                case 3: setSortMode (SortMode::category); break;
+                                case 4: setSortMode (SortMode::origin); break;
+                                case 5: setSortMode (SortMode::lastUsed); break;
+                                default: break;
+                            }
+                        });
+}
+
+void PresetManagerOverlay::setSortMode (SortMode mode, juce::NotificationType notification)
+{
+    if (sortMode_ == mode)
+    {
+        updateSortButton();
+        return;
+    }
+
+    sortMode_ = mode;
+    filter();
+
+    if (notification != juce::dontSendNotification && onSortChanged)
+        onSortChanged (mode);
+}
+
+juce::String PresetManagerOverlay::sortKey (SortMode mode)
+{
+    switch (mode)
+    {
+        case SortMode::nameAsc:  return "nameAsc";
+        case SortMode::nameDesc: return "nameDesc";
+        case SortMode::category: return "category";
+        case SortMode::lastUsed: return "lastUsed";
+        case SortMode::origin:
+        default:                 return "origin";
+    }
+}
+
+PresetManagerOverlay::SortMode PresetManagerOverlay::sortModeFromKey (const juce::String& key)
+{
+    if (key == "nameAsc")  return SortMode::nameAsc;
+    if (key == "nameDesc") return SortMode::nameDesc;
+    if (key == "category") return SortMode::category;
+    if (key == "lastUsed") return SortMode::lastUsed;
+
+    return SortMode::origin;
+}
+
+void PresetManagerOverlay::refreshDetailName()
+{
+    if (detailFullName_.isEmpty())
+    {
+        detailName_.setText ({}, juce::dontSendNotification);
+        return;
+    }
+
+    const auto width = detailName_.getWidth();
+
+    if (width <= 0)
+    {
+        detailName_.setText (detailFullName_, juce::dontSendNotification);
+        return;
+    }
+
+    const auto font = detailName_.getFont();
+    auto text = detailFullName_;
+
+    if (juce::GlyphArrangement::getStringWidth (font, text) <= static_cast<float> (width))
+    {
+        detailName_.setText (text, juce::dontSendNotification);
+        return;
+    }
+
+    const auto ellipsis = juce::String::charToString (0x2026);
+    const auto limit = static_cast<float> (width);
+
+    while (text.isNotEmpty()
+           && juce::GlyphArrangement::getStringWidth (font, text.trimEnd() + ellipsis) > limit)
+        text = text.dropLastCharacters (1);
+
+    detailName_.setText (text.trimEnd() + ellipsis, juce::dontSendNotification);
 }
 
 void PresetManagerOverlay::setFilter (Filter mode, PresetCategory category)
@@ -560,6 +1035,7 @@ void PresetManagerOverlay::updateSidebar()
     int user = 0;
     int favorites = 0;
     int recent = 0;
+    bool visibilityChanged = false;
     int categories[presetCategoryCount] = {};
 
     for (const auto& entry : entries_)
@@ -597,13 +1073,24 @@ void PresetManagerOverlay::updateSidebar()
     for (int i = 0; i < presetCategoryCount; ++i)
     {
         const auto category = static_cast<PresetCategory> (i);
+        const bool active = filter_ == Filter::category && category_ == category;
+        const bool show = categories[i] > 0 || active;
+
+        if (categoryRows_[i].isVisible() != show)
+        {
+            categoryRows_[i].setVisible (show);
+            visibilityChanged = true;
+        }
 
         categoryRows_[i].setContent (categoryName (category),
                                      categories[i],
-                                     filter_ == Filter::category && category_ == category,
+                                     active,
                                      categoryColour (category, colours),
                                      categories[i] == 0);
     }
+
+    if (visibilityChanged)
+        resized();
 }
 
 bool PresetManagerOverlay::matchesFilter (const PresetEntry& entry) const
@@ -630,7 +1117,9 @@ juce::String PresetManagerOverlay::categoryName (PresetCategory category) const
         case PresetCategory::lead:       return tr (TextId::categoryLead);
         case PresetCategory::pad:        return tr (TextId::categoryPad);
         case PresetCategory::strings:    return tr (TextId::categoryStrings);
+        case PresetCategory::brass:      return tr (TextId::categoryBrass);
         case PresetCategory::keys:       return tr (TextId::categoryKeys);
+        case PresetCategory::pluck:      return tr (TextId::categoryPluck);
         case PresetCategory::fx:         return tr (TextId::categoryFx);
         case PresetCategory::other:      return tr (TextId::categoryOther);
     }
@@ -657,13 +1146,16 @@ void PresetManagerOverlay::updateDetail()
     favoriteButton_.setEnabled (hasEntry);
 
     detailCurrentModified_ = isCurrent && modified_;
+    updateAuditionButton();
 
     if (saveWasVisible != userPreset)
         resized();
 
     if (! hasEntry)
     {
-        detailName_.setText (tr (TextId::presetManagerNoSelection), juce::dontSendNotification);
+        detailFullName_ = tr (TextId::presetManagerNoSelection);
+        detailName_.setTooltip ({});
+        refreshDetailName();
         detailCurrent_.setText ({}, juce::dontSendNotification);
         updateActionColours();
         updateFavoriteButton();
@@ -671,7 +1163,9 @@ void PresetManagerOverlay::updateDetail()
         return;
     }
 
-    detailName_.setText (entry->name, juce::dontSendNotification);
+    detailFullName_ = entry->name;
+    detailName_.setTooltip (entry->name);
+    refreshDetailName();
     detailCurrent_.setText (isCurrent
                                 ? (modified_
                                        ? tr (TextId::presetManagerCurrent) + " "
@@ -683,6 +1177,21 @@ void PresetManagerOverlay::updateDetail()
     updateActionColours();
     updateFavoriteButton();
     repaint();
+}
+
+void PresetManagerOverlay::updateAuditionButton()
+{
+    const bool enabled = ! modified_;
+    const auto label = tr (TextId::presetManagerAudition);
+
+    auditionButton_.setEnabled (enabled);
+    auditionButton_.setButtonText (auditionButton_.getToggleState()
+                                       ? juce::String::charToString (0x2713) + " " + label
+                                       : label);
+    auditionButton_.setTooltip (enabled
+                                    ? tr (TextId::presetManagerAuditionTooltip)
+                                    : tr (TextId::presetManagerAuditionBlockedTooltip));
+    auditionButton_.setTheme (theme_);
 }
 
 void PresetManagerOverlay::updateActionColours()
@@ -988,9 +1497,24 @@ void PresetManagerOverlay::rowSelected (int row)
     if (updating_ || row < 0 || row >= filteredCount())
         return;
 
+    pendingClose_ = false;
     selectedName_ = entries_[static_cast<size_t> (visible_[static_cast<size_t> (row)])].name;
     updateDetail();
     repaint();
+    maybeAudition();
+}
+
+void PresetManagerOverlay::maybeAudition()
+{
+    if (! auditionButton_.getToggleState()
+        || modified_
+        || formMode_ != FormMode::none
+        || selectedName_.isEmpty()
+        || selectedName_ == currentName_)
+        return;
+
+    if (onAudition)
+        onAudition (selectedName_);
 }
 
 void PresetManagerOverlay::rowClicked (int row, const juce::MouseEvent& e)
@@ -998,7 +1522,7 @@ void PresetManagerOverlay::rowClicked (int row, const juce::MouseEvent& e)
     if (row < 0 || row >= filteredCount())
         return;
 
-    // La estrella ocupa los primeros 24 px tras el margen izquierdo de la fila.
+    // The star occupies the first 24 px after the row's left margin.
     const int starLeft = ui::px (8);
     const int starRight = starLeft + ui::px (24);
 
@@ -1028,7 +1552,11 @@ void PresetManagerOverlay::focusNextInOverlay (bool backwards)
     else
     {
         focusables.push_back (&searchEditor_);
+        focusables.push_back (&sortButton_);
         focusables.push_back (&listBox_);
+
+        if (auditionButton_.isEnabled())
+            focusables.push_back (&auditionButton_);
 
         SidebarRow* rows[] = { &allRow_, &factoryRow_, &userRow_, &favoritesRow_, &recentsRow_ };
 
@@ -1036,7 +1564,8 @@ void PresetManagerOverlay::focusNextInOverlay (bool backwards)
             focusables.push_back (row);
 
         for (auto& row : categoryRows_)
-            focusables.push_back (&row);
+            if (row.isVisible())
+                focusables.push_back (&row);
 
         auto addAction = [&focusables] (juce::Component& component)
         {
@@ -1044,13 +1573,14 @@ void PresetManagerOverlay::focusNextInOverlay (bool backwards)
                 focusables.push_back (&component);
         };
 
+        addAction (newButton_);
+        addAction (openFolderButton_);
         addAction (favoriteButton_);
         addAction (loadButton_);
         addAction (saveButton_);
         addAction (saveCopyButton_);
         addAction (renameButton_);
         addAction (deleteButton_);
-        focusables.push_back (&openFolderButton_);
     }
 
     const auto* current = juce::Component::getCurrentlyFocusedComponent();
@@ -1089,10 +1619,14 @@ void PresetManagerOverlay::loadSelected()
     if (findEntry (name) == nullptr || visibleRowOf (name) < 0)
         return;
 
-    hide();
+    // Do not close until the load succeeds: if the guard is cancelled, the
+    // manager stays open.
+    pendingClose_ = true;
 
     if (onLoad)
         onLoad (name);
+    else
+        pendingClose_ = false;
 }
 
 int PresetManagerOverlay::visibleRowOf (const juce::String& name) const
@@ -1129,7 +1663,7 @@ juce::String PresetManagerOverlay::rowName (int row) const
 }
 
 // ============================================================================
-//  Pintura
+//  Painting
 // ============================================================================
 
 void PresetManagerOverlay::paint (juce::Graphics& g)
@@ -1176,6 +1710,12 @@ void PresetManagerOverlay::paint (juce::Graphics& g)
         g.fillRect (sidebarSeparatorBounds_);
     }
 
+    if (! footerTopLineBounds_.isEmpty())
+    {
+        g.setColour (colours.panelBorder.withAlpha (0.45f));
+        g.fillRect (footerTopLineBounds_);
+    }
+
     paintListHeader (g);
     paintDetail (g);
     paintEmptyState (g);
@@ -1183,23 +1723,60 @@ void PresetManagerOverlay::paint (juce::Graphics& g)
 
 void PresetManagerOverlay::paintOverChildren (juce::Graphics& g)
 {
-    if (formMode_ != FormMode::none || ! searchEditor_.getText().isEmpty())
+    if (formMode_ != FormMode::none)
         return;
 
-    // Misma caja que usa TextEditor para el texto: viewport (bounds menos
-    // borde) recortado por los indents. Asi el placeholder comparte x y linea
-    // base con el caret y con lo que se escribe.
-    const auto border = searchEditor_.getBorder();
-    auto area = searchEditor_.getBounds()
-                    .withTrimmedLeft (border.getLeft() + searchEditor_.getLeftIndent())
-                    .withTrimmedRight (border.getRight())
-                    .withTrimmedTop (border.getTop() + searchEditor_.getTopIndent())
-                    .withTrimmedBottom (border.getBottom());
+    const auto colours = themeColours (theme_);
 
-    g.setColour (themeColours (theme_).muted);
-    g.setFont (searchEditor_.getFont());
-    g.drawFittedText (tr (TextId::presetManagerSearch), area,
-                      juce::Justification::centredLeft, 1);
+    if (searchEditor_.getText().isEmpty())
+    {
+        // Same box TextEditor uses for the text: viewport (bounds minus
+        // border) clipped by the indents. This way the placeholder shares x and
+        // baseline with the caret and with what is typed.
+        const auto border = searchEditor_.getBorder();
+        auto area = searchEditor_.getBounds()
+                        .withTrimmedLeft (border.getLeft() + searchEditor_.getLeftIndent())
+                        .withTrimmedRight (border.getRight())
+                        .withTrimmedTop (border.getTop() + searchEditor_.getTopIndent())
+                        .withTrimmedBottom (border.getBottom());
+
+        g.setColour (colours.muted);
+        g.setFont (searchEditor_.getFont());
+        g.drawFittedText (tr (TextId::presetManagerSearch), area,
+                          juce::Justification::centredLeft, 1);
+    }
+
+    if (! listFadeBounds_.isEmpty())
+    {
+        juce::ColourGradient fade (
+            colours.panel.withAlpha (0.0f),
+            static_cast<float> (listFadeBounds_.getX()),
+            static_cast<float> (listFadeBounds_.getY()),
+            colours.panel.withAlpha (0.78f),
+            static_cast<float> (listFadeBounds_.getX()),
+            static_cast<float> (listFadeBounds_.getBottom()),
+            false);
+
+        g.setGradientFill (fade);
+        g.fillRect (listFadeBounds_);
+    }
+
+    auto drawFocusRing = [&g, &colours] (juce::Component& component, float radius)
+    {
+        if (! component.isVisible() || ! component.isEnabled()
+            || ! component.hasKeyboardFocus (false))
+            return;
+
+        const auto ring = component.getBounds().toFloat().expanded (static_cast<float> (ui::px (2)));
+        g.setColour (colours.accent);
+        g.drawRoundedRectangle (ring, radius + static_cast<float> (ui::px (2)),
+                                static_cast<float> (ui::px (2)));
+    };
+
+    drawFocusRing (newButton_, 5.0f);
+    drawFocusRing (openFolderButton_, 5.0f);
+    drawFocusRing (sortButton_, 4.0f);
+    drawFocusRing (auditionButton_, 4.0f);
 }
 
 void PresetManagerOverlay::paintListHeader (juce::Graphics& g)
@@ -1213,7 +1790,7 @@ void PresetManagerOverlay::paintListHeader (juce::Graphics& g)
                     .reduced (ui::px (8), 0);
 
     area.removeFromLeft (ui::px (24));
-    auto origin = area.removeFromRight (ui::px (48));
+    area.removeFromRight (ui::px (12));
     auto category = area.removeFromRight (listCategoryWidth_);
     auto name = area;
 
@@ -1223,11 +1800,9 @@ void PresetManagerOverlay::paintListHeader (juce::Graphics& g)
                       name, juce::Justification::centredLeft, 1);
     g.drawFittedText (tr (TextId::presetManagerColumnCategory).toUpperCase(),
                       category, juce::Justification::centredLeft, 1);
-    g.drawFittedText (tr (TextId::presetManagerColumnOrigin).toUpperCase(),
-                      origin, juce::Justification::centredRight, 1);
 
-    // Raya de la cabecera: mismo ancho que las filas y canal de scrollbar
-    // reservado, con 4 px de aire antes del primer preset.
+    // Header rule: same width as the rows with the scrollbar channel
+    // reserved, with 4 px of air before the first preset.
     g.setColour (colours.panelBorder.withAlpha (0.50f));
     g.fillRect (listHeaderBounds_.getX(),
                 listHeaderBounds_.getBottom() - 1,
@@ -1361,7 +1936,7 @@ void PresetManagerOverlay::paintRow (int row, juce::Graphics& g,
 
     auto area = juce::Rectangle<int> (0, 0, rowWidth, height).reduced (ui::px (8), 0);
     auto star = area.removeFromLeft (ui::px (24));
-    auto origin = area.removeFromRight (ui::px (48));
+    auto mark = area.removeFromRight (ui::px (12));
     auto category = area.removeFromRight (listCategoryWidth_);
     auto name = area;
 
@@ -1379,7 +1954,7 @@ void PresetManagerOverlay::paintRow (int row, juce::Graphics& g,
     {
         const auto categoryText = categoryName (entry.metadata.category);
         const int pillW = juce::jmin (category.getWidth(),
-                                      juce::jmax (ui::px (36), badgeWidth (categoryText)));
+                                      juce::jmax (ui::px (40), badgeWidth (categoryText)));
         auto pill = category.removeFromLeft (pillW)
                             .withSizeKeepingCentre (pillW, ui::px (17));
 
@@ -1387,8 +1962,23 @@ void PresetManagerOverlay::paintRow (int row, juce::Graphics& g,
                     categoryColour (entry.metadata.category, colours), colours, true);
     }
 
-    g.setColour (entry.factory ? colours.muted : colours.accent);
-    g.fillEllipse (origin.toFloat().withSizeKeepingCentre (5.0f, 5.0f));
+    // Origin only as an exception: user presets carry a 6 px
+    // diamond. The shape reads without relying on colour; factory presets,
+    // which are 90 % of the library, carry nothing.
+    if (! entry.factory)
+    {
+        const auto centre = mark.toFloat().getCentre();
+        const auto radius = static_cast<float> (ui::px (6)) * 0.7071f;
+        juce::Path diamond;
+        diamond.startNewSubPath (centre.x, centre.y - radius);
+        diamond.lineTo (centre.x + radius, centre.y);
+        diamond.lineTo (centre.x, centre.y + radius);
+        diamond.lineTo (centre.x - radius, centre.y);
+        diamond.closeSubPath();
+
+        g.setColour (colours.accent);
+        g.fillPath (diamond);
+    }
 }
 
 // ============================================================================
@@ -1403,25 +1993,34 @@ void PresetManagerOverlay::resized()
 
     panelBounds_ = full.withSizeKeepingCentre (panelW, panelH);
 
-    auto p = panelBounds_.reduced (ui::px (20));
+    // The footer absorbs the bottom padding: the line stays where it was and the
+    // controls centre between it and the overlay border.
+    auto p = panelBounds_;
+    p.removeFromTop (ui::px (20));
+    p.removeFromLeft (ui::px (20));
+    p.removeFromRight (ui::px (20));
+
+    // One height for every control in the header: three different boxes read as
+    // a misaligned row even when their centres match. The header stays 44.
+    const int headerControlH = ui::px (26);
 
     auto header = p.removeFromTop (ui::px (44));
     closeButton_.setBounds (header.removeFromRight (ui::px (28))
-                                  .withSizeKeepingCentre (ui::px (28), ui::px (24)));
+                                  .withSizeKeepingCentre (ui::px (28), headerControlH));
     header.removeFromRight (ui::px (10));
+    sortButton_.setBounds (header.removeFromRight (ui::px (120))
+                               .withSizeKeepingCentre (ui::px (120), headerControlH));
+    header.removeFromRight (ui::px (8));
     searchEditor_.setBounds (header.removeFromRight (ui::px (320))
-                                   .withSizeKeepingCentre (ui::px (320), ui::px (26)));
+                                   .withSizeKeepingCentre (ui::px (320), headerControlH));
     header.removeFromRight (ui::px (12));
     titleLabel_.setBounds (header);
 
-    auto meta = p.removeFromTop (ui::px (28));
-    countLabel_.setBounds (meta.removeFromLeft (ui::px (220)));
-    sortLabel_.setBounds (meta.removeFromRight (ui::px (80)));
+    // Breathing room between the header and the rule below it. The count that
+    // used to live here repeated the numbers already shown in the sidebar.
+    p.removeFromTop (ui::px (20));
 
-    auto footer = p.removeFromBottom (ui::px (24));
-    footerEsc_.setBounds (footer.removeFromLeft (ui::px (160)));
-    openFolderButton_.setBounds (footer.removeFromRight (ui::px (120)));
-    footer.removeFromRight (ui::px (8));
+    auto footer = p.removeFromBottom (ui::px (52));
 
     auto body = p;
 
@@ -1435,7 +2034,29 @@ void PresetManagerOverlay::resized()
     listHeaderBounds_ = listArea.removeFromTop (ui::px (22));
     listContentWidth_ = juce::jmax (ui::px (120), listArea.getWidth() - ui::px (9));
     listArea.removeFromTop (ui::px (4));
+    listArea.removeFromBottom (ui::px (6));
     listBox_.setBounds (listArea);
+
+    const int fadeHeight = ui::px (12);
+
+    if (listArea.getHeight() > fadeHeight && listContentWidth_ > 0)
+        listFadeBounds_ = { listArea.getX(),
+                            listArea.getBottom() - fadeHeight,
+                            juce::jmin (listContentWidth_, listArea.getWidth()),
+                            fadeHeight };
+    else
+        listFadeBounds_ = {};
+
+    footerTopLineBounds_ = { footer.getX(), footer.getY(), footer.getWidth(), 1 };
+    auto escArea = footer.removeFromLeft (ui::px (120));
+    footerEsc_.setBounds (escArea.withSizeKeepingCentre (escArea.getWidth(), ui::px (24)));
+
+    const int toggleHeight = ui::px (24);
+    const int toggleWidth = juce::jmin (listContentWidth_, ui::px (190));
+    auditionButton_.setBounds (listBounds_.getX(),
+                               footer.getCentreY() - toggleHeight / 2,
+                               toggleWidth,
+                               toggleHeight);
 
     const auto headerFont = ui::font (10.0f);
     float categoryTextWidth = 0.0f;
@@ -1451,7 +2072,14 @@ void PresetManagerOverlay::resized()
 
     const bool compactSidebar = ui::getTextSize() == TextSize::extraLarge;
     auto side = sidebarBounds_.reduced (ui::px (8), ui::px (8));
-    newButton_.setBounds (side.removeFromTop (ui::px (30)));
+
+    auto newRow = side.removeFromTop (ui::px (30));
+    // Same height as the button next to it: a 26 px icon inside a 30 px row
+    // left 2 px of air top and bottom and read as a loose floating icon.
+    openFolderButton_.setBounds (newRow.removeFromRight (ui::px (30))
+                                     .withSizeKeepingCentre (ui::px (30), ui::px (30)));
+    newRow.removeFromRight (ui::px (6));
+    newButton_.setBounds (newRow);
     side.removeFromTop (ui::px (compactSidebar ? 6 : 8));
     libraryLabel_.setBounds (side.removeFromTop (ui::px (compactSidebar ? 20 : 22)));
     side.removeFromTop (ui::px (compactSidebar ? 3 : 4));
@@ -1473,17 +2101,34 @@ void PresetManagerOverlay::resized()
     side.removeFromTop (ui::px (compactSidebar ? 1 : 2));
 
     for (auto& row : categoryRows_)
-        placeRow (row);
+    {
+        if (! row.isVisible())
+            continue;
 
-    auto detail = detailBounds_.reduced (ui::px (12), ui::px (8));
-    detailName_.setBounds (detail.removeFromTop (ui::px (24)));
-    detail.removeFromTop (ui::px (3));
+        // Safety net: a row with no height would be an invisible focus target.
+        if (side.getHeight() < ui::px (23))
+        {
+            jassertfalse;
+            row.setVisible (false);
+            row.setBounds ({});
+            continue;
+        }
+
+        placeRow (row);
+    }
+
+    // The detail column follows the panel rhythm (20 px padding and 12/12/14/16
+    // stacking gaps), not the denser list scale, so its blocks read as a column.
+    auto detail = detailBounds_.reduced (ui::px (12), ui::px (20));
+    detailName_.setBounds (detail.removeFromTop (ui::px (26)));
+    refreshDetailName();
+    detail.removeFromTop (ui::px (12));
     detailBadgesBounds_ = detail.removeFromTop (ui::px (20));
-    detail.removeFromTop (ui::px (6));
+    detail.removeFromTop (ui::px (12));
     favoriteButton_.setBounds (detail.removeFromTop (ui::px (26)));
-    detail.removeFromTop (ui::px (8));
+    detail.removeFromTop (ui::px (14));
     detailCardBounds_ = detail.removeFromTop (ui::px (54));
-    detail.removeFromTop (ui::px (6));
+    detail.removeFromTop (ui::px (16));
 
     auto status = detail.removeFromTop (ui::px (18));
     detailStatusDotBounds_ = status.removeFromLeft (ui::px (10));
@@ -1625,8 +2270,7 @@ void PresetManagerOverlay::applyThemeToChildren()
     const auto colours = themeColours (theme_);
 
     titleLabel_.setColour (juce::Label::textColourId, colours.text);
-    countLabel_.setColour (juce::Label::textColourId, colours.muted);
-    sortLabel_.setColour (juce::Label::textColourId, colours.muted);
+    sortButton_.setTheme (theme_);
     libraryLabel_.setColour (juce::Label::textColourId, colours.muted);
     categoriesLabel_.setColour (juce::Label::textColourId, colours.muted);
 
@@ -1641,12 +2285,14 @@ void PresetManagerOverlay::applyThemeToChildren()
     detailName_.setColour (juce::Label::textColourId, colours.text);
     detailCurrent_.setColour (juce::Label::textColourId, colours.accent);
     footerEsc_.setColour (juce::Label::textColourId, colours.muted);
+    openFolderButton_.setTheme (theme_);
 
     searchEditor_.setTextToShowWhenEmpty ({}, colours.muted);
     searchEditor_.setColour (juce::TextEditor::textColourId, colours.text);
     searchEditor_.setColour (juce::TextEditor::highlightColourId, colours.accent.withAlpha (0.35f));
 
     listBox_.setColour (juce::ListBox::textColourId, colours.text);
+    listScrollLookAndFeel_.setTheme (theme_);
 
     formShield_.setTheme (theme_);
     formTitle_.setColour (juce::Label::textColourId, colours.text);

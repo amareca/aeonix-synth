@@ -31,9 +31,13 @@ void readGroup (const juce::var& group,
 
         if (auto* values = entry.value.getDynamicObject())
         {
-            meta.category = values->hasProperty ("category")
-                              ? PresetLibrary::categoryFromKey (values->getProperty ("category").toString())
-                              : (factory ? factoryCategoryFor (name) : PresetCategory::other);
+            // For factory entries the genre always comes from the static table:
+            // that way a category change does not depend on migrating the sidecar.
+            meta.category = factory
+                              ? factoryCategoryFor (name)
+                              : (values->hasProperty ("category")
+                                     ? PresetLibrary::categoryFromKey (values->getProperty ("category").toString())
+                                     : PresetCategory::other);
             meta.favorite = static_cast<bool> (values->getProperty ("favorite"));
             meta.lastUsed = readLastUsed (values->getProperty ("lastUsed"));
         }
@@ -133,7 +137,14 @@ PresetMetadata PresetLibrary::metadataFor (const juce::String& name, bool factor
     const auto it = group.find (name);
 
     if (it != group.end())
-        return it->second;
+    {
+        auto meta = it->second;
+
+        if (factory)
+            meta.category = factoryCategoryFor (name);
+
+        return meta;
+    }
 
     PresetMetadata meta;
 
@@ -185,7 +196,9 @@ PresetCategory PresetLibrary::categoryFromKey (const juce::String& key)
     if (key == "lead")       return PresetCategory::lead;
     if (key == "pad")        return PresetCategory::pad;
     if (key == "cuerdas")    return PresetCategory::strings;
+    if (key == "metales")    return PresetCategory::brass;
     if (key == "teclas")     return PresetCategory::keys;
+    if (key == "pluck")      return PresetCategory::pluck;
     if (key == "fx")         return PresetCategory::fx;
 
     return PresetCategory::other;
@@ -200,7 +213,9 @@ juce::String PresetLibrary::categoryKey (PresetCategory category)
         case PresetCategory::lead:       return "lead";
         case PresetCategory::pad:        return "pad";
         case PresetCategory::strings:    return "cuerdas";
+        case PresetCategory::brass:      return "metales";
         case PresetCategory::keys:       return "teclas";
+        case PresetCategory::pluck:      return "pluck";
         case PresetCategory::fx:         return "fx";
         case PresetCategory::other:      return "otros";
     }
@@ -228,19 +243,16 @@ PresetMetadata& PresetLibrary::entryFor (const juce::String& name, bool factory)
 
 PresetCategory factoryCategoryFor (const juce::String& name)
 {
-    if (name == "Default")   return PresetCategory::initiation;
-    if (name == "Pluck")     return PresetCategory::keys;
-    if (name == "Acid Bass") return PresetCategory::bass;
+    if (name == "Default") return PresetCategory::initiation;
 
-    if (name == "Lead Saw" || name == "Lead Square" || name == "Lead Soft")
-        return PresetCategory::lead;
-
-    if (name == "String Ensemble" || name == "String Soft" || name == "String Bright")
-        return PresetCategory::strings;
-
-    if (name == "Warm Pad" || name == "Lush Pad" || name == "Dark Pad"
-        || name == "Space Pad" || name == "Bright Pad")
-        return PresetCategory::pad;
+    // The v1 library uses the family suffix in the visible name.
+    if (name.endsWith (" Pad"))     return PresetCategory::pad;
+    if (name.endsWith (" Pluck"))   return PresetCategory::pluck;
+    if (name.endsWith (" Lead"))    return PresetCategory::lead;
+    if (name.endsWith (" Bass"))    return PresetCategory::bass;
+    if (name.endsWith (" Brass"))   return PresetCategory::brass;
+    if (name.endsWith (" Piano"))   return PresetCategory::keys;
+    if (name.endsWith (" Strings")) return PresetCategory::strings;
 
     return PresetCategory::other;
 }

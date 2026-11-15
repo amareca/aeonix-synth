@@ -13,10 +13,10 @@ namespace aeonix
 {
 
 // ============================================================================
-//  PresetBar — barra de presets de una sola fila.
+//  PresetBar - single-row preset bar.
 //
-//  Etiqueta, selector, anterior, siguiente, carpeta del gestor y LED de
-//  cambios. Buscar, guardar, renombrar, borrar y crear viven en el overlay.
+//  Label, selector, previous, next, manager folder and changed LED. Search,
+//  save, rename, delete and create live in the overlay.
 // ============================================================================
 class PresetBar final : public juce::Component
 {
@@ -27,7 +27,7 @@ public:
 
     PresetBar();
 
-    // Intenciones de usuario.
+    // User intents.
     std::function<void (int)> onSelectIndex;
     std::function<void()> onPrev;
     std::function<void()> onNext;
@@ -39,7 +39,7 @@ public:
     [[nodiscard]] int getSelectedIndex() const;
     [[nodiscard]] juce::String getSelectedName() const;
 
-    // LED de cambios sin guardar.
+    // LED for unsaved changes.
     void setModified (bool modified);
     [[nodiscard]] bool isModified() const noexcept { return modified_; }
 

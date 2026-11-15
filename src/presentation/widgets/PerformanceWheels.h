@@ -10,11 +10,11 @@ namespace aeonix
 {
 
 // ============================================================================
-//  PerformanceWheels — pitch bend (con muelle) y rueda de modulacion.
+//  PerformanceWheels - pitch bend (spring-loaded) and modulation wheel.
 //
-//  Vista pura: emite los valores al exterior y refleja los que llegan del
-//  MIDI sin reenviarlos. El orden de las hojas (label/slider por rueda) se
-//  conserva para el informe de layout F11.
+//  Pure view: emits the values outwards and reflects those coming from
+//  MIDI without forwarding them. The order of the leaves (label/slider per
+//  wheel) is kept for the F11 layout report.
 // ============================================================================
 class PerformanceWheels final : public juce::Component
 {
@@ -26,10 +26,10 @@ public:
     std::function<void (float)> onPitchBend;
     std::function<void (float)> onModWheel;
 
-    // Centra el pitch bend y baja la modulacion (enviando notificacion).
+    // Centres the pitch bend and lowers the modulation (sending notification).
     void reset();
 
-    // Refleja un valor venido del MIDI sin reenviarlo.
+    // Reflects a value coming from MIDI without forwarding it.
     void setPitchBendDisplay (float value);
     void setModWheelDisplay (float value);
 

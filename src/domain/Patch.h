@@ -10,10 +10,10 @@ namespace aeonix
 {
 
 // ============================================================================
-//  Patch — el "preset": una coleccion de Parameter (definicion + valor).
+//  Patch - the "preset": a collection of Parameter (definition + value).
 //
-//  Guarda el conjunto de parametros del sintetizador y su valor normalizado
-//  actual. Es un snapshot del estado del instrumento.
+//  Holds the synthesizer parameter set and its current normalized
+//  value. It is a snapshot of the instrument state.
 // ============================================================================
 class Patch
 {
@@ -22,27 +22,27 @@ public:
 
     void add (Parameter p) { params_.push_back (std::move (p)); }
 
-    // Devuelve true si el parametro existe.
+    // Returns true if the parameter exists.
     [[nodiscard]] bool contains (const std::string& id) const
     {
         return find (id) != nullptr;
     }
 
-    // Valor normalizado de un parametro (0.0 si no existe).
+    // Normalized value of a parameter (0.0 if it does not exist).
     [[nodiscard]] float get (const std::string& id) const
     {
         const auto* p = find (id);
         return p != nullptr ? p->getNormalised() : 0.0f;
     }
 
-    // Valor real (en el rango del parametro). Devuelve min si no existe.
+    // Real value (in the parameter range). Returns min if it does not exist.
     [[nodiscard]] float getValue (const std::string& id) const
     {
         const auto* p = find (id);
         return p != nullptr ? p->getValue() : p->getMin();
     }
 
-    // Establece el valor normalizado. Devuelve false si el id no existe.
+    // Sets the normalized value. Returns false if the id does not exist.
     bool set (const std::string& id, float normalised)
     {
         auto* p = find (id);
@@ -55,7 +55,7 @@ public:
 
     [[nodiscard]] size_t size() const { return params_.size(); }
 
-    // Acceso a todos los parametros (para serializar presets, etc.).
+    // Access to all parameters (for serializing presets, etc.).
     [[nodiscard]] const std::vector<Parameter>& parameters() const { return params_; }
 
     [[nodiscard]] const Parameter* find (const std::string& id) const
@@ -67,8 +67,8 @@ public:
         return nullptr;
     }
 
-    // Version no-const: devuelve un puntero modificable (lo usa el motor para
-    // cachear los punteros a los parametros).
+    // Non-const version: returns a mutable pointer (used by the engine to
+    // cache the parameter pointers).
     [[nodiscard]] Parameter* find (const std::string& id)
     {
         for (auto& p : params_)
@@ -82,7 +82,7 @@ private:
     std::vector<Parameter> params_;
 };
 
-// Crea el Patch por defecto con los parametros usados en la Fase 1.
+// Creates the default Patch with the parameters used in Phase 1.
 Patch makeDefaultPatch();
 
 } // namespace aeonix

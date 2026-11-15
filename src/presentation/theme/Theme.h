@@ -12,7 +12,7 @@ namespace aeonix
 {
 
 // ============================================================================
-//  Tema visual de la aplicacion.
+//  Visual theme of the application.
 // ============================================================================
 enum class ThemeId
 {
@@ -40,7 +40,7 @@ struct ThemeColours
     bool holoKnobs        = false;
 };
 
-// Degradado holografico: teal -> azul -> violeta -> ambar.
+// Holographic gradient: teal -> blue -> violet -> amber.
 inline juce::Colour holoColour (float t)
 {
     static const juce::Colour stops[] = {

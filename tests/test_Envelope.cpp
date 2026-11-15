@@ -21,7 +21,7 @@ float run (aeonix::Envelope& env, int samples)
 TEST_CASE ("Envelope attack rises linearly and clamps at 1", "[envelope]")
 {
     Envelope env;
-    env.prepare (1000.0);          // 1 segundo = 1000 muestras
+    env.prepare (1000.0);          // 1 second = 1000 samples
     env.setAttack (1.0);
     env.setDecay (100.0);
     env.setSustain (0.9);
@@ -30,10 +30,10 @@ TEST_CASE ("Envelope attack rises linearly and clamps at 1", "[envelope]")
     env.noteOn();
     REQUIRE (env.getStage() == Envelope::Stage::Attack);
 
-    // A mitad del ataque (500 muestras) el valor deberia ser ~0.5.
+    // Halfway through the attack (500 samples) the value should be ~0.5.
     REQUIRE (run (env, 500) == Catch::Approx (0.5).margin (0.02));
 
-    // Al completarse el ataque llega a 1.0 y nunca lo supera.
+    // When the attack completes it reaches 1.0 and never exceeds it.
     float maxValue = 0.0f;
     for (int i = 0; i < 600; ++i)
         maxValue = std::max (maxValue, env.nextSample());
@@ -51,12 +51,12 @@ TEST_CASE ("Envelope reaches sustain and holds", "[envelope]")
     env.setRelease (0.1);
 
     env.noteOn();
-    run (env, 200);                 // ataque + decaimiento completados
+    run (env, 200);                 // attack + decay completed
 
     REQUIRE (env.getStage() == Envelope::Stage::Sustain);
     REQUIRE (env.getValue() == Catch::Approx (0.5).margin (1e-3));
 
-    run (env, 500);                 // sigue sostenido
+    run (env, 500);                 // still sustained
     REQUIRE (env.getStage() == Envelope::Stage::Sustain);
     REQUIRE (env.getValue() == Catch::Approx (0.5).margin (1e-3));
 }
@@ -71,13 +71,13 @@ TEST_CASE ("Envelope releases to zero and becomes idle", "[envelope]")
     env.setRelease (0.1);
 
     env.noteOn();
-    run (env, 50);                  // llega a sustain
+    run (env, 50);                  // reaches sustain
     REQUIRE (env.getStage() == Envelope::Stage::Sustain);
 
     env.noteOff();
     REQUIRE (env.getStage() == Envelope::Stage::Release);
 
-    run (env, 200);                 // 0.1s * 1000 = 100 muestras de release
+    run (env, 200);                 // 0.1s * 1000 = 100 release samples
     REQUIRE (env.getStage() == Envelope::Stage::Idle);
     REQUIRE (env.getValue() == Catch::Approx (0.0).margin (1e-3));
     REQUIRE_FALSE (env.isActive());
@@ -111,8 +111,8 @@ TEST_CASE ("Envelope retrigger keeps the current level to avoid clicks", "[envel
     const double before = env.getValue();
     REQUIRE (before > 0.5);
 
-    // Al reciclar la voz no se cae a cero: el ataque arranca desde el nivel
-    // actual, que es lo que evita el clic del voice stealing.
+    // When the voice is recycled it does not drop to zero: the attack starts from the
+    // current level, which is what avoids the voice stealing click.
     env.noteOn();
     REQUIRE (env.getStage() == Envelope::Stage::Attack);
     REQUIRE (env.getValue() == Catch::Approx (before).margin (1e-12));

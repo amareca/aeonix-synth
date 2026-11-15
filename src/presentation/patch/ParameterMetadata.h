@@ -12,12 +12,12 @@ namespace aeonix
 {
 
 // ============================================================================
-//  ParameterMetadata — textos de interfaz de cada parametro.
+//  ParameterMetadata - interface texts for each parameter.
 //
-//  Un solo punto de verdad para la etiqueta corta y el tooltip que se muestran
-//  en los knobs. La tabla guarda claves del catalogo (I18n) y parameterUiInfo()
-//  devuelve el texto ya traducido al idioma activo. Los ids vienen de
-//  domain/ParameterIds.h para no duplicar cadenas y evitar erratas.
+//  A single source of truth for the short label and tooltip shown on the
+//  knobs. The table stores catalogue keys (I18n) and parameterUiInfo()
+//  returns the text already translated to the active language. The ids come
+//  from domain/ParameterIds.h to avoid duplicating strings and typos.
 // ============================================================================
 struct ParameterUiInfo
 {
@@ -67,8 +67,8 @@ inline ParameterUiInfo parameterUiInfo (const char* id)
         if (std::string_view (id) == entry.id)
             return { std::string (id), tr (entry.label), tr (entry.tooltip) };
 
-    // Fallback defensivo: si se anade un parametro sin metadatos, al menos
-    // la UI sigue funcionando y muestra el id.
+    // Defensive fallback: if a parameter is added without metadata, at least
+    // the UI keeps working and shows the id.
     return { std::string (id), juce::String (id), juce::String (id) };
 }
 

@@ -9,15 +9,15 @@ namespace aeonix
 {
 
 // ============================================================================
-//  SpScQueue — cola lock-free Single-Producer / Single-Consumer.
+//  SpScQueue - lock-free Single-Producer / Single-Consumer queue.
 //
-//  - Un unico hilo produce (push) y un unico hilo consume (pop).
-//  - No usa locks ni asigna memoria: es segura para el hilo de audio (RT-safe).
-//  - Los indices son contadores monotonos (nunca decrecen); se enmascaran para
-//    indexar el buffer. Asi puede llenarse al completo sin slot desperdiciado.
+//  - A single thread produces (push) and a single thread consumes (pop).
+//  - Uses no locks and allocates no memory: safe for the audio thread (RT-safe).
+//  - The indices are monotonic counters (never decrease); they are masked to
+//    index the buffer. That way it can be filled completely with no wasted slot.
 //
-//  Capacidad fija: si esta llena, tryPush devuelve false (el evento se pierde).
-//  Se elige una capacidad generosa para que esto no ocurra en la practica.
+//  Fixed capacity: if full, tryPush returns false (the event is dropped).
+//  A generous capacity is chosen so this does not happen in practice.
 // ============================================================================
 template <typename T, std::size_t Capacity>
 class SpScQueue
@@ -28,35 +28,35 @@ class SpScQueue
 public:
     SpScQueue() = default;
 
-    // Lado productor (un solo hilo).
+    // Producer side (single thread).
     bool tryPush (const T& item)
     {
         const std::uint64_t write = writePos_.load (std::memory_order_relaxed);
         const std::uint64_t read  = readPos_.load (std::memory_order_acquire);
 
         if (write - read >= Capacity)
-            return false;   // llena
+            return false;   // full
 
         buffer_[static_cast<std::size_t> (write & mask_)] = item;
         writePos_.store (write + 1, std::memory_order_release);
         return true;
     }
 
-    // Lado consumidor (un solo hilo).
+    // Consumer side (single thread).
     bool tryPop (T& out)
     {
         const std::uint64_t write = writePos_.load (std::memory_order_acquire);
         const std::uint64_t read  = readPos_.load (std::memory_order_relaxed);
 
         if (read == write)
-            return false;   // vacia
+            return false;   // empty
 
         out = buffer_[static_cast<std::size_t> (read & mask_)];
         readPos_.store (read + 1, std::memory_order_release);
         return true;
     }
 
-    // Numero de elementos actualmente en la cola (aproximado).
+    // Number of elements currently in the queue (approximate).
     [[nodiscard]] std::uint64_t size() const noexcept
     {
         const std::uint64_t write = writePos_.load (std::memory_order_acquire);

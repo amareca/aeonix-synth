@@ -8,14 +8,15 @@ namespace aeonix
 {
 
 // ============================================================================
-//  PresetLibrary — metadatos de la biblioteca de presets (infraestructura).
+//  PresetLibrary - preset library metadata (infrastructure).
 //
-//  Guarda categoria, favorito y ultimo uso en un sidecar `library.json`
-//  separado de los presets. Nunca escribe dentro del JSON de cada preset.
+//  Stores category, favorite and last use in a `library.json` sidecar
+//  separate from the presets. Never writes inside each preset's JSON.
 // ============================================================================
 
-// Ocho categorias cerradas. Las claves son estables y no se traducen; las
-// etiquetas visibles viven en el catalogo de textos de la interfaz.
+// Ten closed categories. The keys are stable and not translated; the
+// visible labels live in the UI text catalog. The enum order is the order
+// of the manager sidebar.
 enum class PresetCategory
 {
     initiation,
@@ -23,12 +24,14 @@ enum class PresetCategory
     lead,
     pad,
     strings,
+    brass,
     keys,
+    pluck,
     fx,
     other
 };
 
-inline constexpr int presetCategoryCount = 8;
+inline constexpr int presetCategoryCount = 10;
 
 struct PresetMetadata
 {
@@ -36,7 +39,7 @@ struct PresetMetadata
     bool favorite = false;
     juce::int64 lastUsed = 0;
 
-    // Solo en memoria: la entrada del sidecar ya no tiene archivo detras.
+    // In memory only: the sidecar entry no longer has a file behind it.
     bool orphan = false;
 };
 
@@ -45,15 +48,15 @@ class PresetLibrary
 public:
     explicit PresetLibrary (juce::File sidecarFile);
 
-    // Lee el sidecar. Si falta o esta corrupto se parte de grupos vacios; las
-    // categorias de fabrica siguen saliendo de la tabla estatica.
+    // Reads the sidecar. If missing or corrupt it starts from empty groups;
+    // the factory categories still come from the static table.
     void load();
 
-    // Escritura atomica: archivo temporal + reemplazo.
+    // Atomic write: temporary file + replace.
     bool save() const;
 
-    // Anade las entradas que falten para los presets de usuario y marca como
-    // huerfanas las que ya no tienen archivo. No borra nada por su cuenta.
+    // Adds the missing entries for the user presets and marks as
+    // orphans those that no longer have a file. Deletes nothing on its own.
     void reconcile (const juce::File& userPresetDirectory);
 
     [[nodiscard]] PresetMetadata metadataFor (const juce::String& name, bool factory) const;
@@ -62,7 +65,7 @@ public:
     void setFavorite (const juce::String& name, bool factory, bool favorite);
     void markUsed (const juce::String& name, bool factory, juce::int64 timestamp);
 
-    // Renombrar mueve la clave; borrar elimina la entrada.
+    // Renaming moves the key; deleting removes the entry.
     void renameUser (const juce::String& oldName, const juce::String& newName);
     void removeUser (const juce::String& name);
 
@@ -87,7 +90,7 @@ private:
     std::map<juce::String, PresetMetadata> user_;
 };
 
-// Categoria de los presets de fabrica; `other` para cualquier otro nombre.
+// Category of the factory presets; `other` for any other name.
 [[nodiscard]] PresetCategory factoryCategoryFor (const juce::String& name);
 
 } // namespace aeonix

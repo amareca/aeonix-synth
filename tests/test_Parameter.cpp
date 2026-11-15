@@ -43,11 +43,11 @@ TEST_CASE ("Parameter default is clamped to range", "[parameter]")
 
 TEST_CASE ("Parameter logarithmic mapping", "[parameter]")
 {
-    // 20..20000 log: el punto medio (0.5) = 20 * sqrt(1000) ~= 632.46 Hz.
+    // 20..20000 log: the midpoint (0.5) = 20 * sqrt(1000) ~= 632.46 Hz.
     Parameter cutoff ("filter.cutoff", "Cutoff", 20.0f, 20000.0f, 0.5f, true);
     REQUIRE (cutoff.getValue() == Catch::Approx (632.46f).margin (1.0f));
 
-    // setValue hace la conversion inversa.
+    // setValue does the inverse conversion.
     cutoff.setValue (632.46f);
     REQUIRE (cutoff.getNormalised() == Catch::Approx (0.5f).margin (0.01f));
 }

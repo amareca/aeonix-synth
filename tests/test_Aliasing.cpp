@@ -6,9 +6,9 @@
 
 #include "domain/Oscillator.h"
 
-// El optimizador de MSVC se cae generando codigo para las funciones de medida
-// espectral de este archivo (CL.exe termina con un error interno). Como es un
-// test y su coste no importa, se compila sin optimizar.
+// MSVC's optimizer crashes while generating code for the spectral measurement
+// functions in this file (CL.exe ends with an internal error). Since this is a
+// test and its cost does not matter, it is compiled without optimization.
 #if defined(_MSC_VER)
     #pragma optimize ("", off)
 #endif
@@ -20,7 +20,7 @@ namespace
 
 constexpr double pi = 3.14159265358979323846;
 
-// Magnitud de Goertzel en una frecuencia concreta (sin FFT ni JUCE).
+// Goertzel magnitude at a specific frequency (no FFT, no JUCE).
 double goertzelMagnitude (const std::vector<float>& samples,
                           double frequency,
                           double sampleRate)
@@ -57,7 +57,7 @@ std::vector<float> renderSaw (double frequency, int numSamples)
     return out;
 }
 
-// Sierra ideal sin correccion, como referencia de lo que aliasa el naive.
+// Ideal saw without correction, as a reference of what the naive aliases.
 std::vector<float> renderNaiveSaw (double frequency, int numSamples)
 {
     const double increment = frequency / 44100.0;
@@ -80,7 +80,7 @@ TEST_CASE ("PolyBLEP saw has less alias energy than the naive saw", "[aliasing]"
     constexpr double sampleRate  = 44100.0;
     constexpr double fundamental = 3000.0;
 
-    // El 8o armonico cae en 24 kHz (> Nyquist) y se pliega a 20.1 kHz.
+    // The 8th harmonic falls at 24 kHz (> Nyquist) and folds to 20.1 kHz.
     constexpr double aliasFrequency = sampleRate - 8.0 * fundamental;
 
     const int numSamples = 16384;
@@ -94,12 +94,12 @@ TEST_CASE ("PolyBLEP saw has less alias energy than the naive saw", "[aliasing]"
     const double blepFundamental  = goertzelMagnitude (bandLimited, fundamental, sampleRate);
     const double naiveFundamental = goertzelMagnitude (naive, fundamental, sampleRate);
 
-    // La fundamental se conserva (y su energia es comparable).
+    // The fundamental is preserved (and its energy is comparable).
     REQUIRE (blepFundamental > 0.0);
     REQUIRE (blepFundamental > naiveFundamental * 0.5);
 
-    // Donde el naive deja un alias claro, el PolyBLEP lo reduce de forma
-    // notoria (en la practica bastante mas que la mitad).
+    // Where the naive leaves a clear alias, PolyBLEP reduces it
+    // noticeably (in practice quite a bit more than half).
     REQUIRE (naiveAlias > 0.0);
     REQUIRE (blepAlias < naiveAlias * 0.5);
 }
@@ -120,7 +120,7 @@ TEST_CASE ("PolyBLEP square stays within a reasonable range", "[aliasing]")
         peak = std::max (peak, std::fabs (sample));
     }
 
-    // La correccion puede superar ligeramente +/-1 (Gibbs), pero no dispararse.
+    // The correction may slightly exceed +/-1 (Gibbs), but not blow up.
     REQUIRE (peak > 0.5f);
     REQUIRE (peak < 1.25f);
 }

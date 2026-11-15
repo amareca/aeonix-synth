@@ -17,11 +17,11 @@ TEST_CASE ("Reverb produces a tail after an impulse", "[reverb]")
 
     const int n = 3000;
     std::vector<float> left (n, 0.0f), right (n, 0.0f);
-    left[0] = 1.0f;   // impulso
+    left[0] = 1.0f;   // impulse
 
     reverb.process (left.data(), right.data(), n);
 
-    // Debe haber salida no nula despues del impulso (cola de reverberacion).
+    // There must be non-zero output after the impulse (reverb tail).
     bool foundTail = false;
     for (int i = 100; i < n; ++i)
         if (std::fabs (left[i]) > 0.0001f) { foundTail = true; break; }

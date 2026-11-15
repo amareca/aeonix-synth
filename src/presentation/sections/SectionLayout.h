@@ -8,11 +8,11 @@ namespace aeonix
 {
 
 // ============================================================================
-//  Utilidades de layout de las vistas de seccion.
+//  Layout helpers for the section views.
 //
-//  El contenido de una seccion se reparte en celdas iguales; cada vista
-//  coloca sus controles en el mismo orden que antes para conservar el
-//  informe de layout F11.
+//  The content of a section is split into equal cells; each view places its
+//  controls in the same order as before so the F11 layout report stays
+//  unchanged.
 // ============================================================================
 inline int sectionCellWidth (const juce::Rectangle<int>& content, int cells)
 {

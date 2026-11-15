@@ -7,14 +7,14 @@ namespace aeonix
 {
 
 // ============================================================================
-//  Limiter — limitador de seguridad para el bus master.
+//  Limiter - safety limiter for the master bus.
 //
-//  Detector de pico linkado (la misma reduccion se aplica a L y R, para no
-//  mover la imagen estereo) con ataque inmediato y release exponencial.
-//  No aplica makeup gain: por debajo del umbral es transparente. Un clip
-//  duro final garantiza que la salida nunca supere +/-1.
+//  Linked peak detector (the same reduction is applied to L and R, so the
+//  stereo image does not move) with immediate attack and exponential release.
+//  No makeup gain: below the threshold it is transparent. A final hard
+//  clip guarantees the output never exceeds +/-1.
 //
-//  RT-safe: solo aritmetica por muestra, sin asignaciones ni ramas costosas.
+//  RT-safe: per-sample arithmetic only, no allocations or costly branches.
 // ============================================================================
 class Limiter
 {
@@ -40,7 +40,7 @@ public:
     {
         releaseMs_ = std::max (milliseconds, 1.0f);
 
-        // Coeficiente de una pole que vuelve a ~63 % del camino en releaseMs.
+        // Coeff of a pole that returns to ~63 % of the way in releaseMs.
         releaseCoeff_ = static_cast<float> (
             std::exp (-1.0 / (0.001 * static_cast<double> (releaseMs_) * sampleRate_)));
     }
@@ -53,11 +53,11 @@ public:
             const float target = peak > threshold_ ? threshold_ / peak : 1.0f;
 
             if (target < gain_)
-                gain_ = target;                                        // ataque inmediato
+                gain_ = target;                                        // immediate attack
             else
-                gain_ = gain_ * releaseCoeff_ + (1.0f - releaseCoeff_); // release suave
+                gain_ = gain_ * releaseCoeff_ + (1.0f - releaseCoeff_); // smooth release
 
-            // Red de seguridad: el clip duro solo actua si algo se escapa.
+            // Safety net: the hard clip only acts if something escapes.
             left[i]  = std::clamp (left[i] * gain_, -1.0f, 1.0f);
             right[i] = std::clamp (right[i] * gain_, -1.0f, 1.0f);
         }

@@ -17,7 +17,7 @@ TEST_CASE ("Oscillator generates a sine at quarter sample rate", "[oscillator]")
     osc.setFrequency (sr / 4.0);
     osc.reset();
 
-    // Una sinusoide a sr/4 da: 0, +1, 0, -1, 0 ...
+    // A sine at sr/4 gives: 0, +1, 0, -1, 0 ...
     REQUIRE (osc.nextSample() == Catch::Approx (0.0f).margin (1e-4f));
     REQUIRE (osc.nextSample() == Catch::Approx (1.0f).margin (1e-4f));
     REQUIRE (osc.nextSample() == Catch::Approx (0.0f).margin (1e-4f));
@@ -32,13 +32,13 @@ TEST_CASE ("Oscillator saw rises linearly away from the discontinuity", "[oscill
     Oscillator osc;
     osc.setSampleRate (sr);
     osc.setWaveform (Waveform::Saw);
-    osc.setFrequency (25.0);   // 40 muestras por periodo (dt = 0.025)
+    osc.setFrequency (25.0);   // 40 samples per period (dt = 0.025)
     osc.reset();
 
-    // PolyBLEP suaviza el salto: el primer sample ya no cae a -1.
+    // PolyBLEP smooths the jump: the first sample no longer drops to -1.
     REQUIRE (std::fabs (osc.nextSample()) < 1.0f);
 
-    // Fuera de los bordes del salto la sierra sigue siendo lineal.
+    // Outside the jump edges the saw stays linear.
     for (int i = 1; i < 39; ++i)
     {
         const float expected = static_cast<float> (2.0 * (i * 0.025) - 1.0);

@@ -17,10 +17,10 @@ namespace aeonix
 {
 
 // ============================================================================
-//  KnobView — etiqueta + slider rotativo con formato de valor real.
+//  KnobView - label + rotary slider with real-value formatting.
 //
-//  No conoce ViewModels: recibe rango, formato y un callback de cambio. Las
-//  clases ParameterKnob/DiscreteKnob anaden el binding observable.
+//  It does not know ViewModels: it receives a range, a formatter and a change
+//  callback. The ParameterKnob/DiscreteKnob classes add the observable binding.
 // ============================================================================
 class KnobView : public juce::Component
 {
@@ -98,7 +98,7 @@ private:
 };
 
 // ============================================================================
-//  ParameterKnob — knob de un parametro normalizado (0..1) con formato real.
+//  ParameterKnob - knob for a normalised parameter (0..1) with real formatting.
 // ============================================================================
 class ParameterKnob final : public KnobView
 {
@@ -131,7 +131,7 @@ private:
 };
 
 // ============================================================================
-//  DiscreteKnob — knob de un valor entero (p. ej. voces de unison).
+//  DiscreteKnob - knob for an integer value (e.g. unison voices).
 // ============================================================================
 class DiscreteKnob final : public KnobView
 {

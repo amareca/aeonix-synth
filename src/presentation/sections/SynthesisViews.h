@@ -15,10 +15,10 @@ namespace aeonix
 {
 
 // ============================================================================
-//  Vistas del bloque de sintesis: oscilador, filtro y envolventes.
+//  Views of the synthesis block: oscillator, filter and envelopes.
 //
-//  Cada vista es un SectionPanel autosuficiente: crea sus controles, se
-//  suscribe a los ViewModels y se coloca dentro de su propio contenido.
+//  Each view is a self-contained SectionPanel: it creates its controls,
+//  subscribes to the ViewModels and lays itself out inside its own content.
 // ============================================================================
 class OscillatorView final : public SectionPanel
 {

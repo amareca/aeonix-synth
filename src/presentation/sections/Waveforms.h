@@ -5,7 +5,7 @@
 namespace aeonix
 {
 
-// Formas de onda compartidas por el oscilador y el LFO.
+// Waveforms shared by the oscillator and the LFO.
 inline juce::StringArray waveformNames()
 {
     juce::StringArray names;

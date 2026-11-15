@@ -11,14 +11,14 @@ namespace aeonix
 {
 
 // ============================================================================
-//  ViewModels (capa de presentacion).
+//  ViewModels (presentation layer).
 //
-//  Cada ViewModel expone propiedades observables y metodos "set" que:
-//    1. actualizan la propiedad (notificando a las Views suscritas), y
-//    2. llaman al caso de uso (setParameter) para enviar el cambio al motor.
+//  Each ViewModel exposes observable properties and "set" methods that:
+//    1. update the property (notifying the subscribed Views), and
+//    2. call the use case (setParameter) to send the change to the engine.
 //
-//  Los ViewModels viven en el hilo de UI y NO hacen DSP. No conocen el
-//  SynthEngine: reciben un callback (el caso de uso) inyectado.
+//  ViewModels live on the UI thread and do NOT do DSP. They do not know the
+//  SynthEngine: they receive an injected callback (the use case).
 // ============================================================================
 
 using SetParameterFn = std::function<void (const std::string&, float)>;
@@ -33,13 +33,13 @@ public:
         : setParam_ (std::move (setParam)) {}
 
     Observable<int>   waveform { 0 };     // 0..3 (Saw, Square, Sine, Triangle)
-    Observable<float> level    { 0.5f };  // 0..1 normalizado
+    Observable<float> level    { 0.5f };  // 0..1 normalised
 
     void setWaveform (int index)
     {
         index = std::clamp (index, 0, 3);
         waveform.set (index);
-        setParam_ ("osc.waveform", index / 3.0f);   // normalizado 0..1
+        setParam_ ("osc.waveform", index / 3.0f);   // normalised 0..1
     }
 
     void setLevel (float normalised)
@@ -60,8 +60,8 @@ public:
     explicit FilterViewModel (SetParameterFn setParam)
         : setParam_ (std::move (setParam)) {}
 
-    Observable<float> cutoff    { 0.8f };  // normalizado (log)
-    Observable<float> resonance { 0.1f };  // normalizado
+    Observable<float> cutoff    { 0.8f };  // normalised (log)
+    Observable<float> resonance { 0.1f };  // normalised
 
     void setCutoff (float normalised)
     {
@@ -110,10 +110,10 @@ public:
         : setParam_ (std::move (setParam)) {}
 
     Observable<float> amount  { 0.0f };   // 0..1
-    Observable<float> attack  { 0.2f };   // normalizado (log)
-    Observable<float> decay   { 0.67f };  // normalizado (log)
+    Observable<float> attack  { 0.2f };   // normalised (log)
+    Observable<float> decay   { 0.67f };  // normalised (log)
     Observable<float> sustain { 0.2f };
-    Observable<float> release { 0.67f };  // normalizado (log)
+    Observable<float> release { 0.67f };  // normalised (log)
 
     void setAmount  (float n) { n = clamp01 (n); amount.set (n);  setParam_ ("filter.envAmount", n); }
     void setAttack  (float n) { n = clamp01 (n); attack.set (n);  setParam_ ("filter.attack",  n); }
@@ -174,7 +174,7 @@ class LfoViewModel
 public:
     explicit LfoViewModel (SetParameterFn setParam) : setParam_ (std::move (setParam)) {}
 
-    Observable<float> rate     { 0.435f };  // normalizado (log)
+    Observable<float> rate     { 0.435f };  // normalised (log)
     Observable<float> depth    { 0.0f };    // 0..1
     Observable<int>   waveform { 2 };       // 0..3 (Saw, Square, Sine, Triangle)
 
@@ -199,8 +199,8 @@ public:
     explicit UnisonViewModel (SetParameterFn setParam) : setParam_ (std::move (setParam)) {}
 
     Observable<int>   voices { 1 };      // 1..8
-    Observable<float> detune { 0.2f };   // normalizado (rango 0..50 cents)
-    Observable<float> width  { 0.5f };   // 0..1 (reparto estereo)
+    Observable<float> detune { 0.2f };   // normalised (range 0..50 cents)
+    Observable<float> width  { 0.5f };   // 0..1 (stereo spread)
 
     void setVoices (int n)
     {

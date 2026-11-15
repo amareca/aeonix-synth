@@ -1,6 +1,6 @@
-# Verificacion completa: configura, compila Release y ejecuta todos los tests.
+# Full verification: configure, build Release and run every test.
 #
-# Uso:
+# Usage:
 #   .\tools\verify.ps1
 #   .\tools\verify.ps1 -Pro
 #   .\tools\verify.ps1 -Flavour Pro
@@ -43,13 +43,13 @@ Push-Location $repo
 
 try
 {
-    Invoke-Checked -Exe $cmake -Arguments @("--preset", $configurePreset) -Step ("Configurando CMake ({0})" -f $Flavour)
-    Invoke-Checked -Exe $cmake -Arguments @("--build", "--preset", $buildPreset) -Step ("Compilando {0} Release" -f $Flavour)
+    Invoke-Checked -Exe $cmake -Arguments @("--preset", $configurePreset) -Step ("Configuring CMake ({0})" -f $Flavour)
+    Invoke-Checked -Exe $cmake -Arguments @("--build", "--preset", $buildPreset) -Step ("Building {0} Release" -f $Flavour)
 
     & (Join-Path $PSScriptRoot "test.ps1") -Configuration "Release" -Flavour $Flavour
 
     Write-Host ""
-    Write-Host "Verificacion completada correctamente." -ForegroundColor Green
+    Write-Host "Verification finished successfully." -ForegroundColor Green
 }
 finally
 {

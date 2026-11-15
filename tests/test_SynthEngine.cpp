@@ -12,8 +12,8 @@ using namespace aeonix;
 
 namespace
 {
-// Renderiza n muestras estereo y devuelve el pico absoluto de salida.
-// Tambien sirve para "drenar" los eventos pendientes del motor.
+// Renders n stereo samples and returns the absolute output peak.
+// It also serves to "drain" the engine's pending events.
 float renderPeak (SynthEngine& engine, int numSamples)
 {
     std::vector<float> left (numSamples, 0.0f);
@@ -36,7 +36,7 @@ TEST_CASE ("SynthEngine allocates voices on noteOn", "[engine]")
     REQUIRE (engine.getActiveVoiceCount() == 0);
 
     engine.noteOn (60, 1.0f);
-    renderPeak (engine, 1);                 // aplica el evento
+    renderPeak (engine, 1);                 // applies the event
     REQUIRE (engine.getActiveVoiceCount() == 1);
 
     engine.noteOn (64, 1.0f);
@@ -58,7 +58,7 @@ TEST_CASE ("SynthEngine caps voices at polyphony (voice stealing)", "[engine]")
     renderPeak (engine, 1);
     REQUIRE (engine.getActiveVoiceCount() == 4);
 
-    engine.noteOn (76, 1.0f);               // roba la voz mas antigua (nota 60)
+    engine.noteOn (76, 1.0f);               // steals the oldest voice (note 60)
     renderPeak (engine, 1);
     REQUIRE (engine.getActiveVoiceCount() == 4);
 }
@@ -73,7 +73,7 @@ TEST_CASE ("SynthEngine noteOff releases the voice", "[engine]")
     REQUIRE (engine.getActiveVoiceCount() == 1);
 
     engine.noteOff (60);
-    renderPeak (engine, 400);               // aplica NoteOff y completa el release
+    renderPeak (engine, 400);               // applies NoteOff and completes the release
     REQUIRE (engine.getActiveVoiceCount() == 0);
 }
 
@@ -101,13 +101,13 @@ TEST_CASE ("SynthEngine sustain holds notes until released", "[engine]")
     engine.noteOn (60, 1.0f);
     engine.setSustain (true);
     engine.noteOff (60);
-    renderPeak (engine, 1);                 // aplica NoteOn + SustainOn + NoteOff
+    renderPeak (engine, 1);                 // applies NoteOn + SustainOn + NoteOff
 
-    // Con el pedal pisado, la nota sigue activa (retenida).
+    // With the pedal down, the note stays active (held).
     REQUIRE (engine.getActiveVoiceCount() == 1);
 
     engine.setSustain (false);
-    renderPeak (engine, 400);               // se libera y completa el release
+    renderPeak (engine, 400);               // it is freed and completes the release
     REQUIRE (engine.getActiveVoiceCount() == 0);
 }
 
@@ -130,7 +130,7 @@ TEST_CASE ("SynthEngine setParameter takes effect", "[engine]")
     engine.noteOn (60, 1.0f);
     REQUIRE (renderPeak (engine, 256) > 0.0f);
 
-    // Baja el volumen a 0: la siguiente renderizacion debe ser silencio.
+    // Lowers the volume to 0: the next render must be silence.
     engine.setParameter (param::masterVolume, 0.0f);
     REQUIRE (renderPeak (engine, 256) == Catch::Approx (0.0f));
 }
@@ -140,9 +140,9 @@ TEST_CASE ("SynthEngine unison allocates multiple voices per note", "[engine]")
     SynthEngine engine;
     engine.prepare (44100.0, 256, 8);
 
-    // unison.voices = 4 (rango 1..8, normalizado = (4-1)/7).
+    // unison.voices = 4 (range 1..8, normalised = (4-1)/7).
     engine.setParameter (param::unisonVoices, 3.0f / 7.0f);
-    renderPeak (engine, 1);   // aplica el parametro
+    renderPeak (engine, 1);   // applies the parameter
 
     engine.noteOn (60, 1.0f);
     renderPeak (engine, 1);
@@ -172,7 +172,7 @@ TEST_CASE ("SynthEngine pitch bend and mod wheel do not break rendering", "[engi
 
     REQUIRE (renderPeak (engine, 256) > 0.0f);
 
-    // Volver al centro y soltar la rueda sigue siendo seguro.
+    // Returning to centre and releasing the wheel stays safe.
     engine.setPitchBend (0.0f);
     engine.setModWheel (0.0f);
     REQUIRE (renderPeak (engine, 256) > 0.0f);
@@ -197,9 +197,9 @@ TEST_CASE ("SynthEngine unison width spreads voices across channels", "[engine]"
     SynthEngine engine;
     engine.prepare (44100.0, 256, 8);
 
-    engine.setParameter (param::unisonVoices, 1.0f / 7.0f);   // 2 voces
+    engine.setParameter (param::unisonVoices, 1.0f / 7.0f);   // 2 voices
     engine.setParameter (param::unisonDetune, 1.0f);          // 50 cents
-    engine.setParameter (param::unisonWidth, 1.0f);           // pan duro
+    engine.setParameter (param::unisonWidth, 1.0f);           // hard pan
     engine.noteOn (60, 1.0f);
 
     const int numSamples = 4096;
@@ -249,7 +249,7 @@ TEST_CASE ("SynthEngine steals a releasing voice before sustained ones", "[engin
     SynthEngine engine;
     engine.prepare (44100.0, 256, 8);
     engine.setPolyphony (8);
-    engine.setParameter (param::ampRelease, 1.0f);   // release largo
+    engine.setParameter (param::ampRelease, 1.0f);   // long release
 
     for (int i = 0; i < 8; ++i)
         engine.noteOn (48 + i, 1.0f);
@@ -261,8 +261,8 @@ TEST_CASE ("SynthEngine steals a releasing voice before sustained ones", "[engin
     engine.noteOff (48);
     renderPeak (engine, 64);
 
-    // La voz 0 esta en release: la nota nueva debe reutilizarla en lugar de
-    // cortar una voz que sigue sostenida.
+    // Voice 0 is in release: the new note must reuse it instead of
+    // cutting a voice that is still sustained.
     engine.noteOn (72, 1.0f);
     renderPeak (engine, 64);
 

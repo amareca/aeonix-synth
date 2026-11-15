@@ -29,7 +29,7 @@ void KeyboardBed::paint (juce::Graphics& g)
     if (keys.getWidth() <= 0.0f || keys.getHeight() <= 0.0f)
         return;
 
-    // Fieltro + marco del keybed (el teclado se pinta encima como hijo).
+    // Felt + keybed frame (the keyboard is painted on top as a child).
     const auto felt = juce::Rectangle<float> (keys.getX() - 6.0f,
                                               keys.getY() - 8.0f,
                                               keys.getWidth() + 12.0f,

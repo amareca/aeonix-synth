@@ -6,20 +6,20 @@ using namespace aeonix;
 
 TEST_CASE ("ParameterFormat shows real units", "[format]")
 {
-    // Frecuencias.
+    // Frequencies.
     REQUIRE (formatParameterValue ("filter.cutoff", 0.0f) == "20 Hz");
     REQUIRE (formatParameterValue ("filter.cutoff", 1.0f) == "20 kHz");
 
-    // Tiempos.
+    // Times.
     REQUIRE (formatParameterValue ("amp.attack", 0.0f) == "1 ms");
     REQUIRE (formatParameterValue ("fx.delay.time", 0.0f) == "50 ms");
 
-    // Cents y porcentajes.
+    // Cents and percentages.
     REQUIRE (formatParameterValue ("unison.detune", 0.2f) == "10 ct");
     REQUIRE (formatParameterValue ("master.volume", 0.5f) == "50%");
     REQUIRE (formatParameterValue ("filter.envAmount", 0.65f) == "65%");
 
-    // Formas de onda y voces.
+    // Waveforms and voices.
     REQUIRE (formatParameterValue ("osc.waveform", 0.0f) == "Saw");
     REQUIRE (formatParameterValue ("osc.waveform", 1.0f) == "Triangle");
     REQUIRE (formatParameterValue ("unison.voices", 1.0f) == "8");

@@ -1,7 +1,7 @@
-# Utilidades compartidas por los scripts de desarrollo de AEONIX.
+# Helpers shared by the AEONIX development scripts.
 #
-# Los .ps1 se mantienen en ASCII a proposito: Windows PowerShell 5.1 no lee
-# UTF-8 sin BOM y los acentos se corrompen. La documentacion si lleva tildes.
+# The .ps1 files stay ASCII on purpose: Windows PowerShell 5.1 cannot read
+# UTF-8 without BOM and accents get mangled. Documentation may use them.
 
 $script:RepoRoot = Split-Path -Parent $PSScriptRoot
 $script:VsBuildTools = "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools"
@@ -49,7 +49,7 @@ function Get-CMakePath
 
     if (-not $path)
     {
-        throw "No se encontro CMake. Anade Visual Studio Build Tools o CMake al PATH."
+        throw "CMake not found. Add Visual Studio Build Tools or CMake to PATH."
     }
 
     return $path
@@ -62,7 +62,7 @@ function Get-CTestPath
 
     if (-not $path)
     {
-        throw "No se encontro CTest. Anade Visual Studio Build Tools o CMake al PATH."
+        throw "CTest not found. Add Visual Studio Build Tools or CMake to PATH."
     }
 
     return $path
@@ -207,13 +207,13 @@ function Write-Ok
 function Write-Fail
 {
     param([string]$Text)
-    Write-Host ("  FALLO  {0}" -f $Text) -ForegroundColor Red
+    Write-Host ("  FAIL  {0}" -f $Text) -ForegroundColor Red
 }
 
 function Write-Warn
 {
     param([string]$Text)
-    Write-Host ("  AVISO  {0}" -f $Text) -ForegroundColor Yellow
+    Write-Host ("  WARN  {0}" -f $Text) -ForegroundColor Yellow
 }
 
 function Invoke-Checked
@@ -229,7 +229,7 @@ function Invoke-Checked
 
     if ($LASTEXITCODE -ne 0)
     {
-        throw ("{0} fallo con codigo {1}." -f $Step, $LASTEXITCODE)
+        throw ("{0} failed with code {1}." -f $Step, $LASTEXITCODE)
     }
 }
 
@@ -244,7 +244,7 @@ function Assert-AeonixNotRunning
 
     if ($processes.Count -gt 0)
     {
-        throw "AEONIX esta en ejecucion; cierra la app antes de compilar (o usa -StopAeonix)."
+        throw "AEONIX is running; close the app before building (or use -StopAeonix)."
     }
 }
 
@@ -376,7 +376,7 @@ function Restore-AeonixConfig
 
     if ($null -eq $backup)
     {
-        throw ("No hay copia de configuracion para {0}." -f $Flavour)
+        throw ("No config backup for {0}." -f $Flavour)
     }
 
     $path = Get-AeonixConfigPath -Flavour $Flavour
@@ -419,7 +419,7 @@ function Restore-AeonixLibrary
 
     if ($null -eq $backup)
     {
-        throw ("No hay copia de library.json para {0}." -f $Flavour)
+        throw ("No library.json backup for {0}." -f $Flavour)
     }
 
     $path = Get-AeonixLibraryPath -Flavour $Flavour

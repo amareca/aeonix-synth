@@ -41,12 +41,12 @@ PerformanceWheels::PerformanceWheels()
     };
     pitchBendSlider_.onDragEnd = [this]
     {
-        // Muelle: al soltar, vuelve al centro.
+        // Spring: on release, it returns to the centre.
         pitchBendSlider_.setValue (0.0, juce::sendNotificationSync);
     };
     addAndMakeVisible (pitchBendSlider_);
 
-    // ---- rueda de modulacion ----
+    // ---- modulation wheel ----
     modWheelLabel_.setText (tr (TextId::labelMod), juce::dontSendNotification);
     modWheelLabel_.setJustificationType (juce::Justification::centred);
     modWheelLabel_.setFont (ui::font (10.0f, juce::Font::bold));

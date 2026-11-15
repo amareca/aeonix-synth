@@ -1,10 +1,10 @@
-# Smoke test de presets: abre el gestor, busca y carga una muestra.
+# Preset smoke test: opens the manager, searches and loads a sample.
 #
-# Uso:
+# Usage:
 #   .\tools\presets-smoke.ps1
 #   .\tools\presets-smoke.ps1 -Queries "lead","string"
 #
-# Restaura la config y library.json del usuario al terminar.
+# Restores the user's config and library.json when it finishes.
 
 [CmdletBinding()]
 param(
@@ -22,8 +22,8 @@ $Queries = @($Queries | ForEach-Object { $_ -split "," } |
              ForEach-Object { $_.Trim() } | Where-Object { $_ })
 
 $expected = @{
-    "lead"   = "Lead Saw"
-    "string" = "String Ensemble"
+    "lead"   = "Copper Lead"
+    "string" = "Warm Strings"
 }
 
 $cases = @()
@@ -32,7 +32,7 @@ foreach ($query in $Queries)
 {
     if (-not $expected.ContainsKey($query))
     {
-        throw ("No hay preset esperado para la busqueda '{0}'. Anade el caso en el script." -f $query)
+        throw ("No expected preset for the query '{0}'. Add the case to the script." -f $query)
     }
 
     $cases += [pscustomobject]@{
@@ -45,7 +45,7 @@ $exe = Get-AeonixExePath -Configuration Release
 
 if (-not (Test-Path -LiteralPath $exe))
 {
-    throw "No existe AEONIX-dev.exe. Compila antes con: .\dev.ps1 build"
+    throw "AEONIX-dev.exe not found. Build it first with: .\dev.ps1 build"
 }
 
 function Open-PresetManager
@@ -55,7 +55,7 @@ function Open-PresetManager
 
     if ($null -eq $button)
     {
-        throw "No se encontro el boton del gestor de presets."
+        throw "The preset manager button was not found."
     }
 
     Invoke-AeonixElementClick -Element $button
@@ -71,7 +71,7 @@ function Set-ManagerSearch
 
     if ($null -eq $search)
     {
-        throw "No se encontro el buscador del gestor."
+        throw "The manager search box was not found."
     }
 
     Invoke-AeonixElementClick -Element $search
@@ -165,10 +165,10 @@ try
         }
 
         $results.Add([pscustomobject]@{
-            Busqueda = $case.Query
-            Esperado = $case.Expected
-            Cargado  = Get-AeonixConfigValue -Key "preset.last"
-            Estado   = if ($loaded) { "OK" } else { "FALLO" }
+            Search   = $case.Query
+            Expected = $case.Expected
+            Loaded   = Get-AeonixConfigValue -Key "preset.last"
+            Status   = if ($loaded) { "OK" } else { "FAIL" }
         })
     }
 }
@@ -191,11 +191,11 @@ Write-JsonFile -Path $reportPath -Object ([ordered]@{
     cases       = $results.ToArray()
 })
 
-Write-Host ("  Informe: {0}" -f $reportPath) -ForegroundColor DarkGray
+Write-Host ("  Report: {0}" -f $reportPath) -ForegroundColor DarkGray
 
 if ($failures -gt 0)
 {
-    throw ("Smoke de presets con {0} fallo(s)." -f $failures)
+    throw ("Preset smoke test with {0} failure(s)." -f $failures)
 }
 
-Write-Host ("Presets OK ({0} casos)." -f $results.Count) -ForegroundColor Green
+Write-Host ("Presets OK ({0} cases)." -f $results.Count) -ForegroundColor Green

@@ -8,11 +8,11 @@ namespace aeonix
 {
 
 // ============================================================================
-//  IconButton — boton compacto solo-icono, con estilo de tema.
+//  IconButton - compact icon-only button with theme styling.
 //
-//  Se usa en la barra de titulo (ajustes, MIDI, minimizar/maximizar/cerrar)
-//  y junto a los presets (abrir carpeta). El nombre/tooltip es accesible; el
-//  layout audit lo trata como icono (sin texto visible).
+//  Used in the title bar (settings, MIDI, minimise/maximise/close)
+//  and next to the presets (open folder). The name/tooltip is accessible; the
+//  layout audit treats it as an icon (no visible text).
 // ============================================================================
 enum class IconType
 {

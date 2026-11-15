@@ -6,11 +6,11 @@ namespace aeonix
 {
 
 // ============================================================================
-//  TextSize — escala de legibilidad de la interfaz.
+//  TextSize - interface legibility scale.
 //
-//  La app arranca en el tamano detectado por la altura de pantalla si no hay
-//  una eleccion guardada. El valor se persiste en config.json con la clave
-//  "ui.textSize" ("normal", "large" o "xlarge") y se aplica al reiniciar.
+//  The app starts with the size detected from the screen height if there is
+//  no saved choice. The value is persisted in config.json under the key
+//  "ui.textSize" ("normal", "large" or "xlarge") and applied on restart.
 // ============================================================================
 enum class TextSize
 {
@@ -37,8 +37,8 @@ inline TextSize textSizeFromKey (const juce::String& key)
     return TextSize::normal;
 }
 
-// Altura fisica (px reales, ya multiplicada por el escalado de Windows).
-// 768 px se queda en Normal; 1080p arranca en Grande; 1440p y 4K en Muy grande.
+// Physical height (real px, already multiplied by the Windows scaling).
+// 768 px stays at Normal; 1080p starts at Grande; 1440p and 4K at Muy grande.
 inline TextSize defaultTextSizeForHeight (int screenHeight)
 {
     if (screenHeight >= 1300)
@@ -47,7 +47,7 @@ inline TextSize defaultTextSizeForHeight (int screenHeight)
     return screenHeight >= 900 ? TextSize::large : TextSize::normal;
 }
 
-// Escala de fuente. La base real es 12 px: 12 / 15 / 18.
+// Font scale. The real base is 12 px: 12 / 15 / 18.
 inline float textFontScaleForSize (TextSize size)
 {
     switch (size)
@@ -59,8 +59,8 @@ inline float textFontScaleForSize (TextSize size)
     }
 }
 
-// El layout crece menos que la fuente: el texto gana presencia sin que la
-// ventana se dispare. Normal 1042x714, Grande 1160x724, XL 1300x744.
+// The layout grows less than the font: the text gains presence without the
+// window ballooning. Normal 1042x714, Grande 1160x724, XL 1300x744.
 inline float textLayoutScaleForSize (TextSize size)
 {
     switch (size)

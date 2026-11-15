@@ -1,5 +1,5 @@
-# Compatibilidad: el flujo real vive en tools\verify.ps1.
-# Recomendado: .\dev.ps1 verify
+# Compatibility shim: the real flow lives in tools\verify.ps1.
+# Recommended: .\dev.ps1 verify
 
 $ErrorActionPreference = "Stop"
 

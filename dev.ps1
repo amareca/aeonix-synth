@@ -1,6 +1,6 @@
-# Punto de entrada unico para el desarrollo de AEONIX.
+# Single entry point for AEONIX development.
 #
-# Uso:
+# Usage:
 #   .\dev.ps1 help
 #   .\dev.ps1 doctor
 #   .\dev.ps1 build [-Configuration Debug] [-Flavour Pro] [-Target aeonix_tests] [-StopAeonix]
@@ -10,24 +10,24 @@
 #   .\dev.ps1 presets
 #   .\dev.ps1 captures [-Clean|-Legacy|-Open]
 #
-# Los .ps1 se mantienen en ASCII: Windows PowerShell 5.1 no lee UTF-8 sin BOM.
+# The .ps1 files stay ASCII: Windows PowerShell 5.1 cannot read UTF-8 without BOM.
 
 $ErrorActionPreference = "Stop"
 
 function Show-Usage
 {
     Write-Host ""
-    Write-Host "AEONIX - comandos de desarrollo" -ForegroundColor Cyan
+    Write-Host "AEONIX - development commands" -ForegroundColor Cyan
     Write-Host ""
-    Write-Host "  .\dev.ps1 doctor    Comprueba VS, CMake, JUCE, build y rutas."
-    Write-Host "  .\dev.ps1 build     Compila DEV Release (o Debug con -Configuration Debug)."
-    Write-Host "  .\dev.ps1 test      Ejecuta todos los tests (o -Tag engine)."
-    Write-Host "  .\dev.ps1 verify    Configura, compila Release y ejecuta ctest."
-    Write-Host "  .\dev.ps1 ui        Matriz F11/F12 (48/48) o -Quick (1 combinacion)."
-    Write-Host "  .\dev.ps1 presets   Carga presets de muestra con el gestor."
-    Write-Host "  .\dev.ps1 captures  Resume las capturas; -Clean, -Legacy o -Open."
+    Write-Host "  .\dev.ps1 doctor    Checks VS, CMake, JUCE, build and paths."
+    Write-Host "  .\dev.ps1 build     Builds DEV Release (or Debug with -Configuration Debug)."
+    Write-Host "  .\dev.ps1 test      Runs every test (or -Tag engine)."
+    Write-Host "  .\dev.ps1 verify    Configures, builds Release and runs ctest."
+    Write-Host "  .\dev.ps1 ui        F11/F12 matrix (48/48) or -Quick (1 combination)."
+    Write-Host "  .\dev.ps1 presets   Loads sample presets through the manager."
+    Write-Host "  .\dev.ps1 captures  Summarises captures; -Clean, -Legacy or -Open."
     Write-Host ""
-    Write-Host "Ejemplos:" -ForegroundColor DarkGray
+    Write-Host "Examples:" -ForegroundColor DarkGray
     Write-Host "  .\dev.ps1 build -Configuration Debug" -ForegroundColor DarkGray
     Write-Host "  .\dev.ps1 build -Flavour Pro" -ForegroundColor DarkGray
     Write-Host "  .\dev.ps1 verify -Pro" -ForegroundColor DarkGray
@@ -73,7 +73,7 @@ $scripts = @{
 
 if (-not $scripts.ContainsKey($command))
 {
-    Write-Host ("Comando desconocido: {0}" -f $command) -ForegroundColor Red
+    Write-Host ("Unknown command: {0}" -f $command) -ForegroundColor Red
     Show-Usage
     exit 1
 }

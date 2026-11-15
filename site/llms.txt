@@ -5,7 +5,7 @@
 ## Facts
 
 - Name: AEONIX
-- Version: 0.1.0
+- Version: 0.2.0
 - Price: free
 - License: AGPL-3.0
 - Platform: Windows 10 and Windows 11, 64-bit
@@ -18,7 +18,7 @@
 - Extras: preset manager with search, filters, favourites and recents; four themes; three text sizes
 - Install: unzip the release and run `AEONIX.exe`; the C++ runtime is linked statically
 - Size: ZIP 3.5 MB, executable 8.1 MB
-- Code signing: the 0.1.0 executable is not signed, so Windows SmartScreen may warn once
+- Code signing: the 0.2.0 executable is not signed, so Windows SmartScreen may warn once
 - User data: `%APPDATA%\Aeonix` and `Documents\Aeonix\Presets`
 
 ## Links
@@ -38,7 +38,7 @@
 
 ## Español
 
-AEONIX es un sintetizador sustractivo standalone, gratuito y open source (AGPL-3.0) para Windows 10/11 de 64 bits. Está pensado para pads cinematográficos, plucks atmosféricos y diseño sonoro experimental. La versión 0.1.0 no es un plugin VST/VST3.
+AEONIX es un sintetizador sustractivo standalone, gratuito y open source (AGPL-3.0) para Windows 10/11 de 64 bits. Está pensado para pads cinematográficos, plucks atmosféricos y diseño sonoro experimental. La versión 0.2.0 no es un plugin VST/VST3.
 
 - Web en español: https://amareca.github.io/aeonix-synth/es/
 - Código y descargas: https://github.com/amareca/aeonix-synth

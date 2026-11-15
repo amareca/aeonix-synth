@@ -9,21 +9,21 @@ namespace aeonix
 {
 
 // ============================================================================
-//  KeyboardBed — marco, fieltro y teclado "Studio Ivory".
+//  KeyboardBed - frame, felt and "Studio Ivory" keyboard.
 //
-//  El componente ocupa el marco completo y coloca el teclado dentro con el
-//  mismo margen que antes. Incluye 1 px extra abajo para que la sombra del
-//  marco no quede recortada por los limites del componente.
+//  The component fills the whole frame and places the keyboard inside it with
+//  the same margin as before. It adds 1 extra px at the bottom so the frame
+//  shadow is not clipped by the component bounds.
 // ============================================================================
 class KeyboardBed final : public juce::Component
 {
 public:
-    // Margen del marco respecto a las teclas. El +1 evita que el trazo
-    // centrado del borde quede recortado por los limites del componente.
+    // Frame margin around the keys. The +1 stops the centred border stroke
+    // from being clipped by the component bounds.
     static constexpr int frameLeft   = 7;
     static constexpr int frameTop    = 9;
     static constexpr int frameRight  = 7;
-    static constexpr int frameBottom = 10;   // marco (6) + sombra (3) + holgura
+    static constexpr int frameBottom = 10;   // frame (6) + shadow (3) + slack
 
     explicit KeyboardBed (juce::MidiKeyboardState& state);
 
@@ -32,7 +32,7 @@ public:
 
     void setTheme (ThemeId theme);
 
-    // Convierte los bounds del teclado en los del marco que lo contiene.
+    // Converts the keyboard bounds into those of the frame that contains it.
     static juce::Rectangle<int> bedBoundsFor (juce::Rectangle<int> keys)
     {
         return { keys.getX() - frameLeft,

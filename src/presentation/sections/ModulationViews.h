@@ -15,7 +15,7 @@ namespace aeonix
 {
 
 // ============================================================================
-//  Vistas del bloque de modulacion: LFO y unison.
+//  Views of the modulation block: LFO and unison.
 // ============================================================================
 class LfoView final : public SectionPanel
 {

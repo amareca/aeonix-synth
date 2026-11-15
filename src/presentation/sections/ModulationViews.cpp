@@ -21,7 +21,7 @@ LfoView::LfoView (LfoViewModel& viewModel)
               getAccentColour()),
       waveform_ (tr (TextId::labelWaveform), tr (TextId::tooltipLfoWaveform), waveformNames())
 {
-    // Orden de hijos identico al original: rate, depth y despues el combo.
+    // Child order identical to the original: rate, depth and then the combo.
     addAndMakeVisible (rate_);
     addAndMakeVisible (depth_);
 
@@ -69,7 +69,7 @@ UnisonView::UnisonView (UnisonViewModel& viewModel)
                [&viewModel] (int n) { viewModel.setVoices (n); },
                getAccentColour())
 {
-    // Orden de hijos identico al original: detune, spread y despues voices.
+    // Child order identical to the original: detune, spread and then voices.
     addAndMakeVisible (detune_);
     addAndMakeVisible (width_);
     addAndMakeVisible (voices_);

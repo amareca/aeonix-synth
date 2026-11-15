@@ -20,14 +20,14 @@ struct ThemedDialogButton
 };
 
 // ============================================================================
-//  ThemedDialog — dialogo modal con la estetica de la app.
+//  ThemedDialog - modal dialog with the app's look and feel.
 //
-//  Scrim + tarjeta centrada sobre el contenido de la ventana, con titulo,
-//  mensaje y botones. Sustituye a juw::AlertWindow en la capa de presentacion.
+//  Scrim + centred card over the window content, with title,
+//  message and buttons. Replaces juw::AlertWindow in the presentation layer.
 //
-//  Los botones se colocan en el orden recibido, de izquierda a derecha:
-//  para acciones destructivas se pasa primero la accion y luego Cancelar.
-//  Enter y el clic en el scrim equivalen a Cancelar.
+//  Buttons are laid out in the order received, left to right:
+//  for destructive actions pass the action first and then Cancelar.
+//  Enter and clicking the scrim are equivalent to Cancelar.
 // ============================================================================
 class ThemedDialog final : public juce::Component
 {

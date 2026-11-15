@@ -19,7 +19,7 @@ TEST_CASE ("TextSize keys round-trip", "[textsize]")
 
 TEST_CASE ("TextSize picks a readable default from physical screen height", "[textsize]")
 {
-    // 768 px se queda en Normal; 1080p arranca en Grande; 1440p en Muy grande.
+    // 768 px stays at Normal; 1080p starts at Large; 1440p at Extra large.
     REQUIRE (defaultTextSizeForHeight (720) == TextSize::normal);
     REQUIRE (defaultTextSizeForHeight (768) == TextSize::normal);
     REQUIRE (defaultTextSizeForHeight (899) == TextSize::normal);
@@ -51,7 +51,7 @@ TEST_CASE ("TextSize scales fonts more than layout and limits monotonically", "[
     REQUIRE (minWindowHeightForSize (TextSize::large) == 724);
     REQUIRE (minWindowHeightForSize (TextSize::extraLarge) == 744);
 
-    // Grande debe caber en 1366x768; Muy grande queda para 1080p.
+    // Large must fit in 1366x768; Extra large is left for 1080p.
     REQUIRE (minWindowWidthForSize (TextSize::large) <= 1366);
     REQUIRE (minWindowHeightForSize (TextSize::large) <= 730);
     REQUIRE (minWindowHeightForSize (TextSize::extraLarge) > 730);

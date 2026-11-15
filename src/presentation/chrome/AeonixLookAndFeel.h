@@ -11,12 +11,12 @@ namespace aeonix
 {
 
 // ============================================================================
-//  AeonixLookAndFeel — estilo visual de la aplicacion.
+//  AeonixLookAndFeel - visual style of the application.
 //
-//  Cuatro temas: Holo Accents, Holo Glass, Holo Minimal y Prototipo.
-//  El color de acento por seccion se sigue leyendo de
-//  Slider::rotarySliderFillColourId en Prototipo; los temas Holo usan el
-//  degradado teal -> azul -> violeta -> ambar.
+//  Four themes: Holo Accents, Holo Glass, Holo Minimal and Prototipo.
+//  The accent colour per section is still read from
+//  Slider::rotarySliderFillColourId in Prototipo; the Holo themes use the
+//  teal -> blue -> violet -> amber gradient.
 // ============================================================================
 class AeonixLookAndFeel : public juce::LookAndFeel_V4
 {
@@ -48,8 +48,6 @@ public:
 
         setColour (juce::PopupMenu::backgroundColourId, c.panel);
         setColour (juce::PopupMenu::textColourId, c.text);
-        setColour (juce::PopupMenu::highlightedBackgroundColourId, c.panelBorder.brighter (0.15f));
-        setColour (juce::PopupMenu::highlightedTextColourId, juce::Colours::white);
 
         setColour (juce::Label::textColourId, c.text);
 
@@ -113,10 +111,10 @@ public:
                 const int steps = juce::jlimit (8, 64,
                     juce::roundToInt ((angle - rotaryStartAngle) / 0.06f) + 1);
 
-                // Los angulos de Path::addCentredArc se miden en sentido
-                // horario desde las 12 en punto (0 = arriba), igual que
-                // Point::getPointOnCircumference. Hay que usar esa misma
-                // convencion o el relleno queda girado 90 grados.
+                // Path::addCentredArc angles are measured clockwise from
+                // 12 o'clock (0 = up), same as
+                // Point::getPointOnCircumference. That same convention must
+                // be used or the fill ends up rotated 90 degrees.
                 auto pointOnArc = [&] (float a)
                 {
                     return juce::Point<float> (centre.x + arcRadius * std::sin (a),
@@ -132,9 +130,9 @@ public:
                     const auto a0 = rotaryStartAngle + (angle - rotaryStartAngle) * t0;
                     const auto a1 = rotaryStartAngle + (angle - rotaryStartAngle) * t1;
 
-                    // Color segun la posicion dentro del recorrido COMPLETO:
-                    // asi el minimo es teal y el maximo ambar, y el puntero
-                    // siempre coincide con el color del final del relleno.
+                    // Colour based on the position within the FULL range:
+                    // so the minimum is teal and the maximum amber, and the
+                    // pointer always matches the fill end colour.
                     const auto globalT = (a0 - rotaryStartAngle) / fullRange;
                     const auto colour = holoColour (globalT);
 
@@ -185,8 +183,8 @@ public:
         juce::Path pointer;
         pointer.addRoundedRectangle (-1.5f, -innerRadius * 0.92f,
                                      3.0f, innerRadius * 0.55f, 1.0f);
-        // El rectangulo apunta hacia arriba (12 en punto) y "angle" tambien se
-        // mide desde arriba en sentido horario, asi que basta rotar por angle.
+        // The rectangle points up (12 o'clock) and "angle" is also measured
+        // from the top clockwise, so rotating by angle is enough.
         pointer.applyTransform (juce::AffineTransform::rotation (angle)
                                     .translated (centre.x, centre.y));
         g.setColour (pointerColour);
@@ -224,7 +222,7 @@ public:
         g.setColour (colours_.arcTrack.withAlpha (0.9f));
         g.fillRoundedRectangle (track, 3.0f);
 
-        // Marca central de Pitch (punto neutro).
+        // Centre mark for Pitch (neutral point).
         if (slider.getName() == "Pitch")
         {
             const auto midY = (trackTop + trackBottom) * 0.5f;
@@ -247,6 +245,147 @@ public:
 
         g.setColour (juce::Colours::white.withAlpha (0.18f));
         g.drawEllipse (centreX - 6.0f, thumbY - 6.0f, 12.0f, 12.0f, 1.0f);
+    }
+
+    // ------------------------------------------------------------------------
+    //  Popup menu (PopupMenu and ComboBox dropdowns).
+    //  One single language: panel, 1 px border, radius 4, 24 px rows and the
+    //  active option with accent tint and a drawn check.
+    // ------------------------------------------------------------------------
+    int getPopupMenuBorderSize() override { return ui::px (4); }
+
+    juce::Font getPopupMenuFont() override { return ui::font (12.0f); }
+
+    void drawPopupMenuBackground (juce::Graphics& g, int width, int height) override
+    {
+        // The menu window is opaque, so it is filled entirely and the rounded
+        // border is drawn inside. Over the manager panel the corners are not
+        // visible because they share the same colour.
+        g.fillAll (colours_.panel);
+
+        const auto bounds = juce::Rectangle<float> (0.0f, 0.0f,
+                                                    static_cast<float> (width),
+                                                    static_cast<float> (height)).reduced (0.5f);
+
+        g.setColour (colours_.panelBorder);
+        g.drawRoundedRectangle (bounds, static_cast<float> (ui::px (4)), 1.0f);
+    }
+
+    void drawPopupMenuItem (juce::Graphics& g,
+                            const juce::Rectangle<int>& area,
+                            bool isSeparator,
+                            bool isActive,
+                            bool isHighlighted,
+                            bool isTicked,
+                            bool hasSubMenu,
+                            const juce::String& text,
+                            const juce::String& shortcutKeyText,
+                            const juce::Drawable* icon,
+                            const juce::Colour* textColourToUse) override
+    {
+        if (isSeparator)
+        {
+            auto line = area.reduced (ui::px (8), 0);
+            g.setColour (colours_.panelBorder.withAlpha (0.55f));
+            g.fillRect (line.getX(), area.getCentreY(), line.getWidth(), 1);
+            return;
+        }
+
+        auto r = area.reduced (ui::px (4), ui::px (2));
+
+        if (isHighlighted && isActive)
+        {
+            g.setColour (colours_.accent.withAlpha (isTicked ? 0.14f : 0.08f));
+            g.fillRoundedRectangle (r.toFloat(), static_cast<float> (ui::px (4)));
+        }
+
+        auto colour = isTicked ? colours_.accent : colours_.text;
+
+        if (! isActive)
+            colour = colours_.muted.withAlpha (0.45f);
+
+        if (textColourToUse != nullptr)
+            colour = *textColourToUse;
+
+        auto gutter = r.removeFromLeft (ui::px (10));
+        r.removeFromLeft (ui::px (7));
+
+        if (icon != nullptr)
+        {
+            icon->drawWithin (g, gutter.toFloat(),
+                              juce::RectanglePlacement::centred
+                                  | juce::RectanglePlacement::onlyReduceInSize, 1.0f);
+        }
+        else if (isTicked)
+        {
+            juce::Path tick;
+            tick.startNewSubPath (0.0f, 0.45f);
+            tick.lineTo (0.38f, 0.82f);
+            tick.lineTo (1.0f, 0.12f);
+
+            const auto box = gutter.reduced (0, ui::px (1)).toFloat();
+            const auto transform = tick.getTransformToScaleToFit (box, true);
+
+            g.setColour (colour);
+            g.strokePath (tick,
+                          juce::PathStrokeType (1.6f,
+                                                juce::PathStrokeType::mitered,
+                                                juce::PathStrokeType::rounded),
+                          transform);
+        }
+
+        if (hasSubMenu)
+        {
+            auto arrow = r.removeFromRight (ui::px (12)).toFloat();
+            const auto cx = arrow.getCentreX();
+            const auto cy = arrow.getCentreY();
+            const auto w = static_cast<float> (ui::px (3));
+
+            juce::Path chevron;
+            chevron.startNewSubPath (cx - w, cy - w);
+            chevron.lineTo (cx, cy);
+            chevron.lineTo (cx - w, cy + w);
+
+            g.setColour (colour);
+            g.strokePath (chevron, juce::PathStrokeType (1.4f));
+        }
+
+        r.removeFromRight (ui::px (8));
+
+        g.setColour (colour);
+        g.setFont (getPopupMenuFont());
+        g.drawFittedText (text, r, juce::Justification::centredLeft, 1);
+
+        if (shortcutKeyText.isNotEmpty())
+        {
+            auto shortcut = r.removeFromRight (ui::px (60));
+            g.setColour (colour.withAlpha (0.7f));
+            g.drawFittedText (shortcutKeyText, shortcut,
+                              juce::Justification::centredRight, 1);
+        }
+    }
+
+    void getIdealPopupMenuItemSize (const juce::String& text,
+                                    bool isSeparator,
+                                    int standardMenuItemHeight,
+                                    int& idealWidth,
+                                    int& idealHeight) override
+    {
+        juce::LookAndFeel_V4::getIdealPopupMenuItemSize (text, isSeparator,
+                                                         standardMenuItemHeight,
+                                                         idealWidth, idealHeight);
+
+        if (isSeparator)
+        {
+            idealHeight = ui::px (9);
+            return;
+        }
+
+        idealHeight = standardMenuItemHeight > 0
+                          ? standardMenuItemHeight
+                          : juce::jmax (ui::px (22), idealHeight);
+
+        idealWidth += ui::px (8);
     }
 
     // ------------------------------------------------------------------------
@@ -316,7 +455,7 @@ public:
         return ui::font (12.0f);
     }
 
-    // Valores de los knobs: mas compactos para que quepan en celdas estrechas.
+    // Knob values: more compact so they fit in narrow cells.
     juce::Label* createSliderTextBox (juce::Slider& slider) override
     {
         auto* label = juce::LookAndFeel_V4::createSliderTextBox (slider);

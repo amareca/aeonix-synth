@@ -11,10 +11,10 @@ namespace aeonix
 {
 
 // ============================================================================
-//  SectionPanel — caja visual de una seccion del sintetizador.
+//  SectionPanel - visual box of a synthesizer section.
 //
-//  Pinta fondo, borde y titulo. En Prototipo usa el color de acento de la
-//  seccion; en los temas Holo usa el degradado y las lineas del tema.
+//  Paints background, border and title. In Prototipo it uses the accent colour
+//  of the section; in the Holo themes it uses the theme gradient and lines.
 // ============================================================================
 class SectionPanel : public juce::Component
 {
@@ -35,7 +35,7 @@ public:
         repaint();
     }
 
-    // Area util (debajo del titulo) en coordenadas locales del panel.
+    // Usable area (below the title) in the panel's local coordinates.
     [[nodiscard]] juce::Rectangle<int> getContentBounds() const
     {
         return getLocalBounds().withTrimmedTop (ui::sectionTitleHeight())
@@ -106,7 +106,7 @@ public:
         }
         else
         {
-            // Titulo con degradado Holo.
+            // Title with Holo gradient.
             const auto textArea = titleArea.withTrimmedLeft (4);
             const auto baseline = static_cast<float> (textArea.getCentreY())
                                 + (titleFont.getAscent() - titleFont.getDescent()) * 0.5f;

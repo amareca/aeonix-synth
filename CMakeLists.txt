@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.24)
 
 project(Aeonix
-    VERSION 0.1.0
+    VERSION 0.2.0
     DESCRIPTION "AEONIX - sintetizador sustractivo cinematografico (standalone)"
     LANGUAGES C CXX)
 
@@ -12,14 +12,14 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 option(AEONIX_BUILD_TESTS "Compila y registra los unit tests del nucleo" ON)
 option(AEONIX_DEV_TOOLS "Compila las herramientas de desarrollo (F11/F12, snapshots y badge DEV)" OFF)
 
-# Runtime estatico de MSVC (/MT): el binario no depende del redistribuible
-# Visual C++. Debe fijarse antes de crear cualquier target, JUCE incluido.
+# MSVC static runtime (/MT): the binary does not depend on the Visual C++
+# redistributable. It must be set before creating any target, JUCE included.
 if(MSVC)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
 
 # ==============================================================================
-#  NUCLEO PURO (dominio) — C++ sin JUCE, sin I/O, sin GUI.
+#  PURE CORE (domain) - C++ without JUCE, without I/O, without GUI.
 # ==============================================================================
 add_library(aeonix_core STATIC
     src/domain/Parameter.h
@@ -47,12 +47,12 @@ target_include_directories(aeonix_core PUBLIC src)
 target_compile_features(aeonix_core PUBLIC cxx_std_20)
 
 # ==============================================================================
-#  JUCE (submodulo fijado en external/JUCE, tag 8.0.15)
+#  JUCE (submodule pinned at external/JUCE, tag 8.0.15)
 # ==============================================================================
 add_subdirectory(external/JUCE)
 
 # ==============================================================================
-#  Aplicacion standalone: ventana + audio + MIDI
+#  Standalone application: window + audio + MIDI
 # ==============================================================================
 if(AEONIX_DEV_TOOLS)
     set(AEONIX_PRODUCT_NAME "AEONIX-dev")
@@ -64,7 +64,7 @@ juce_add_gui_app(Aeonix
     PRODUCT_NAME "${AEONIX_PRODUCT_NAME}"
     COMPANY_NAME "Aeonix"
     COMPANY_COPYRIGHT "Copyright (C) 2026 AEONIX contributors"
-    VERSION     "0.1.0"
+    VERSION     "0.2.0"
     ICON_BIG    "${CMAKE_CURRENT_SOURCE_DIR}/assets/icon.png"
     NEEDS_WEB_BROWSER FALSE
     NEEDS_CURL FALSE
@@ -137,7 +137,7 @@ target_compile_definitions(Aeonix PRIVATE
     JUCE_USE_CURL=0
 )
 
-# Los literales de la interfaz estan en UTF-8 (tildes, signos invertidos, etc.).
+# Interface literals are UTF-8 (accents, inverted punctuation, etc.).
 target_compile_options(Aeonix PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/utf-8>)
 
 target_link_libraries(Aeonix PRIVATE

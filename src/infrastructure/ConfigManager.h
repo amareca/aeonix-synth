@@ -8,13 +8,13 @@ namespace aeonix
 {
 
 // ============================================================================
-//  ConfigManager — persistencia de ajustes de la aplicacion (infraestructura).
+//  ConfigManager - application settings persistence (infrastructure).
 //
-//  Guarda un JSON pequeno en %APPDATA%\Aeonix\config.json con lo que debe
-//  recordarse entre sesiones: dispositivo MIDI, estado de audio, octava del
-//  teclado del ordenador, ultimo preset y geometria de la ventana.
+//  Stores a small JSON in %APPDATA%\Aeonix\config.json with what must be
+//  remembered between sessions: MIDI device, audio state, computer keyboard
+//  octave, last preset and window geometry.
 //
-//  Se usa solo desde el hilo de mensajes (nunca desde el hilo de audio).
+//  Used only from the message thread (never from the audio thread).
 // ============================================================================
 class ConfigManager
 {
@@ -25,8 +25,8 @@ public:
         load();
     }
 
-    // Instancia unica compartida por toda la app: evita que dos objetos con
-    // snapshots distintos se sobrescriban al guardar.
+    // Single instance shared by the whole app: prevents two objects with
+    // different snapshots from overwriting each other on save.
     static ConfigManager& getInstance()
     {
         static ConfigManager instance;
@@ -63,7 +63,7 @@ public:
         set (key, value);
     }
 
-    // Guarda el JSON en disco (crea el directorio si hace falta).
+    // Saves the JSON to disk (creates the directory if needed).
     void save() const
     {
         file_.getParentDirectory().createDirectory();

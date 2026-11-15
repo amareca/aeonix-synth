@@ -16,18 +16,18 @@ namespace aeonix
 {
 
 // ============================================================================
-//  TitleBar — chrome propio de la ventana.
+//  TitleBar - window chrome of our own.
 //
-//  Sustituye a la barra nativa del sistema (que desaparece con
-//  setUsingNativeTitleBar(false)) para que la app se vea igual en Windows,
-//  macOS y Linux. Contiene:
+//  Replaces the native system bar (which disappears with
+//  setUsingNativeTitleBar(false)) so the app looks the same on Windows,
+//  macOS and Linux. Contains:
 //
-//    [Holo Delta + AEONIX]  ···  [Ajustes] [MIDI] | [Min] [Max] [Cerrar]
+//    [Holo Delta + AEONIX]  ...  [Ajustes] [MIDI] | [Min] [Max] [Cerrar]
 //
-//  - La zona central arrastra la ventana y el doble clic maximiza/restaura.
-//  - Los iconos de aplicacion van agrupados antes de un divisor para no
-//    mezclarlos con los controles de ventana (y que el cierre nunca quede
-//    pegado a una accion).
+//  - The central area drags the window and a double click maximises/restores.
+//  - The app icons are grouped before a divider so they are not mixed
+//    with the window controls (and the close button never ends up
+//    glued to an action).
 // ============================================================================
 class TitleBar final : public juce::Component
 {
@@ -76,15 +76,15 @@ public:
         repaint();
     }
 
-    // ---- acciones de la barra ----
+    // ---- bar actions ----
     std::function<void()> onSettings;
     std::function<void()> onMidi;
     std::function<void()> onMinimise;
     std::function<void()> onToggleMaximise;
     std::function<void()> onClose;
 
-    // (proporcionX, posicionEnPantalla): la ventana esta maximizada y hay que
-    // restaurarla antes de empezar a arrastrar.
+    // (proportionX, screenPosition): the window is maximised and must be
+    // restored before dragging starts.
     std::function<void (float, juce::Point<int>)> onRestoreForDrag;
 
     void paint (juce::Graphics& g) override
@@ -168,8 +168,8 @@ public:
         pendingRestore_ = maximised_;
         pendingProportion_ = static_cast<float> (e.x) / static_cast<float> (juce::jmax (1, getWidth()));
 
-        // Ojo: e.getScreenPosition() deja de ser fiable en cuanto movemos la
-        // ventana durante el arrastre. Usamos siempre el raton actual.
+        // Careful: e.getScreenPosition() stops being reliable as soon as we
+        // move the window while dragging. We always use the current mouse.
         dragStartScreen_ = currentMouseScreen();
         dragStartWindow_ = getTopLevelComponent()->getBounds();
         dragging_ = true;
@@ -192,8 +192,8 @@ public:
             if (onRestoreForDrag)
                 onRestoreForDrag (pendingProportion_, mouseScreen);
 
-            // La ventana acaba de cambiar de tamano y posicion: reanclamos el
-            // arrastre al punto actual para que no salte.
+            // The window just changed size and position: we re-anchor the
+            // drag to the current point so it does not jump.
             dragStartScreen_ = mouseScreen;
             dragStartWindow_ = window->getBounds();
             return;

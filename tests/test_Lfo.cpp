@@ -16,7 +16,7 @@ TEST_CASE ("LFO output follows a sine scaled by depth", "[lfo]")
     lfo.setDepth (0.5f);
     lfo.reset();
 
-    // sr/4 => ciclo en 4 muestras: 0, +0.5, 0, -0.5
+    // sr/4 => cycle in 4 samples: 0, +0.5, 0, -0.5
     REQUIRE (lfo.nextSample() == Catch::Approx (0.0f).margin (1e-4f));
     REQUIRE (lfo.nextSample() == Catch::Approx (0.5f).margin (1e-4f));
     REQUIRE (lfo.nextSample() == Catch::Approx (0.0f).margin (1e-4f));

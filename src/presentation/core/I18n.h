@@ -10,19 +10,19 @@ namespace aeonix
 {
 
 // ============================================================================
-//  I18n — catalogo de textos de la interfaz (espanol / ingles).
+//  I18n - catalogue of interface texts (Spanish / English).
 //
-//  TextId enumera todas las cadenas visibles; la tabla vive en I18n.cpp y se
-//  genera desde StringCatalog.inc, de modo que una traduccion olvidada no
-//  compila. tr() devuelve el texto del idioma activo y trf() sustituye los
-//  marcadores {0}, {1}...
+//  TextId enumerates every visible string; the table lives in I18n.cpp and is
+//  generated from StringCatalog.inc, so a forgotten translation does not
+//  compile. tr() returns the text for the active language and trf() replaces
+//  the {0}, {1}... placeholders.
 //
-//  El idioma se fija al arrancar (Main.cpp) y se cambia en Ajustes; el cambio
-//  se aplica al reiniciar, asi que no hay retraduccion en caliente.
+//  The language is fixed at startup (Main.cpp) and changed in Ajustes; the
+//  change is applied on restart, so there is no hot retranslation.
 // ============================================================================
 enum class TextId : int
 {
-#define AEONIX_TEXT(id, es, en) id,
+#define AEONIX_TEXT(id, en, es) id,
 #include "presentation/core/StringCatalog.inc"
 #undef AEONIX_TEXT
 
@@ -35,9 +35,9 @@ juce::String trf (TextId id, std::initializer_list<juce::String> args);
 void setLanguage (Language language);
 Language getLanguage();
 
-// Instala (o retira) las traducciones de las cadenas que pone JUCE en la
-// pestana de audio (AudioDeviceSelectorComponent). Es independiente del
-// catalogo propio: JUCE traduce por texto en ingles.
+// Installs (or removes) the translations for the strings JUCE puts in the
+// audio tab (AudioDeviceSelectorComponent). It is independent from our own
+// catalogue: JUCE translates by English text.
 void installJuceLocalisation (Language language);
 
 } // namespace aeonix

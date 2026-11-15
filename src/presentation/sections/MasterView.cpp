@@ -48,7 +48,7 @@ MasterView::MasterView (SynthViewModel& viewModel)
     };
     addAndMakeVisible (octave_);
 
-    polyphony_.setSelectedIndex (1, juce::dontSendNotification);   // 16 por defecto
+    polyphony_.setSelectedIndex (1, juce::dontSendNotification);   // 16 by default
     polyphony_.onChange = [this] (int index)
     {
         const int voices = index == 0 ? 8 : (index == 1 ? 16 : 32);

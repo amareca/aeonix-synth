@@ -10,15 +10,15 @@ namespace aeonix
 {
 
 // ============================================================================
-//  Observable — propiedad observable (nuestro "LiveData" de Android).
+//  Observable - observable property (our Android-style "LiveData").
 //
-//  Guarda un valor y notifica a los observadores suscritos cuando cambia.
-//  Los ViewModels exponen estas propiedades; las Views se suscriben para
-//  redibujar/actualizar sus controles.
+//  Stores a value and notifies subscribed observers when it changes.
+//  ViewModels expose these properties; Views subscribe to
+//  repaint/update their controls.
 //
-//  La suscripcion devuelve un Subscription RAII: al destruirse se da de baja
-//  del Observable. Es importante que el Subscription se destruya ANTES que el
-//  Observable (declarar el Observable antes que la View que se suscribe).
+//  Subscribing returns an RAII Subscription: on destruction it unsubscribes
+//  from the Observable. The Subscription must be destroyed BEFORE the
+//  Observable (declare the Observable before the View that subscribes).
 // ============================================================================
 template <typename T>
 class Observable
@@ -83,7 +83,7 @@ public:
 
     [[nodiscard]] const T& get() const noexcept { return value_; }
 
-    // Establece el valor y notifica a los observadores (solo si cambio).
+    // Sets the value and notifies the observers (only if it changed).
     void set (T value)
     {
         if (value == value_)
@@ -93,7 +93,7 @@ public:
         notify();
     }
 
-    // Suscribe un observador y devuelve un token RAII para cancelarlo.
+    // Subscribes an observer and returns an RAII token to cancel it.
     [[nodiscard]] Subscription subscribe (std::function<void (const T&)> listener)
     {
         const auto id = nextId_++;
@@ -126,8 +126,8 @@ private:
 
     void notify()
     {
-        // Copia defensiva: un listener puede darse de baja (o destruir una
-        // View) durante la notificacion.
+        // Defensive copy: a listener may unsubscribe (or destroy a
+        // View) during the notification.
         const auto snapshot = listeners_;
 
         for (const auto& entry : snapshot)

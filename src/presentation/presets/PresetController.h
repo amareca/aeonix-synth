@@ -13,11 +13,11 @@ namespace aeonix
 {
 
 // ============================================================================
-//  PresetController — reglas de interaccion del navegador de presets.
+//  PresetController - interaction rules for the preset browser.
 //
-//  Conecta PresetBar con PresetCatalog/PatchBinder y gestiona los dialogos
-//  asincronos (sobrescribir, borrar, renombrar). La vista no conoce el
-//  repositorio y el controlador no conoce el motor.
+//  Connects PresetBar with PresetCatalog/PatchBinder and manages the
+//  asynchronous dialogs (overwrite, delete, rename). The view knows nothing
+//  about the repository and the controller knows nothing about the engine.
 // ============================================================================
 class PresetController
 {
@@ -27,6 +27,7 @@ public:
                       PatchBinder& binder,
                       juce::Component& dialogParent,
                       std::function<void (const juce::String&)> onPresetLoaded,
+                      std::function<void (const juce::String&)> onPresetPreviewed,
                       std::function<bool()> isDirty,
                       std::function<void (const juce::String&)> notify);
     ~PresetController();
@@ -34,25 +35,26 @@ public:
     PresetController (const PresetController&) = delete;
     PresetController& operator= (const PresetController&) = delete;
 
-    // Reconstruye la lista (fabrica + usuario) y conserva/forza la seleccion.
+    // Rebuilds the list (factory + user) and keeps/forces the selection.
     void refresh (const juce::String& selectName = {});
 
-    // Selecciona y carga un preset por nombre (al restaurar la config).
+    // Selects and loads a preset by name (when restoring the config).
     void selectByName (const juce::String& name, bool countAsRecent = true);
 
-    // Carga pedida por el gestor: respeta la guardia de cambios.
-    void requestLoadByName (const juce::String& name);
+    // Load requested by the manager. With countAsRecent=false it is an audition:
+    // it does not mark "Recientes" nor save the last preset.
+    void requestLoadByName (const juce::String& name, bool countAsRecent = true);
 
-    // Acciones del gestor de presets (sin formularios propios).
+    // Preset manager actions (without their own forms).
     bool saveCurrentPreset();
     bool savePresetCopy (const juce::String& name, PresetCategory category);
     bool renamePreset (const juce::String& oldName, const juce::String& newName);
     bool deletePreset (const juce::String& name);
 
-    // Tema para los dialogos (se sincroniza desde SynthPanel).
+    // Theme for the dialogs (synchronised from SynthPanel).
     void setTheme (ThemeId theme) { theme_ = theme; }
 
-    // Guardar copia desde la guardia de cambios de un preset de fabrica.
+    // Save copy from the guard for changes of a factory preset.
     std::function<void()> onRequestSaveCopy;
 
 private:
@@ -68,7 +70,7 @@ private:
                      std::vector<ThemedDialogButton> buttons,
                      std::function<void (int)> onResult);
 
-    // Aviso breve al usuario (un Toast en MainComponent).
+    // Brief notice to the user (a Toast in MainComponent).
     void notify (const juce::String& message);
 
     PresetBar& bar_;
@@ -76,6 +78,7 @@ private:
     PatchBinder& binder_;
     juce::Component& dialogParent_;
     std::function<void (const juce::String&)> onPresetLoaded_;
+    std::function<void (const juce::String&)> onPresetPreviewed_;
     std::function<bool()> isDirty_;
     std::function<void (const juce::String&)> notify_;
     juce::String loadedName_;

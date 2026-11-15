@@ -11,21 +11,21 @@ TEST_CASE ("Delay echoes an impulse (dry + delayed copy)", "[delay]")
 {
     Delay delay;
     delay.prepare (44100.0, 2.0);
-    delay.setTime (0.001);      // ~44 muestras
+    delay.setTime (0.001);      // ~44 samples
     delay.setFeedback (0.0f);
     delay.setMix (0.5f);
     delay.reset();
 
     const int n = 100;
     std::vector<float> left (n, 0.0f), right (n, 0.0f);
-    left[0] = 1.0f;             // impulso
+    left[0] = 1.0f;             // impulse
 
     delay.process (left.data(), right.data(), n);
 
-    // Muestra 0: senal seca = 1.0 * (1 - 0.5) = 0.5.
+    // Sample 0: dry signal = 1.0 * (1 - 0.5) = 0.5.
     REQUIRE (left[0] == Catch::Approx (0.5f));
 
-    // Debe aparecer una copia retardada (eco) mas adelante.
+    // A delayed copy (echo) must appear later.
     bool foundEcho = false;
     for (int i = 1; i < n; ++i)
         if (left[i] > 0.3f) { foundEcho = true; break; }
