@@ -28,7 +28,7 @@ public:
     {
         return aeonix::build::devTools ? "AEONIX-dev" : "AEONIX";
     }
-    const juce::String getApplicationVersion() override { return "0.1.0"; }
+    const juce::String getApplicationVersion() override { return "0.2.0"; }
 
     // One instance per flavour: PRO and DEV can coexist because they use
     // different instance names and data folders.

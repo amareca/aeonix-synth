@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.24)
 
 project(Aeonix
-    VERSION 0.1.0
+    VERSION 0.2.0
     DESCRIPTION "AEONIX - sintetizador sustractivo cinematografico (standalone)"
     LANGUAGES C CXX)
 
@@ -64,7 +64,7 @@ juce_add_gui_app(Aeonix
     PRODUCT_NAME "${AEONIX_PRODUCT_NAME}"
     COMPANY_NAME "Aeonix"
     COMPANY_COPYRIGHT "Copyright (C) 2026 AEONIX contributors"
-    VERSION     "0.1.0"
+    VERSION     "0.2.0"
     ICON_BIG    "${CMAKE_CURRENT_SOURCE_DIR}/assets/icon.png"
     NEEDS_WEB_BROWSER FALSE
     NEEDS_CURL FALSE

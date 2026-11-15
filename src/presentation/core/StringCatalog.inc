@@ -78,7 +78,7 @@ AEONIX_TEXT (settingsTextSizeLabel,       "Text size",                       "Ta
 AEONIX_TEXT (settingsTextSizeTooltip,     "Interface text size. Applies after restart.",                  "Tamaño de los textos de la interfaz. Se aplica al reiniciar.")
 AEONIX_TEXT (settingsTextSizeHint,        "The text size will apply after restart.", "El tamaño se aplicará al reiniciar.")
 AEONIX_TEXT (settingsEsc,                 "Esc to close",                    "Esc para cerrar")
-AEONIX_TEXT (settingsVersion,             "AEONIX 0.1.0  |  Holo Delta",     "AEONIX 0.1.0  |  Holo Delta")
+AEONIX_TEXT (settingsVersion,             "AEONIX 0.2.0  |  Holo Delta",     "AEONIX 0.2.0  |  Holo Delta")
 
 // ---- preset browser ----
 AEONIX_TEXT (presetBarTitle,              "Preset browser",                  "Navegador de presets")

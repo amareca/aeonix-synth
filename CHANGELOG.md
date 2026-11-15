@@ -5,12 +5,7 @@ All notable changes to AEONIX are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [0.2.0] - Unreleased
-
-> [!IMPORTANT]
-> This section is in preparation. The project version in the source tree is
-> still **0.1.0**; `CMakeLists.txt`, `src/Main.cpp`, the README and the website
-> are updated only when 0.2.0 is released.
+## [0.2.0] - 2026-11-15
 
 ### Added
 
@@ -126,5 +121,5 @@ First public release.
 - AGPL-3.0.
 - Unsigned executable with SHA-256 checksums and a SmartScreen warning.
 
-[0.2.0]: https://github.com/amareca/aeonix-synth/compare/v0.1.0...HEAD
+[0.2.0]: https://github.com/amareca/aeonix-synth/releases/tag/v0.2.0
 [0.1.0]: https://github.com/amareca/aeonix-synth/releases/tag/v0.1.0
