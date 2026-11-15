@@ -2015,15 +2015,19 @@ void PresetManagerOverlay::resized()
     p.removeFromLeft (ui::px (20));
     p.removeFromRight (ui::px (20));
 
+    // One height for every control in the header: three different boxes read as
+    // a misaligned row even when their centres match. The header stays 44.
+    const int headerControlH = ui::px (26);
+
     auto header = p.removeFromTop (ui::px (44));
     closeButton_.setBounds (header.removeFromRight (ui::px (28))
-                                  .withSizeKeepingCentre (ui::px (28), ui::px (24)));
+                                  .withSizeKeepingCentre (ui::px (28), headerControlH));
     header.removeFromRight (ui::px (10));
     sortButton_.setBounds (header.removeFromRight (ui::px (120))
-                               .withSizeKeepingCentre (ui::px (120), ui::px (22)));
+                               .withSizeKeepingCentre (ui::px (120), headerControlH));
     header.removeFromRight (ui::px (8));
     searchEditor_.setBounds (header.removeFromRight (ui::px (320))
-                                   .withSizeKeepingCentre (ui::px (320), ui::px (26)));
+                                   .withSizeKeepingCentre (ui::px (320), headerControlH));
     header.removeFromRight (ui::px (12));
     titleLabel_.setBounds (header);
 
@@ -2087,8 +2091,10 @@ void PresetManagerOverlay::resized()
     auto side = sidebarBounds_.reduced (ui::px (8), ui::px (8));
 
     auto newRow = side.removeFromTop (ui::px (30));
-    openFolderButton_.setBounds (newRow.removeFromRight (ui::px (26))
-                                     .withSizeKeepingCentre (ui::px (26), ui::px (26)));
+    // Same height as the button next to it: a 26 px icon inside a 30 px row
+    // left 2 px of air top and bottom and read as a loose floating icon.
+    openFolderButton_.setBounds (newRow.removeFromRight (ui::px (30))
+                                     .withSizeKeepingCentre (ui::px (30), ui::px (30)));
     newRow.removeFromRight (ui::px (6));
     newButton_.setBounds (newRow);
     side.removeFromTop (ui::px (compactSidebar ? 6 : 8));

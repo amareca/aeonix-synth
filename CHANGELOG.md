@@ -47,7 +47,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   catalogue lists the English column first, and the Spanish column stays as the
   second argument for the product strings.
 - The preset manager header now holds the title, search, sort and close in one
-  44 px row; the counter keeps a small band of its own.
+  44 px row; the counter keeps a small band of its own. The three controls share
+  a 26 px height so their boxes line up, and the sidebar folder button is 30×30
+  to match the `+ New preset` button beside it.
 - The footer is 52 px and absorbs the bottom padding: `Esc` and the audition
   toggle are centred between its top rule and the overlay border.
 - The body grew from 476 to 484 px, so normal and large text show a full extra
